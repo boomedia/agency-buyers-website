@@ -11,8 +11,14 @@ import { Media } from './collections/Media'
 import { Pages } from './collections/Pages'
 import { Posts } from './collections/Posts'
 import { Users } from './collections/Users'
+import { Properties } from './collections/Properties'
+import { Regions } from './collections/Regions'
+import { Suburbs } from './collections/Suburbs'
+import { AccessToken } from './collections/AccessToken'
+import { BuyersAccess } from './collections/BuyersAccess'
 import { Footer } from './Footer/config'
 import { Header } from './Header/config'
+import { CompanySettings } from './globals/CompanySettings'
 import { plugins } from './plugins'
 import { defaultLexical } from '@/fields/defaultLexical'
 import { getServerSideURL } from './utilities/getURL'
@@ -34,6 +40,22 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
     user: Users.slug,
+    // Add groups for better organization in the admin UI
+    // @ts-expect-error unreleased config
+    groups: [
+      {
+        name: 'Content',
+        label: 'Content',
+      },
+      {
+        name: 'Real Estate',
+        label: 'Real Estate',
+      },
+      {
+        name: 'Admin',
+        label: 'Admin',
+      },
+    ],
     livePreview: {
       breakpoints: [
         {
@@ -64,9 +86,9 @@ export default buildConfig({
       connectionString: process.env.POSTGRES_URL || '',
     },
   }),
-  collections: [Pages, Posts, Media, Categories, Users],
+  collections: [Pages, Posts, Media, Categories, Users, Properties, Regions, Suburbs, AccessToken, BuyersAccess],
   cors: [getServerSideURL()].filter(Boolean),
-  globals: [Header, Footer],
+  globals: [Header, Footer, CompanySettings],
   plugins: [
     ...plugins,
     vercelBlobStorage({

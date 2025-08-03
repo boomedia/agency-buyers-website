@@ -64,6 +64,8 @@ export type SupportedTimezones =
 export interface Config {
   auth: {
     users: UserAuthOperations;
+    'access-token': AccessTokenAuthOperations;
+    'buyers-access': BuyersAccessAuthOperations;
   };
   blocks: {};
   collections: {
@@ -72,6 +74,11 @@ export interface Config {
     media: Media;
     categories: Category;
     users: User;
+    properties: Property;
+    regions: Region;
+    suburbs: Suburb;
+    'access-token': AccessToken;
+    'buyers-access': BuyersAccess;
     redirects: Redirect;
     forms: Form;
     'form-submissions': FormSubmission;
@@ -88,6 +95,11 @@ export interface Config {
     media: MediaSelect<false> | MediaSelect<true>;
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
+    properties: PropertiesSelect<false> | PropertiesSelect<true>;
+    regions: RegionsSelect<false> | RegionsSelect<true>;
+    suburbs: SuburbsSelect<false> | SuburbsSelect<true>;
+    'access-token': AccessTokenSelect<false> | AccessTokenSelect<true>;
+    'buyers-access': BuyersAccessSelect<false> | BuyersAccessSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
     forms: FormsSelect<false> | FormsSelect<true>;
     'form-submissions': FormSubmissionsSelect<false> | FormSubmissionsSelect<true>;
@@ -103,15 +115,24 @@ export interface Config {
   globals: {
     header: Header;
     footer: Footer;
+    'company-settings': CompanySetting;
   };
   globalsSelect: {
     header: HeaderSelect<false> | HeaderSelect<true>;
     footer: FooterSelect<false> | FooterSelect<true>;
+    'company-settings': CompanySettingsSelect<false> | CompanySettingsSelect<true>;
   };
   locale: null;
-  user: User & {
-    collection: 'users';
-  };
+  user:
+    | (User & {
+        collection: 'users';
+      })
+    | (AccessToken & {
+        collection: 'access-token';
+      })
+    | (BuyersAccess & {
+        collection: 'buyers-access';
+      });
   jobs: {
     tasks: {
       schedulePublish: TaskSchedulePublish;
@@ -124,6 +145,42 @@ export interface Config {
   };
 }
 export interface UserAuthOperations {
+  forgotPassword: {
+    email: string;
+    password: string;
+  };
+  login: {
+    email: string;
+    password: string;
+  };
+  registerFirstUser: {
+    email: string;
+    password: string;
+  };
+  unlock: {
+    email: string;
+    password: string;
+  };
+}
+export interface AccessTokenAuthOperations {
+  forgotPassword: {
+    email: string;
+    password: string;
+  };
+  login: {
+    email: string;
+    password: string;
+  };
+  registerFirstUser: {
+    email: string;
+    password: string;
+  };
+  unlock: {
+    email: string;
+    password: string;
+  };
+}
+export interface BuyersAccessAuthOperations {
   forgotPassword: {
     email: string;
     password: string;
@@ -736,6 +793,534 @@ export interface Form {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "properties".
+ */
+export interface Property {
+  id: number;
+  name: string;
+  /**
+   * Buyers who have this property in their portfolio. You can remove buyers from this list.
+   */
+  linkedBuyers?: (number | BuyersAccess)[] | null;
+  generalInformation?: {
+    heroImage?: (number | null) | Media;
+    agentNotes?:
+      | {
+          /**
+           * Auto-filled with current logged-in user name
+           */
+          agentName?: string | null;
+          /**
+           * Notes about the agent
+           */
+          agentNote?: {
+            root: {
+              type: string;
+              children: {
+                type: string;
+                version: number;
+                [k: string]: unknown;
+              }[];
+              direction: ('ltr' | 'rtl') | null;
+              format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+              indent: number;
+              version: number;
+            };
+            [k: string]: unknown;
+          } | null;
+          id?: string | null;
+        }[]
+      | null;
+    agentSummary?: {
+      root: {
+        type: string;
+        children: {
+          type: string;
+          version: number;
+          [k: string]: unknown;
+        }[];
+        direction: ('ltr' | 'rtl') | null;
+        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+        indent: number;
+        version: number;
+      };
+      [k: string]: unknown;
+    } | null;
+    /**
+     * Loom video URL
+     */
+    videoUrl?: string | null;
+    /**
+     * The target or recommended in AUD Currency
+     */
+    purchasePrice?: number | null;
+    /**
+     * AUD Currency
+     */
+    askingPrice?: number | null;
+    address?: {
+      streetAddress?: string | null;
+      /**
+       * Suburb Name
+       */
+      suburbName?: (number | null) | Suburb;
+      /**
+       * Region (automatically populated from selected suburb)
+       */
+      region?: (number | null) | Region;
+      postcode?: string | null;
+      state?: ('nsw' | 'vic' | 'qld' | 'wa' | 'sa' | 'tas' | 'act' | 'nt') | null;
+    };
+    saleHistory?:
+      | {
+          year?: number | null;
+          /**
+           * Median Value in AUD Currency
+           */
+          value?: number | null;
+          id?: string | null;
+        }[]
+      | null;
+    format?: {
+      bedrooms?: number | null;
+      bathrooms?: number | null;
+      carSpaces?: number | null;
+    };
+    /**
+     * m² (square meters)
+     */
+    internal?: number | null;
+    /**
+     * m² (square meters)
+     */
+    land?: number | null;
+    buildYear?: number | null;
+    /**
+     * Image gallery NOT CURRENTLY LIVE
+     */
+    images?:
+      | {
+          image: number | Media;
+          id?: string | null;
+        }[]
+      | null;
+    /**
+     * Comparable sales
+     */
+    comparableSales?:
+      | {
+          address?: string | null;
+          /**
+           * AUD Currency
+           */
+          salePrice?: number | null;
+          /**
+           * How this comparable sale compares to the current property
+           */
+          comparison?: ('superior' | 'similar' | 'inferior') | null;
+          /**
+           * Link to the property external website
+           */
+          link?: string | null;
+          /**
+           * Image
+           */
+          heroImage?: (number | null) | Media;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  dueDiligence?: {
+    /**
+     * Warning: Adding empty zone entries can cause formatting issues. Please ensure all fields are completed before saving.
+     */
+    zoneData?:
+      | {
+          type?:
+            | (
+                | 'easement'
+                | 'flood'
+                | 'bushfire'
+                | 'transmission'
+                | 'publicHousing'
+                | 'trainLine'
+                | 'renovations'
+                | 'other'
+              )
+            | null;
+          effected?: ('yes' | 'no' | 'partial') | null;
+          /**
+           * More detailed information about the zone data for the buyer
+           */
+          details?: {
+            root: {
+              type: string;
+              children: {
+                type: string;
+                version: number;
+                [k: string]: unknown;
+              }[];
+              direction: ('ltr' | 'rtl') | null;
+              format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+              indent: number;
+              version: number;
+            };
+            [k: string]: unknown;
+          } | null;
+          /**
+           * These notes are for the agent to provide additional internal information, but not visible to buyers.
+           */
+          agentNotes?: {
+            root: {
+              type: string;
+              children: {
+                type: string;
+                version: number;
+                [k: string]: unknown;
+              }[];
+              direction: ('ltr' | 'rtl') | null;
+              format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+              indent: number;
+              version: number;
+            };
+            [k: string]: unknown;
+          } | null;
+          /**
+           * Web link to more information in new window
+           */
+          url?: string | null;
+          image?: (number | null) | Media;
+          id?: string | null;
+        }[]
+      | null;
+    propertyOccupancy?: ('vacant' | 'tenanted' | 'ownerOccupied') | null;
+    leaseExpiryDate?: string | null;
+    /**
+     * Last Rental Price Date the rent was Increased
+     */
+    lastRentalIncrease?: string | null;
+    /**
+     * Weekly AUD Currency
+     */
+    currentWeeklyRent?: number | null;
+  };
+  valueProposition?: {
+    purchaseCost?: {
+      /**
+       * Calculated value equals Purchase Price from General Information
+       */
+      purchasePriceDisplay?: string | null;
+      /**
+       * Years
+       */
+      loanTerm?: number | null;
+      /**
+       * Percentage
+       */
+      interestRate?: number | null;
+      /**
+       * AUD value
+       */
+      depositCash?: number | null;
+      /**
+       * AUD Currency
+       */
+      equityRelease?: number | null;
+      /**
+       * Percentage
+       */
+      equityReleaseInterestRate?: number | null;
+      /**
+       * Calc: Purchase Price - Deposit Cash - Equity Release
+       */
+      loanAmountDisplay?: string | null;
+      /**
+       * Calc: Deposit Cash + Equity Release
+       */
+      depositTotalDisplay?: string | null;
+      /**
+       * Calc: Deposit Total as percentage of Purchase Price
+       */
+      depositPercentageDisplay?: string | null;
+      /**
+       * AUD Currency
+       */
+      stampDuty?: number | null;
+      /**
+       * AUD Currency
+       */
+      renovationsCost?: number | null;
+      /**
+       * AUD Currency
+       */
+      buildingAndPest?: number | null;
+      /**
+       * This is also called solicitor AUD Currency
+       */
+      conveyancing?: number | null;
+      /**
+       * AUD Currency
+       */
+      bankFees?: number | null;
+      /**
+       * AUD Currency LMI
+       */
+      lendersMortgageInsurance?: number | null;
+      /**
+       * Calc: Purchase Price + Stamp Duty + Renovations Cost + Building and Pest + Conveyancing + Bank Fees + (Lenders Mortgage Insurance / Loan Term)
+       */
+      totalPurchaseCostDisplay?: string | null;
+    };
+    annualExpenses?: {
+      /**
+       * Annual AUD Currency
+       */
+      councilRates?: number | null;
+      /**
+       * Annual AUD Currency
+       */
+      insuranceCosts?: number | null;
+      /**
+       * Annual AUD Currency
+       */
+      utilities?: number | null;
+      /**
+       * Annual AUD Currency
+       */
+      repairsAndMaintenance?: number | null;
+      /**
+       * Percentage of weekly rent
+       */
+      pmPercentage?: number | null;
+      /**
+       * Calc: Property Management Percentage of Weekly Rent * 52
+       */
+      pmFeesDisplay?: string | null;
+      /**
+       * Calc: (Loan Amount - Equity Release × Interest Rate) + (Loan Amount - Deposit Cash × Equity Release Interest Rate) / Loan Term
+       */
+      loanRepaymentsDisp?: string | null;
+      /**
+       * Calc: Council Rates + Insurance Costs + Utilities + Property Management Fees + Repairs and Maintenance + (Lenders Mortgage Insurance / Loan Term) + Loan Repayments
+       */
+      totalExpensesDisp?: string | null;
+    };
+    expectedResults?: {
+      /**
+       * Expected Weekly rent as AUD Currency
+       */
+      expectedWeeklyRent?: number | null;
+      /**
+       * AUD Currency Depreciation potential
+       */
+      depreciationPotential?: number | null;
+      /**
+       * Calc: Expected Weekly rent X 52
+       */
+      annualGrossIncomeDisplay?: string | null;
+      /**
+       * Calc: Annual Gross income / Purchase Price X 100
+       */
+      annualGrossYieldDisplay?: string | null;
+      /**
+       * Calc: Gross - Expenses
+       */
+      annualNetIncomeDisplay?: string | null;
+      /**
+       * Calc: Annual Net Income / Purchase Price X 100
+       */
+      annualNetYieldDisplay?: string | null;
+      /**
+       * Calc: Purchase price X 0.08
+       */
+      equityAt8Display?: string | null;
+      /**
+       * Calc: Purchase price X 0.1
+       */
+      equityAt10Display?: string | null;
+      /**
+       * Calc: Purchase price X 0.12
+       */
+      equityAt12Display?: string | null;
+      /**
+       * Calc: Purchase price X 0.16
+       */
+      equityAt16Display?: string | null;
+    };
+  };
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "buyers-access".
+ */
+export interface BuyersAccess {
+  id: number;
+  name?: string | null;
+  /**
+   * Select properties that are part of this buyer's portfolio
+   */
+  properties?: (number | Property)[] | null;
+  updatedAt: string;
+  createdAt: string;
+  email: string;
+  resetPasswordToken?: string | null;
+  resetPasswordExpiration?: string | null;
+  salt?: string | null;
+  hash?: string | null;
+  loginAttempts?: number | null;
+  lockUntil?: string | null;
+  sessions?:
+    | {
+        id: string;
+        createdAt?: string | null;
+        expiresAt: string;
+      }[]
+    | null;
+  password?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "suburbs".
+ */
+export interface Suburb {
+  id: number;
+  name: string;
+  /**
+   * Suburbs are in Regions
+   */
+  region: number | Region;
+  /**
+   * Vacancy rate as a percentage (e.g., 0.7 for 0.7%)
+   */
+  vacancyRate?: number | null;
+  heroImage?: (number | null) | Media;
+  description?: {
+    root: {
+      type: string;
+      children: {
+        type: string;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  medianValueByYear?:
+    | {
+        year: number;
+        /**
+         * Median Value in AUD Currency
+         */
+        medianValue: number;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "regions".
+ */
+export interface Region {
+  id: number;
+  /**
+   * Region Name also called Local Government Area LGA
+   */
+  name: string;
+  heroImage?: (number | null) | Media;
+  description?: {
+    root: {
+      type: string;
+      children: {
+        type: string;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Video URL
+   */
+  video?: string | null;
+  communityEconomicLandscape?:
+    | {
+        title: string;
+        url?: string | null;
+        image?: (number | null) | Media;
+        icon?: (number | null) | Media;
+        description?: {
+          root: {
+            type: string;
+            children: {
+              type: string;
+              version: number;
+              [k: string]: unknown;
+            }[];
+            direction: ('ltr' | 'rtl') | null;
+            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+            indent: number;
+            version: number;
+          };
+          [k: string]: unknown;
+        } | null;
+        id?: string | null;
+      }[]
+    | null;
+  infrastructureFutureDevelopment?:
+    | {
+        title: string;
+        url?: string | null;
+        image?: (number | null) | Media;
+        icon?: (number | null) | Media;
+        description?: {
+          root: {
+            type: string;
+            children: {
+              type: string;
+              version: number;
+              [k: string]: unknown;
+            }[];
+            direction: ('ltr' | 'rtl') | null;
+            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+            indent: number;
+            version: number;
+          };
+          [k: string]: unknown;
+        } | null;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "access-token".
+ */
+export interface AccessToken {
+  id: number;
+  name: string;
+  updatedAt: string;
+  createdAt: string;
+  enableAPIKey?: boolean | null;
+  apiKey?: string | null;
+  apiKeyIndex?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "redirects".
  */
 export interface Redirect {
@@ -928,6 +1513,26 @@ export interface PayloadLockedDocument {
         value: number | User;
       } | null)
     | ({
+        relationTo: 'properties';
+        value: number | Property;
+      } | null)
+    | ({
+        relationTo: 'regions';
+        value: number | Region;
+      } | null)
+    | ({
+        relationTo: 'suburbs';
+        value: number | Suburb;
+      } | null)
+    | ({
+        relationTo: 'access-token';
+        value: number | AccessToken;
+      } | null)
+    | ({
+        relationTo: 'buyers-access';
+        value: number | BuyersAccess;
+      } | null)
+    | ({
         relationTo: 'redirects';
         value: number | Redirect;
       } | null)
@@ -948,10 +1553,19 @@ export interface PayloadLockedDocument {
         value: number | PayloadJob;
       } | null);
   globalSlug?: string | null;
-  user: {
-    relationTo: 'users';
-    value: number | User;
-  };
+  user:
+    | {
+        relationTo: 'users';
+        value: number | User;
+      }
+    | {
+        relationTo: 'access-token';
+        value: number | AccessToken;
+      }
+    | {
+        relationTo: 'buyers-access';
+        value: number | BuyersAccess;
+      };
   updatedAt: string;
   createdAt: string;
 }
@@ -961,10 +1575,19 @@ export interface PayloadLockedDocument {
  */
 export interface PayloadPreference {
   id: number;
-  user: {
-    relationTo: 'users';
-    value: number | User;
-  };
+  user:
+    | {
+        relationTo: 'users';
+        value: number | User;
+      }
+    | {
+        relationTo: 'access-token';
+        value: number | AccessToken;
+      }
+    | {
+        relationTo: 'buyers-access';
+        value: number | BuyersAccess;
+      };
   key?: string | null;
   value?:
     | {
@@ -1274,6 +1897,232 @@ export interface CategoriesSelect<T extends boolean = true> {
  */
 export interface UsersSelect<T extends boolean = true> {
   name?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  email?: T;
+  resetPasswordToken?: T;
+  resetPasswordExpiration?: T;
+  salt?: T;
+  hash?: T;
+  loginAttempts?: T;
+  lockUntil?: T;
+  sessions?:
+    | T
+    | {
+        id?: T;
+        createdAt?: T;
+        expiresAt?: T;
+      };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "properties_select".
+ */
+export interface PropertiesSelect<T extends boolean = true> {
+  name?: T;
+  linkedBuyers?: T;
+  generalInformation?:
+    | T
+    | {
+        heroImage?: T;
+        agentNotes?:
+          | T
+          | {
+              agentName?: T;
+              agentNote?: T;
+              id?: T;
+            };
+        agentSummary?: T;
+        videoUrl?: T;
+        purchasePrice?: T;
+        askingPrice?: T;
+        address?:
+          | T
+          | {
+              streetAddress?: T;
+              suburbName?: T;
+              region?: T;
+              postcode?: T;
+              state?: T;
+            };
+        saleHistory?:
+          | T
+          | {
+              year?: T;
+              value?: T;
+              id?: T;
+            };
+        format?:
+          | T
+          | {
+              bedrooms?: T;
+              bathrooms?: T;
+              carSpaces?: T;
+            };
+        internal?: T;
+        land?: T;
+        buildYear?: T;
+        images?:
+          | T
+          | {
+              image?: T;
+              id?: T;
+            };
+        comparableSales?:
+          | T
+          | {
+              address?: T;
+              salePrice?: T;
+              comparison?: T;
+              link?: T;
+              heroImage?: T;
+              id?: T;
+            };
+      };
+  dueDiligence?:
+    | T
+    | {
+        zoneData?:
+          | T
+          | {
+              type?: T;
+              effected?: T;
+              details?: T;
+              agentNotes?: T;
+              url?: T;
+              image?: T;
+              id?: T;
+            };
+        propertyOccupancy?: T;
+        leaseExpiryDate?: T;
+        lastRentalIncrease?: T;
+        currentWeeklyRent?: T;
+      };
+  valueProposition?:
+    | T
+    | {
+        purchaseCost?:
+          | T
+          | {
+              purchasePriceDisplay?: T;
+              loanTerm?: T;
+              interestRate?: T;
+              depositCash?: T;
+              equityRelease?: T;
+              equityReleaseInterestRate?: T;
+              loanAmountDisplay?: T;
+              depositTotalDisplay?: T;
+              depositPercentageDisplay?: T;
+              stampDuty?: T;
+              renovationsCost?: T;
+              buildingAndPest?: T;
+              conveyancing?: T;
+              bankFees?: T;
+              lendersMortgageInsurance?: T;
+              totalPurchaseCostDisplay?: T;
+            };
+        annualExpenses?:
+          | T
+          | {
+              councilRates?: T;
+              insuranceCosts?: T;
+              utilities?: T;
+              repairsAndMaintenance?: T;
+              pmPercentage?: T;
+              pmFeesDisplay?: T;
+              loanRepaymentsDisp?: T;
+              totalExpensesDisp?: T;
+            };
+        expectedResults?:
+          | T
+          | {
+              expectedWeeklyRent?: T;
+              depreciationPotential?: T;
+              annualGrossIncomeDisplay?: T;
+              annualGrossYieldDisplay?: T;
+              annualNetIncomeDisplay?: T;
+              annualNetYieldDisplay?: T;
+              equityAt8Display?: T;
+              equityAt10Display?: T;
+              equityAt12Display?: T;
+              equityAt16Display?: T;
+            };
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "regions_select".
+ */
+export interface RegionsSelect<T extends boolean = true> {
+  name?: T;
+  heroImage?: T;
+  description?: T;
+  video?: T;
+  communityEconomicLandscape?:
+    | T
+    | {
+        title?: T;
+        url?: T;
+        image?: T;
+        icon?: T;
+        description?: T;
+        id?: T;
+      };
+  infrastructureFutureDevelopment?:
+    | T
+    | {
+        title?: T;
+        url?: T;
+        image?: T;
+        icon?: T;
+        description?: T;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "suburbs_select".
+ */
+export interface SuburbsSelect<T extends boolean = true> {
+  name?: T;
+  region?: T;
+  vacancyRate?: T;
+  heroImage?: T;
+  description?: T;
+  medianValueByYear?:
+    | T
+    | {
+        year?: T;
+        medianValue?: T;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "access-token_select".
+ */
+export interface AccessTokenSelect<T extends boolean = true> {
+  name?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  enableAPIKey?: T;
+  apiKey?: T;
+  apiKeyIndex?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "buyers-access_select".
+ */
+export interface BuyersAccessSelect<T extends boolean = true> {
+  name?: T;
+  properties?: T;
   updatedAt?: T;
   createdAt?: T;
   email?: T;
@@ -1606,6 +2455,104 @@ export interface Footer {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "company-settings".
+ */
+export interface CompanySetting {
+  id: number;
+  companyName: string;
+  motto?: string | null;
+  /**
+   * Rich Text Description
+   */
+  description?: {
+    root: {
+      type: string;
+      children: {
+        type: string;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  disclaimer?: string | null;
+  /**
+   * Image SVG or PNG
+   */
+  logo?: (number | null) | Media;
+  /**
+   * Image SVG or PNG
+   */
+  logoDarkmode?: (number | null) | Media;
+  /**
+   * Video URL
+   */
+  corporateVideo?: string | null;
+  /**
+   * Image SVG or PNG
+   */
+  favicon?: (number | null) | Media;
+  /**
+   * Image SVG or PNG
+   */
+  faviconDarkmode?: (number | null) | Media;
+  /**
+   * AU Phone Number
+   */
+  phone?: string | null;
+  /**
+   * Email Address
+   */
+  email?: string | null;
+  /**
+   * AU Postal address
+   */
+  address?: string | null;
+  /**
+   * ABN Number
+   */
+  abn?: string | null;
+  /**
+   * ACN Number
+   */
+  acn?: string | null;
+  /**
+   * URL
+   */
+  website?: string | null;
+  /**
+   * Array of Social Media Links with Icon
+   */
+  socialMedia?:
+    | {
+        platform: string;
+        url: string;
+        icon?: (number | null) | Media;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Array containing text fields, potentially with color picker UI component
+   */
+  brandColours?:
+    | {
+        colorName: string;
+        /**
+         * Hex color code (e.g., #FF0000)
+         */
+        colorValue: string;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "header_select".
  */
 export interface HeaderSelect<T extends boolean = true> {
@@ -1644,6 +2591,45 @@ export interface FooterSelect<T extends boolean = true> {
               url?: T;
               label?: T;
             };
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "company-settings_select".
+ */
+export interface CompanySettingsSelect<T extends boolean = true> {
+  companyName?: T;
+  motto?: T;
+  description?: T;
+  disclaimer?: T;
+  logo?: T;
+  logoDarkmode?: T;
+  corporateVideo?: T;
+  favicon?: T;
+  faviconDarkmode?: T;
+  phone?: T;
+  email?: T;
+  address?: T;
+  abn?: T;
+  acn?: T;
+  website?: T;
+  socialMedia?:
+    | T
+    | {
+        platform?: T;
+        url?: T;
+        icon?: T;
+        id?: T;
+      };
+  brandColours?:
+    | T
+    | {
+        colorName?: T;
+        colorValue?: T;
         id?: T;
       };
   updatedAt?: T;
