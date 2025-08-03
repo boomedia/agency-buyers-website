@@ -26,6 +26,17 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   CREATE TYPE "public"."enum__pages_v_version_status" AS ENUM('draft', 'published');
   CREATE TYPE "public"."enum_posts_status" AS ENUM('draft', 'published');
   CREATE TYPE "public"."enum__posts_v_version_status" AS ENUM('draft', 'published');
+  CREATE TYPE "public"."comp_type" AS ENUM('superior', 'similar', 'inferior');
+  CREATE TYPE "public"."enum_properties_due_diligence_zone_data_type" AS ENUM('easement', 'flood', 'bushfire', 'transmission', 'publicHousing', 'trainLine', 'renovations', 'other');
+  CREATE TYPE "public"."enum_properties_due_diligence_zone_data_effected" AS ENUM('yes', 'no', 'partial');
+  CREATE TYPE "public"."enum_properties_general_information_address_state" AS ENUM('nsw', 'vic', 'qld', 'wa', 'sa', 'tas', 'act', 'nt');
+  CREATE TYPE "public"."enum_properties_due_diligence_property_occupancy" AS ENUM('vacant', 'tenanted', 'ownerOccupied');
+  CREATE TYPE "public"."enum_properties_status" AS ENUM('draft', 'published');
+  CREATE TYPE "public"."enum__properties_v_version_due_diligence_zone_data_type" AS ENUM('easement', 'flood', 'bushfire', 'transmission', 'publicHousing', 'trainLine', 'renovations', 'other');
+  CREATE TYPE "public"."enum__properties_v_version_due_diligence_zone_data_effected" AS ENUM('yes', 'no', 'partial');
+  CREATE TYPE "public"."enum__properties_v_version_general_information_address_state" AS ENUM('nsw', 'vic', 'qld', 'wa', 'sa', 'tas', 'act', 'nt');
+  CREATE TYPE "public"."enum__properties_v_version_due_diligence_property_occupancy" AS ENUM('vacant', 'tenanted', 'ownerOccupied');
+  CREATE TYPE "public"."enum__properties_v_version_status" AS ENUM('draft', 'published');
   CREATE TYPE "public"."enum_redirects_to_type" AS ENUM('reference', 'custom');
   CREATE TYPE "public"."enum_forms_confirmation_type" AS ENUM('message', 'redirect');
   CREATE TYPE "public"."enum_payload_jobs_log_task_slug" AS ENUM('inline', 'schedulePublish');
@@ -442,6 +453,339 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"lock_until" timestamp(3) with time zone
   );
   
+  CREATE TABLE "properties_general_information_agent_notes" (
+  	"_order" integer NOT NULL,
+  	"_parent_id" integer NOT NULL,
+  	"id" varchar PRIMARY KEY NOT NULL,
+  	"agent_name" varchar,
+  	"agent_note" jsonb
+  );
+  
+  CREATE TABLE "properties_general_information_sale_history" (
+  	"_order" integer NOT NULL,
+  	"_parent_id" integer NOT NULL,
+  	"id" varchar PRIMARY KEY NOT NULL,
+  	"year" numeric,
+  	"value" numeric
+  );
+  
+  CREATE TABLE "properties_general_information_images" (
+  	"_order" integer NOT NULL,
+  	"_parent_id" integer NOT NULL,
+  	"id" varchar PRIMARY KEY NOT NULL,
+  	"image_id" integer
+  );
+  
+  CREATE TABLE "properties_general_information_comparable_sales" (
+  	"_order" integer NOT NULL,
+  	"_parent_id" integer NOT NULL,
+  	"id" varchar PRIMARY KEY NOT NULL,
+  	"address" varchar,
+  	"sale_price" numeric,
+  	"comparison" "comp_type",
+  	"link" varchar,
+  	"hero_image_id" integer
+  );
+  
+  CREATE TABLE "properties_due_diligence_zone_data" (
+  	"_order" integer NOT NULL,
+  	"_parent_id" integer NOT NULL,
+  	"id" varchar PRIMARY KEY NOT NULL,
+  	"type" "enum_properties_due_diligence_zone_data_type",
+  	"effected" "enum_properties_due_diligence_zone_data_effected",
+  	"details" jsonb,
+  	"agent_notes" jsonb,
+  	"url" varchar,
+  	"image_id" integer
+  );
+  
+  CREATE TABLE "properties" (
+  	"id" serial PRIMARY KEY NOT NULL,
+  	"name" varchar,
+  	"general_information_hero_image_id" integer,
+  	"general_information_agent_summary" jsonb,
+  	"general_information_video_url" varchar,
+  	"general_information_purchase_price" numeric,
+  	"general_information_asking_price" numeric,
+  	"general_information_address_street_address" varchar,
+  	"general_information_address_suburb_name_id" integer,
+  	"general_information_address_region_id" integer,
+  	"general_information_address_postcode" varchar,
+  	"general_information_address_state" "enum_properties_general_information_address_state",
+  	"general_information_format_bedrooms" numeric,
+  	"general_information_format_bathrooms" numeric,
+  	"general_information_format_car_spaces" numeric,
+  	"general_information_internal" numeric,
+  	"general_information_land" numeric,
+  	"general_information_build_year" numeric,
+  	"due_diligence_property_occupancy" "enum_properties_due_diligence_property_occupancy",
+  	"due_diligence_lease_expiry_date" timestamp(3) with time zone,
+  	"due_diligence_last_rental_increase" timestamp(3) with time zone,
+  	"due_diligence_current_weekly_rent" numeric,
+  	"value_proposition_purchase_cost_purchase_price_display" varchar,
+  	"value_proposition_purchase_cost_loan_term" numeric DEFAULT 30,
+  	"value_proposition_purchase_cost_interest_rate" numeric,
+  	"value_proposition_purchase_cost_deposit_cash" numeric,
+  	"value_proposition_purchase_cost_equity_release" numeric,
+  	"value_proposition_purchase_cost_equity_release_interest_rate" numeric,
+  	"value_proposition_purchase_cost_loan_amount_display" varchar,
+  	"value_proposition_purchase_cost_deposit_total_display" varchar,
+  	"value_proposition_purchase_cost_deposit_percentage_display" varchar,
+  	"value_proposition_purchase_cost_stamp_duty" numeric,
+  	"value_proposition_purchase_cost_renovations_cost" numeric,
+  	"value_proposition_purchase_cost_building_and_pest" numeric,
+  	"value_proposition_purchase_cost_conveyancing" numeric,
+  	"value_proposition_purchase_cost_bank_fees" numeric,
+  	"value_proposition_purchase_cost_lenders_mortgage_insurance" numeric,
+  	"value_proposition_purchase_cost_total_purchase_cost_display" varchar,
+  	"value_proposition_annual_expenses_council_rates" numeric,
+  	"value_proposition_annual_expenses_insurance_costs" numeric,
+  	"value_proposition_annual_expenses_utilities" numeric,
+  	"value_proposition_annual_expenses_repairs_and_maintenance" numeric,
+  	"value_proposition_annual_expenses_pm_percentage" numeric,
+  	"value_proposition_annual_expenses_pm_fees_display" varchar,
+  	"value_proposition_annual_expenses_loan_repayments_disp" varchar,
+  	"value_proposition_annual_expenses_total_expenses_disp" varchar,
+  	"value_proposition_expected_results_expected_weekly_rent" numeric,
+  	"value_proposition_expected_results_depreciation_potential" numeric,
+  	"value_proposition_expected_results_annual_gross_income_display" varchar,
+  	"value_proposition_expected_results_annual_gross_yield_display" varchar,
+  	"value_proposition_expected_results_annual_net_income_display" varchar,
+  	"value_proposition_expected_results_annual_net_yield_display" varchar,
+  	"value_proposition_expected_results_equity_at8_display" varchar,
+  	"value_proposition_expected_results_equity_at10_display" varchar,
+  	"value_proposition_expected_results_equity_at12_display" varchar,
+  	"value_proposition_expected_results_equity_at16_display" varchar,
+  	"updated_at" timestamp(3) with time zone DEFAULT now() NOT NULL,
+  	"created_at" timestamp(3) with time zone DEFAULT now() NOT NULL,
+  	"_status" "enum_properties_status" DEFAULT 'draft'
+  );
+  
+  CREATE TABLE "properties_rels" (
+  	"id" serial PRIMARY KEY NOT NULL,
+  	"order" integer,
+  	"parent_id" integer NOT NULL,
+  	"path" varchar NOT NULL,
+  	"buyers_access_id" integer
+  );
+  
+  CREATE TABLE "_properties_v_version_general_information_agent_notes" (
+  	"_order" integer NOT NULL,
+  	"_parent_id" integer NOT NULL,
+  	"id" serial PRIMARY KEY NOT NULL,
+  	"agent_name" varchar,
+  	"agent_note" jsonb,
+  	"_uuid" varchar
+  );
+  
+  CREATE TABLE "_properties_v_version_general_information_sale_history" (
+  	"_order" integer NOT NULL,
+  	"_parent_id" integer NOT NULL,
+  	"id" serial PRIMARY KEY NOT NULL,
+  	"year" numeric,
+  	"value" numeric,
+  	"_uuid" varchar
+  );
+  
+  CREATE TABLE "_properties_v_version_general_information_images" (
+  	"_order" integer NOT NULL,
+  	"_parent_id" integer NOT NULL,
+  	"id" serial PRIMARY KEY NOT NULL,
+  	"image_id" integer,
+  	"_uuid" varchar
+  );
+  
+  CREATE TABLE "_properties_v_version_general_information_comparable_sales" (
+  	"_order" integer NOT NULL,
+  	"_parent_id" integer NOT NULL,
+  	"id" serial PRIMARY KEY NOT NULL,
+  	"address" varchar,
+  	"sale_price" numeric,
+  	"comparison" "comp_type",
+  	"link" varchar,
+  	"hero_image_id" integer,
+  	"_uuid" varchar
+  );
+  
+  CREATE TABLE "_properties_v_version_due_diligence_zone_data" (
+  	"_order" integer NOT NULL,
+  	"_parent_id" integer NOT NULL,
+  	"id" serial PRIMARY KEY NOT NULL,
+  	"type" "enum__properties_v_version_due_diligence_zone_data_type",
+  	"effected" "enum__properties_v_version_due_diligence_zone_data_effected",
+  	"details" jsonb,
+  	"agent_notes" jsonb,
+  	"url" varchar,
+  	"image_id" integer,
+  	"_uuid" varchar
+  );
+  
+  CREATE TABLE "_properties_v" (
+  	"id" serial PRIMARY KEY NOT NULL,
+  	"parent_id" integer,
+  	"version_name" varchar,
+  	"version_general_information_hero_image_id" integer,
+  	"version_general_information_agent_summary" jsonb,
+  	"version_general_information_video_url" varchar,
+  	"version_general_information_purchase_price" numeric,
+  	"version_general_information_asking_price" numeric,
+  	"version_general_information_address_street_address" varchar,
+  	"version_general_information_address_suburb_name_id" integer,
+  	"version_general_information_address_region_id" integer,
+  	"version_general_information_address_postcode" varchar,
+  	"version_general_information_address_state" "enum__properties_v_version_general_information_address_state",
+  	"version_general_information_format_bedrooms" numeric,
+  	"version_general_information_format_bathrooms" numeric,
+  	"version_general_information_format_car_spaces" numeric,
+  	"version_general_information_internal" numeric,
+  	"version_general_information_land" numeric,
+  	"version_general_information_build_year" numeric,
+  	"version_due_diligence_property_occupancy" "enum__properties_v_version_due_diligence_property_occupancy",
+  	"version_due_diligence_lease_expiry_date" timestamp(3) with time zone,
+  	"version_due_diligence_last_rental_increase" timestamp(3) with time zone,
+  	"version_due_diligence_current_weekly_rent" numeric,
+  	"version_value_proposition_purchase_cost_purchase_price_display" varchar,
+  	"version_value_proposition_purchase_cost_loan_term" numeric DEFAULT 30,
+  	"version_value_proposition_purchase_cost_interest_rate" numeric,
+  	"version_value_proposition_purchase_cost_deposit_cash" numeric,
+  	"version_value_proposition_purchase_cost_equity_release" numeric,
+  	"version_value_proposition_purchase_cost_equity_release_interest_rate" numeric,
+  	"version_value_proposition_purchase_cost_loan_amount_display" varchar,
+  	"version_value_proposition_purchase_cost_deposit_total_display" varchar,
+  	"version_value_proposition_purchase_cost_deposit_percentage_display" varchar,
+  	"version_value_proposition_purchase_cost_stamp_duty" numeric,
+  	"version_value_proposition_purchase_cost_renovations_cost" numeric,
+  	"version_value_proposition_purchase_cost_building_and_pest" numeric,
+  	"version_value_proposition_purchase_cost_conveyancing" numeric,
+  	"version_value_proposition_purchase_cost_bank_fees" numeric,
+  	"version_value_proposition_purchase_cost_lenders_mortgage_insurance" numeric,
+  	"version_value_proposition_purchase_cost_total_purchase_cost_display" varchar,
+  	"version_value_proposition_annual_expenses_council_rates" numeric,
+  	"version_value_proposition_annual_expenses_insurance_costs" numeric,
+  	"version_value_proposition_annual_expenses_utilities" numeric,
+  	"version_value_proposition_annual_expenses_repairs_and_maintenance" numeric,
+  	"version_value_proposition_annual_expenses_pm_percentage" numeric,
+  	"version_value_proposition_annual_expenses_pm_fees_display" varchar,
+  	"version_value_proposition_annual_expenses_loan_repayments_disp" varchar,
+  	"version_value_proposition_annual_expenses_total_expenses_disp" varchar,
+  	"version_value_proposition_expected_results_expected_weekly_rent" numeric,
+  	"version_value_proposition_expected_results_depreciation_potential" numeric,
+  	"version_value_proposition_expected_results_annual_gross_income_display" varchar,
+  	"version_value_proposition_expected_results_annual_gross_yield_display" varchar,
+  	"version_value_proposition_expected_results_annual_net_income_display" varchar,
+  	"version_value_proposition_expected_results_annual_net_yield_display" varchar,
+  	"version_value_proposition_expected_results_equity_at8_display" varchar,
+  	"version_value_proposition_expected_results_equity_at10_display" varchar,
+  	"version_value_proposition_expected_results_equity_at12_display" varchar,
+  	"version_value_proposition_expected_results_equity_at16_display" varchar,
+  	"version_updated_at" timestamp(3) with time zone,
+  	"version_created_at" timestamp(3) with time zone,
+  	"version__status" "enum__properties_v_version_status" DEFAULT 'draft',
+  	"created_at" timestamp(3) with time zone DEFAULT now() NOT NULL,
+  	"updated_at" timestamp(3) with time zone DEFAULT now() NOT NULL,
+  	"latest" boolean,
+  	"autosave" boolean
+  );
+  
+  CREATE TABLE "_properties_v_rels" (
+  	"id" serial PRIMARY KEY NOT NULL,
+  	"order" integer,
+  	"parent_id" integer NOT NULL,
+  	"path" varchar NOT NULL,
+  	"buyers_access_id" integer
+  );
+  
+  CREATE TABLE "regions_community_economic_landscape" (
+  	"_order" integer NOT NULL,
+  	"_parent_id" integer NOT NULL,
+  	"id" varchar PRIMARY KEY NOT NULL,
+  	"title" varchar NOT NULL,
+  	"url" varchar,
+  	"image_id" integer,
+  	"icon_id" integer,
+  	"description" jsonb
+  );
+  
+  CREATE TABLE "regions_infrastructure_future_development" (
+  	"_order" integer NOT NULL,
+  	"_parent_id" integer NOT NULL,
+  	"id" varchar PRIMARY KEY NOT NULL,
+  	"title" varchar NOT NULL,
+  	"url" varchar,
+  	"image_id" integer,
+  	"icon_id" integer,
+  	"description" jsonb
+  );
+  
+  CREATE TABLE "regions" (
+  	"id" serial PRIMARY KEY NOT NULL,
+  	"name" varchar NOT NULL,
+  	"hero_image_id" integer,
+  	"description" jsonb,
+  	"video" varchar,
+  	"updated_at" timestamp(3) with time zone DEFAULT now() NOT NULL,
+  	"created_at" timestamp(3) with time zone DEFAULT now() NOT NULL
+  );
+  
+  CREATE TABLE "suburbs_median_value_by_year" (
+  	"_order" integer NOT NULL,
+  	"_parent_id" integer NOT NULL,
+  	"id" varchar PRIMARY KEY NOT NULL,
+  	"year" numeric NOT NULL,
+  	"median_value" numeric NOT NULL
+  );
+  
+  CREATE TABLE "suburbs" (
+  	"id" serial PRIMARY KEY NOT NULL,
+  	"name" varchar NOT NULL,
+  	"region_id" integer NOT NULL,
+  	"vacancy_rate" numeric,
+  	"hero_image_id" integer,
+  	"description" jsonb,
+  	"updated_at" timestamp(3) with time zone DEFAULT now() NOT NULL,
+  	"created_at" timestamp(3) with time zone DEFAULT now() NOT NULL
+  );
+  
+  CREATE TABLE "access_token" (
+  	"id" serial PRIMARY KEY NOT NULL,
+  	"name" varchar NOT NULL,
+  	"updated_at" timestamp(3) with time zone DEFAULT now() NOT NULL,
+  	"created_at" timestamp(3) with time zone DEFAULT now() NOT NULL,
+  	"enable_a_p_i_key" boolean,
+  	"api_key" varchar,
+  	"api_key_index" varchar
+  );
+  
+  CREATE TABLE "buyers_access_sessions" (
+  	"_order" integer NOT NULL,
+  	"_parent_id" integer NOT NULL,
+  	"id" varchar PRIMARY KEY NOT NULL,
+  	"created_at" timestamp(3) with time zone,
+  	"expires_at" timestamp(3) with time zone NOT NULL
+  );
+  
+  CREATE TABLE "buyers_access" (
+  	"id" serial PRIMARY KEY NOT NULL,
+  	"name" varchar,
+  	"updated_at" timestamp(3) with time zone DEFAULT now() NOT NULL,
+  	"created_at" timestamp(3) with time zone DEFAULT now() NOT NULL,
+  	"email" varchar NOT NULL,
+  	"reset_password_token" varchar,
+  	"reset_password_expiration" timestamp(3) with time zone,
+  	"salt" varchar,
+  	"hash" varchar,
+  	"login_attempts" numeric DEFAULT 0,
+  	"lock_until" timestamp(3) with time zone
+  );
+  
+  CREATE TABLE "buyers_access_rels" (
+  	"id" serial PRIMARY KEY NOT NULL,
+  	"order" integer,
+  	"parent_id" integer NOT NULL,
+  	"path" varchar NOT NULL,
+  	"properties_id" integer
+  );
+  
   CREATE TABLE "redirects" (
   	"id" serial PRIMARY KEY NOT NULL,
   	"from" varchar NOT NULL,
@@ -693,6 +1037,11 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"media_id" integer,
   	"categories_id" integer,
   	"users_id" integer,
+  	"properties_id" integer,
+  	"regions_id" integer,
+  	"suburbs_id" integer,
+  	"access_token_id" integer,
+  	"buyers_access_id" integer,
   	"redirects_id" integer,
   	"forms_id" integer,
   	"form_submissions_id" integer,
@@ -713,7 +1062,9 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"order" integer,
   	"parent_id" integer NOT NULL,
   	"path" varchar NOT NULL,
-  	"users_id" integer
+  	"users_id" integer,
+  	"access_token_id" integer,
+  	"buyers_access_id" integer
   );
   
   CREATE TABLE "payload_migrations" (
@@ -774,6 +1125,44 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"posts_id" integer
   );
   
+  CREATE TABLE "company_settings_social_media" (
+  	"_order" integer NOT NULL,
+  	"_parent_id" integer NOT NULL,
+  	"id" varchar PRIMARY KEY NOT NULL,
+  	"platform" varchar NOT NULL,
+  	"url" varchar NOT NULL,
+  	"icon_id" integer
+  );
+  
+  CREATE TABLE "company_settings_brand_colours" (
+  	"_order" integer NOT NULL,
+  	"_parent_id" integer NOT NULL,
+  	"id" varchar PRIMARY KEY NOT NULL,
+  	"color_name" varchar NOT NULL,
+  	"color_value" varchar NOT NULL
+  );
+  
+  CREATE TABLE "company_settings" (
+  	"id" serial PRIMARY KEY NOT NULL,
+  	"company_name" varchar NOT NULL,
+  	"motto" varchar,
+  	"description" jsonb,
+  	"disclaimer" varchar,
+  	"logo_id" integer,
+  	"logo_darkmode_id" integer,
+  	"corporate_video" varchar,
+  	"favicon_id" integer,
+  	"favicon_darkmode_id" integer,
+  	"phone" varchar,
+  	"email" varchar,
+  	"address" varchar,
+  	"abn" varchar,
+  	"acn" varchar,
+  	"website" varchar,
+  	"updated_at" timestamp(3) with time zone,
+  	"created_at" timestamp(3) with time zone
+  );
+  
   ALTER TABLE "pages_hero_links" ADD CONSTRAINT "pages_hero_links_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."pages"("id") ON DELETE cascade ON UPDATE no action;
   ALTER TABLE "pages_blocks_cta_links" ADD CONSTRAINT "pages_blocks_cta_links_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."pages_blocks_cta"("id") ON DELETE cascade ON UPDATE no action;
   ALTER TABLE "pages_blocks_cta" ADD CONSTRAINT "pages_blocks_cta_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."pages"("id") ON DELETE cascade ON UPDATE no action;
@@ -826,6 +1215,46 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   ALTER TABLE "categories_breadcrumbs" ADD CONSTRAINT "categories_breadcrumbs_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."categories"("id") ON DELETE cascade ON UPDATE no action;
   ALTER TABLE "categories" ADD CONSTRAINT "categories_parent_id_categories_id_fk" FOREIGN KEY ("parent_id") REFERENCES "public"."categories"("id") ON DELETE set null ON UPDATE no action;
   ALTER TABLE "users_sessions" ADD CONSTRAINT "users_sessions_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;
+  ALTER TABLE "properties_general_information_agent_notes" ADD CONSTRAINT "properties_general_information_agent_notes_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."properties"("id") ON DELETE cascade ON UPDATE no action;
+  ALTER TABLE "properties_general_information_sale_history" ADD CONSTRAINT "properties_general_information_sale_history_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."properties"("id") ON DELETE cascade ON UPDATE no action;
+  ALTER TABLE "properties_general_information_images" ADD CONSTRAINT "properties_general_information_images_image_id_media_id_fk" FOREIGN KEY ("image_id") REFERENCES "public"."media"("id") ON DELETE set null ON UPDATE no action;
+  ALTER TABLE "properties_general_information_images" ADD CONSTRAINT "properties_general_information_images_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."properties"("id") ON DELETE cascade ON UPDATE no action;
+  ALTER TABLE "properties_general_information_comparable_sales" ADD CONSTRAINT "properties_general_information_comparable_sales_hero_image_id_media_id_fk" FOREIGN KEY ("hero_image_id") REFERENCES "public"."media"("id") ON DELETE set null ON UPDATE no action;
+  ALTER TABLE "properties_general_information_comparable_sales" ADD CONSTRAINT "properties_general_information_comparable_sales_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."properties"("id") ON DELETE cascade ON UPDATE no action;
+  ALTER TABLE "properties_due_diligence_zone_data" ADD CONSTRAINT "properties_due_diligence_zone_data_image_id_media_id_fk" FOREIGN KEY ("image_id") REFERENCES "public"."media"("id") ON DELETE set null ON UPDATE no action;
+  ALTER TABLE "properties_due_diligence_zone_data" ADD CONSTRAINT "properties_due_diligence_zone_data_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."properties"("id") ON DELETE cascade ON UPDATE no action;
+  ALTER TABLE "properties" ADD CONSTRAINT "properties_general_information_hero_image_id_media_id_fk" FOREIGN KEY ("general_information_hero_image_id") REFERENCES "public"."media"("id") ON DELETE set null ON UPDATE no action;
+  ALTER TABLE "properties" ADD CONSTRAINT "properties_general_information_address_suburb_name_id_suburbs_id_fk" FOREIGN KEY ("general_information_address_suburb_name_id") REFERENCES "public"."suburbs"("id") ON DELETE set null ON UPDATE no action;
+  ALTER TABLE "properties" ADD CONSTRAINT "properties_general_information_address_region_id_regions_id_fk" FOREIGN KEY ("general_information_address_region_id") REFERENCES "public"."regions"("id") ON DELETE set null ON UPDATE no action;
+  ALTER TABLE "properties_rels" ADD CONSTRAINT "properties_rels_parent_fk" FOREIGN KEY ("parent_id") REFERENCES "public"."properties"("id") ON DELETE cascade ON UPDATE no action;
+  ALTER TABLE "properties_rels" ADD CONSTRAINT "properties_rels_buyers_access_fk" FOREIGN KEY ("buyers_access_id") REFERENCES "public"."buyers_access"("id") ON DELETE cascade ON UPDATE no action;
+  ALTER TABLE "_properties_v_version_general_information_agent_notes" ADD CONSTRAINT "_properties_v_version_general_information_agent_notes_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."_properties_v"("id") ON DELETE cascade ON UPDATE no action;
+  ALTER TABLE "_properties_v_version_general_information_sale_history" ADD CONSTRAINT "_properties_v_version_general_information_sale_history_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."_properties_v"("id") ON DELETE cascade ON UPDATE no action;
+  ALTER TABLE "_properties_v_version_general_information_images" ADD CONSTRAINT "_properties_v_version_general_information_images_image_id_media_id_fk" FOREIGN KEY ("image_id") REFERENCES "public"."media"("id") ON DELETE set null ON UPDATE no action;
+  ALTER TABLE "_properties_v_version_general_information_images" ADD CONSTRAINT "_properties_v_version_general_information_images_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."_properties_v"("id") ON DELETE cascade ON UPDATE no action;
+  ALTER TABLE "_properties_v_version_general_information_comparable_sales" ADD CONSTRAINT "_properties_v_version_general_information_comparable_sales_hero_image_id_media_id_fk" FOREIGN KEY ("hero_image_id") REFERENCES "public"."media"("id") ON DELETE set null ON UPDATE no action;
+  ALTER TABLE "_properties_v_version_general_information_comparable_sales" ADD CONSTRAINT "_properties_v_version_general_information_comparable_sales_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."_properties_v"("id") ON DELETE cascade ON UPDATE no action;
+  ALTER TABLE "_properties_v_version_due_diligence_zone_data" ADD CONSTRAINT "_properties_v_version_due_diligence_zone_data_image_id_media_id_fk" FOREIGN KEY ("image_id") REFERENCES "public"."media"("id") ON DELETE set null ON UPDATE no action;
+  ALTER TABLE "_properties_v_version_due_diligence_zone_data" ADD CONSTRAINT "_properties_v_version_due_diligence_zone_data_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."_properties_v"("id") ON DELETE cascade ON UPDATE no action;
+  ALTER TABLE "_properties_v" ADD CONSTRAINT "_properties_v_parent_id_properties_id_fk" FOREIGN KEY ("parent_id") REFERENCES "public"."properties"("id") ON DELETE set null ON UPDATE no action;
+  ALTER TABLE "_properties_v" ADD CONSTRAINT "_properties_v_version_general_information_hero_image_id_media_id_fk" FOREIGN KEY ("version_general_information_hero_image_id") REFERENCES "public"."media"("id") ON DELETE set null ON UPDATE no action;
+  ALTER TABLE "_properties_v" ADD CONSTRAINT "_properties_v_version_general_information_address_suburb_name_id_suburbs_id_fk" FOREIGN KEY ("version_general_information_address_suburb_name_id") REFERENCES "public"."suburbs"("id") ON DELETE set null ON UPDATE no action;
+  ALTER TABLE "_properties_v" ADD CONSTRAINT "_properties_v_version_general_information_address_region_id_regions_id_fk" FOREIGN KEY ("version_general_information_address_region_id") REFERENCES "public"."regions"("id") ON DELETE set null ON UPDATE no action;
+  ALTER TABLE "_properties_v_rels" ADD CONSTRAINT "_properties_v_rels_parent_fk" FOREIGN KEY ("parent_id") REFERENCES "public"."_properties_v"("id") ON DELETE cascade ON UPDATE no action;
+  ALTER TABLE "_properties_v_rels" ADD CONSTRAINT "_properties_v_rels_buyers_access_fk" FOREIGN KEY ("buyers_access_id") REFERENCES "public"."buyers_access"("id") ON DELETE cascade ON UPDATE no action;
+  ALTER TABLE "regions_community_economic_landscape" ADD CONSTRAINT "regions_community_economic_landscape_image_id_media_id_fk" FOREIGN KEY ("image_id") REFERENCES "public"."media"("id") ON DELETE set null ON UPDATE no action;
+  ALTER TABLE "regions_community_economic_landscape" ADD CONSTRAINT "regions_community_economic_landscape_icon_id_media_id_fk" FOREIGN KEY ("icon_id") REFERENCES "public"."media"("id") ON DELETE set null ON UPDATE no action;
+  ALTER TABLE "regions_community_economic_landscape" ADD CONSTRAINT "regions_community_economic_landscape_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."regions"("id") ON DELETE cascade ON UPDATE no action;
+  ALTER TABLE "regions_infrastructure_future_development" ADD CONSTRAINT "regions_infrastructure_future_development_image_id_media_id_fk" FOREIGN KEY ("image_id") REFERENCES "public"."media"("id") ON DELETE set null ON UPDATE no action;
+  ALTER TABLE "regions_infrastructure_future_development" ADD CONSTRAINT "regions_infrastructure_future_development_icon_id_media_id_fk" FOREIGN KEY ("icon_id") REFERENCES "public"."media"("id") ON DELETE set null ON UPDATE no action;
+  ALTER TABLE "regions_infrastructure_future_development" ADD CONSTRAINT "regions_infrastructure_future_development_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."regions"("id") ON DELETE cascade ON UPDATE no action;
+  ALTER TABLE "regions" ADD CONSTRAINT "regions_hero_image_id_media_id_fk" FOREIGN KEY ("hero_image_id") REFERENCES "public"."media"("id") ON DELETE set null ON UPDATE no action;
+  ALTER TABLE "suburbs_median_value_by_year" ADD CONSTRAINT "suburbs_median_value_by_year_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."suburbs"("id") ON DELETE cascade ON UPDATE no action;
+  ALTER TABLE "suburbs" ADD CONSTRAINT "suburbs_region_id_regions_id_fk" FOREIGN KEY ("region_id") REFERENCES "public"."regions"("id") ON DELETE set null ON UPDATE no action;
+  ALTER TABLE "suburbs" ADD CONSTRAINT "suburbs_hero_image_id_media_id_fk" FOREIGN KEY ("hero_image_id") REFERENCES "public"."media"("id") ON DELETE set null ON UPDATE no action;
+  ALTER TABLE "buyers_access_sessions" ADD CONSTRAINT "buyers_access_sessions_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."buyers_access"("id") ON DELETE cascade ON UPDATE no action;
+  ALTER TABLE "buyers_access_rels" ADD CONSTRAINT "buyers_access_rels_parent_fk" FOREIGN KEY ("parent_id") REFERENCES "public"."buyers_access"("id") ON DELETE cascade ON UPDATE no action;
+  ALTER TABLE "buyers_access_rels" ADD CONSTRAINT "buyers_access_rels_properties_fk" FOREIGN KEY ("properties_id") REFERENCES "public"."properties"("id") ON DELETE cascade ON UPDATE no action;
   ALTER TABLE "redirects_rels" ADD CONSTRAINT "redirects_rels_parent_fk" FOREIGN KEY ("parent_id") REFERENCES "public"."redirects"("id") ON DELETE cascade ON UPDATE no action;
   ALTER TABLE "redirects_rels" ADD CONSTRAINT "redirects_rels_pages_fk" FOREIGN KEY ("pages_id") REFERENCES "public"."pages"("id") ON DELETE cascade ON UPDATE no action;
   ALTER TABLE "redirects_rels" ADD CONSTRAINT "redirects_rels_posts_fk" FOREIGN KEY ("posts_id") REFERENCES "public"."posts"("id") ON DELETE cascade ON UPDATE no action;
@@ -853,6 +1282,11 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   ALTER TABLE "payload_locked_documents_rels" ADD CONSTRAINT "payload_locked_documents_rels_media_fk" FOREIGN KEY ("media_id") REFERENCES "public"."media"("id") ON DELETE cascade ON UPDATE no action;
   ALTER TABLE "payload_locked_documents_rels" ADD CONSTRAINT "payload_locked_documents_rels_categories_fk" FOREIGN KEY ("categories_id") REFERENCES "public"."categories"("id") ON DELETE cascade ON UPDATE no action;
   ALTER TABLE "payload_locked_documents_rels" ADD CONSTRAINT "payload_locked_documents_rels_users_fk" FOREIGN KEY ("users_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;
+  ALTER TABLE "payload_locked_documents_rels" ADD CONSTRAINT "payload_locked_documents_rels_properties_fk" FOREIGN KEY ("properties_id") REFERENCES "public"."properties"("id") ON DELETE cascade ON UPDATE no action;
+  ALTER TABLE "payload_locked_documents_rels" ADD CONSTRAINT "payload_locked_documents_rels_regions_fk" FOREIGN KEY ("regions_id") REFERENCES "public"."regions"("id") ON DELETE cascade ON UPDATE no action;
+  ALTER TABLE "payload_locked_documents_rels" ADD CONSTRAINT "payload_locked_documents_rels_suburbs_fk" FOREIGN KEY ("suburbs_id") REFERENCES "public"."suburbs"("id") ON DELETE cascade ON UPDATE no action;
+  ALTER TABLE "payload_locked_documents_rels" ADD CONSTRAINT "payload_locked_documents_rels_access_token_fk" FOREIGN KEY ("access_token_id") REFERENCES "public"."access_token"("id") ON DELETE cascade ON UPDATE no action;
+  ALTER TABLE "payload_locked_documents_rels" ADD CONSTRAINT "payload_locked_documents_rels_buyers_access_fk" FOREIGN KEY ("buyers_access_id") REFERENCES "public"."buyers_access"("id") ON DELETE cascade ON UPDATE no action;
   ALTER TABLE "payload_locked_documents_rels" ADD CONSTRAINT "payload_locked_documents_rels_redirects_fk" FOREIGN KEY ("redirects_id") REFERENCES "public"."redirects"("id") ON DELETE cascade ON UPDATE no action;
   ALTER TABLE "payload_locked_documents_rels" ADD CONSTRAINT "payload_locked_documents_rels_forms_fk" FOREIGN KEY ("forms_id") REFERENCES "public"."forms"("id") ON DELETE cascade ON UPDATE no action;
   ALTER TABLE "payload_locked_documents_rels" ADD CONSTRAINT "payload_locked_documents_rels_form_submissions_fk" FOREIGN KEY ("form_submissions_id") REFERENCES "public"."form_submissions"("id") ON DELETE cascade ON UPDATE no action;
@@ -860,6 +1294,8 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   ALTER TABLE "payload_locked_documents_rels" ADD CONSTRAINT "payload_locked_documents_rels_payload_jobs_fk" FOREIGN KEY ("payload_jobs_id") REFERENCES "public"."payload_jobs"("id") ON DELETE cascade ON UPDATE no action;
   ALTER TABLE "payload_preferences_rels" ADD CONSTRAINT "payload_preferences_rels_parent_fk" FOREIGN KEY ("parent_id") REFERENCES "public"."payload_preferences"("id") ON DELETE cascade ON UPDATE no action;
   ALTER TABLE "payload_preferences_rels" ADD CONSTRAINT "payload_preferences_rels_users_fk" FOREIGN KEY ("users_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;
+  ALTER TABLE "payload_preferences_rels" ADD CONSTRAINT "payload_preferences_rels_access_token_fk" FOREIGN KEY ("access_token_id") REFERENCES "public"."access_token"("id") ON DELETE cascade ON UPDATE no action;
+  ALTER TABLE "payload_preferences_rels" ADD CONSTRAINT "payload_preferences_rels_buyers_access_fk" FOREIGN KEY ("buyers_access_id") REFERENCES "public"."buyers_access"("id") ON DELETE cascade ON UPDATE no action;
   ALTER TABLE "header_nav_items" ADD CONSTRAINT "header_nav_items_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."header"("id") ON DELETE cascade ON UPDATE no action;
   ALTER TABLE "header_rels" ADD CONSTRAINT "header_rels_parent_fk" FOREIGN KEY ("parent_id") REFERENCES "public"."header"("id") ON DELETE cascade ON UPDATE no action;
   ALTER TABLE "header_rels" ADD CONSTRAINT "header_rels_pages_fk" FOREIGN KEY ("pages_id") REFERENCES "public"."pages"("id") ON DELETE cascade ON UPDATE no action;
@@ -868,6 +1304,13 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   ALTER TABLE "footer_rels" ADD CONSTRAINT "footer_rels_parent_fk" FOREIGN KEY ("parent_id") REFERENCES "public"."footer"("id") ON DELETE cascade ON UPDATE no action;
   ALTER TABLE "footer_rels" ADD CONSTRAINT "footer_rels_pages_fk" FOREIGN KEY ("pages_id") REFERENCES "public"."pages"("id") ON DELETE cascade ON UPDATE no action;
   ALTER TABLE "footer_rels" ADD CONSTRAINT "footer_rels_posts_fk" FOREIGN KEY ("posts_id") REFERENCES "public"."posts"("id") ON DELETE cascade ON UPDATE no action;
+  ALTER TABLE "company_settings_social_media" ADD CONSTRAINT "company_settings_social_media_icon_id_media_id_fk" FOREIGN KEY ("icon_id") REFERENCES "public"."media"("id") ON DELETE set null ON UPDATE no action;
+  ALTER TABLE "company_settings_social_media" ADD CONSTRAINT "company_settings_social_media_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."company_settings"("id") ON DELETE cascade ON UPDATE no action;
+  ALTER TABLE "company_settings_brand_colours" ADD CONSTRAINT "company_settings_brand_colours_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."company_settings"("id") ON DELETE cascade ON UPDATE no action;
+  ALTER TABLE "company_settings" ADD CONSTRAINT "company_settings_logo_id_media_id_fk" FOREIGN KEY ("logo_id") REFERENCES "public"."media"("id") ON DELETE set null ON UPDATE no action;
+  ALTER TABLE "company_settings" ADD CONSTRAINT "company_settings_logo_darkmode_id_media_id_fk" FOREIGN KEY ("logo_darkmode_id") REFERENCES "public"."media"("id") ON DELETE set null ON UPDATE no action;
+  ALTER TABLE "company_settings" ADD CONSTRAINT "company_settings_favicon_id_media_id_fk" FOREIGN KEY ("favicon_id") REFERENCES "public"."media"("id") ON DELETE set null ON UPDATE no action;
+  ALTER TABLE "company_settings" ADD CONSTRAINT "company_settings_favicon_darkmode_id_media_id_fk" FOREIGN KEY ("favicon_darkmode_id") REFERENCES "public"."media"("id") ON DELETE set null ON UPDATE no action;
   CREATE INDEX "pages_hero_links_order_idx" ON "pages_hero_links" USING btree ("_order");
   CREATE INDEX "pages_hero_links_parent_id_idx" ON "pages_hero_links" USING btree ("_parent_id");
   CREATE INDEX "pages_blocks_cta_links_order_idx" ON "pages_blocks_cta_links" USING btree ("_order");
@@ -998,6 +1441,85 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   CREATE INDEX "users_updated_at_idx" ON "users" USING btree ("updated_at");
   CREATE INDEX "users_created_at_idx" ON "users" USING btree ("created_at");
   CREATE UNIQUE INDEX "users_email_idx" ON "users" USING btree ("email");
+  CREATE INDEX "properties_general_information_agent_notes_order_idx" ON "properties_general_information_agent_notes" USING btree ("_order");
+  CREATE INDEX "properties_general_information_agent_notes_parent_id_idx" ON "properties_general_information_agent_notes" USING btree ("_parent_id");
+  CREATE INDEX "properties_general_information_sale_history_order_idx" ON "properties_general_information_sale_history" USING btree ("_order");
+  CREATE INDEX "properties_general_information_sale_history_parent_id_idx" ON "properties_general_information_sale_history" USING btree ("_parent_id");
+  CREATE INDEX "properties_general_information_images_order_idx" ON "properties_general_information_images" USING btree ("_order");
+  CREATE INDEX "properties_general_information_images_parent_id_idx" ON "properties_general_information_images" USING btree ("_parent_id");
+  CREATE INDEX "properties_general_information_images_image_idx" ON "properties_general_information_images" USING btree ("image_id");
+  CREATE INDEX "properties_general_information_comparable_sales_order_idx" ON "properties_general_information_comparable_sales" USING btree ("_order");
+  CREATE INDEX "properties_general_information_comparable_sales_parent_id_idx" ON "properties_general_information_comparable_sales" USING btree ("_parent_id");
+  CREATE INDEX "properties_general_information_comparable_sales_hero_image_idx" ON "properties_general_information_comparable_sales" USING btree ("hero_image_id");
+  CREATE INDEX "properties_due_diligence_zone_data_order_idx" ON "properties_due_diligence_zone_data" USING btree ("_order");
+  CREATE INDEX "properties_due_diligence_zone_data_parent_id_idx" ON "properties_due_diligence_zone_data" USING btree ("_parent_id");
+  CREATE INDEX "properties_due_diligence_zone_data_image_idx" ON "properties_due_diligence_zone_data" USING btree ("image_id");
+  CREATE INDEX "properties_general_information_general_information_hero_image_idx" ON "properties" USING btree ("general_information_hero_image_id");
+  CREATE INDEX "properties_general_information_address_general_information_address_suburb_name_idx" ON "properties" USING btree ("general_information_address_suburb_name_id");
+  CREATE INDEX "properties_general_information_address_general_information_address_region_idx" ON "properties" USING btree ("general_information_address_region_id");
+  CREATE INDEX "properties_updated_at_idx" ON "properties" USING btree ("updated_at");
+  CREATE INDEX "properties_created_at_idx" ON "properties" USING btree ("created_at");
+  CREATE INDEX "properties__status_idx" ON "properties" USING btree ("_status");
+  CREATE INDEX "properties_rels_order_idx" ON "properties_rels" USING btree ("order");
+  CREATE INDEX "properties_rels_parent_idx" ON "properties_rels" USING btree ("parent_id");
+  CREATE INDEX "properties_rels_path_idx" ON "properties_rels" USING btree ("path");
+  CREATE INDEX "properties_rels_buyers_access_id_idx" ON "properties_rels" USING btree ("buyers_access_id");
+  CREATE INDEX "_properties_v_version_general_information_agent_notes_order_idx" ON "_properties_v_version_general_information_agent_notes" USING btree ("_order");
+  CREATE INDEX "_properties_v_version_general_information_agent_notes_parent_id_idx" ON "_properties_v_version_general_information_agent_notes" USING btree ("_parent_id");
+  CREATE INDEX "_properties_v_version_general_information_sale_history_order_idx" ON "_properties_v_version_general_information_sale_history" USING btree ("_order");
+  CREATE INDEX "_properties_v_version_general_information_sale_history_parent_id_idx" ON "_properties_v_version_general_information_sale_history" USING btree ("_parent_id");
+  CREATE INDEX "_properties_v_version_general_information_images_order_idx" ON "_properties_v_version_general_information_images" USING btree ("_order");
+  CREATE INDEX "_properties_v_version_general_information_images_parent_id_idx" ON "_properties_v_version_general_information_images" USING btree ("_parent_id");
+  CREATE INDEX "_properties_v_version_general_information_images_image_idx" ON "_properties_v_version_general_information_images" USING btree ("image_id");
+  CREATE INDEX "_properties_v_version_general_information_comparable_sales_order_idx" ON "_properties_v_version_general_information_comparable_sales" USING btree ("_order");
+  CREATE INDEX "_properties_v_version_general_information_comparable_sales_parent_id_idx" ON "_properties_v_version_general_information_comparable_sales" USING btree ("_parent_id");
+  CREATE INDEX "_properties_v_version_general_information_comparable_sales_hero_image_idx" ON "_properties_v_version_general_information_comparable_sales" USING btree ("hero_image_id");
+  CREATE INDEX "_properties_v_version_due_diligence_zone_data_order_idx" ON "_properties_v_version_due_diligence_zone_data" USING btree ("_order");
+  CREATE INDEX "_properties_v_version_due_diligence_zone_data_parent_id_idx" ON "_properties_v_version_due_diligence_zone_data" USING btree ("_parent_id");
+  CREATE INDEX "_properties_v_version_due_diligence_zone_data_image_idx" ON "_properties_v_version_due_diligence_zone_data" USING btree ("image_id");
+  CREATE INDEX "_properties_v_parent_idx" ON "_properties_v" USING btree ("parent_id");
+  CREATE INDEX "_properties_v_version_general_information_version_general_information_hero_image_idx" ON "_properties_v" USING btree ("version_general_information_hero_image_id");
+  CREATE INDEX "_properties_v_version_general_information_address_version_general_information_address_suburb_name_idx" ON "_properties_v" USING btree ("version_general_information_address_suburb_name_id");
+  CREATE INDEX "_properties_v_version_general_information_address_version_general_information_address_region_idx" ON "_properties_v" USING btree ("version_general_information_address_region_id");
+  CREATE INDEX "_properties_v_version_version_updated_at_idx" ON "_properties_v" USING btree ("version_updated_at");
+  CREATE INDEX "_properties_v_version_version_created_at_idx" ON "_properties_v" USING btree ("version_created_at");
+  CREATE INDEX "_properties_v_version_version__status_idx" ON "_properties_v" USING btree ("version__status");
+  CREATE INDEX "_properties_v_created_at_idx" ON "_properties_v" USING btree ("created_at");
+  CREATE INDEX "_properties_v_updated_at_idx" ON "_properties_v" USING btree ("updated_at");
+  CREATE INDEX "_properties_v_latest_idx" ON "_properties_v" USING btree ("latest");
+  CREATE INDEX "_properties_v_autosave_idx" ON "_properties_v" USING btree ("autosave");
+  CREATE INDEX "_properties_v_rels_order_idx" ON "_properties_v_rels" USING btree ("order");
+  CREATE INDEX "_properties_v_rels_parent_idx" ON "_properties_v_rels" USING btree ("parent_id");
+  CREATE INDEX "_properties_v_rels_path_idx" ON "_properties_v_rels" USING btree ("path");
+  CREATE INDEX "_properties_v_rels_buyers_access_id_idx" ON "_properties_v_rels" USING btree ("buyers_access_id");
+  CREATE INDEX "regions_community_economic_landscape_order_idx" ON "regions_community_economic_landscape" USING btree ("_order");
+  CREATE INDEX "regions_community_economic_landscape_parent_id_idx" ON "regions_community_economic_landscape" USING btree ("_parent_id");
+  CREATE INDEX "regions_community_economic_landscape_image_idx" ON "regions_community_economic_landscape" USING btree ("image_id");
+  CREATE INDEX "regions_community_economic_landscape_icon_idx" ON "regions_community_economic_landscape" USING btree ("icon_id");
+  CREATE INDEX "regions_infrastructure_future_development_order_idx" ON "regions_infrastructure_future_development" USING btree ("_order");
+  CREATE INDEX "regions_infrastructure_future_development_parent_id_idx" ON "regions_infrastructure_future_development" USING btree ("_parent_id");
+  CREATE INDEX "regions_infrastructure_future_development_image_idx" ON "regions_infrastructure_future_development" USING btree ("image_id");
+  CREATE INDEX "regions_infrastructure_future_development_icon_idx" ON "regions_infrastructure_future_development" USING btree ("icon_id");
+  CREATE INDEX "regions_hero_image_idx" ON "regions" USING btree ("hero_image_id");
+  CREATE INDEX "regions_updated_at_idx" ON "regions" USING btree ("updated_at");
+  CREATE INDEX "regions_created_at_idx" ON "regions" USING btree ("created_at");
+  CREATE INDEX "suburbs_median_value_by_year_order_idx" ON "suburbs_median_value_by_year" USING btree ("_order");
+  CREATE INDEX "suburbs_median_value_by_year_parent_id_idx" ON "suburbs_median_value_by_year" USING btree ("_parent_id");
+  CREATE INDEX "suburbs_region_idx" ON "suburbs" USING btree ("region_id");
+  CREATE INDEX "suburbs_hero_image_idx" ON "suburbs" USING btree ("hero_image_id");
+  CREATE INDEX "suburbs_updated_at_idx" ON "suburbs" USING btree ("updated_at");
+  CREATE INDEX "suburbs_created_at_idx" ON "suburbs" USING btree ("created_at");
+  CREATE INDEX "access_token_updated_at_idx" ON "access_token" USING btree ("updated_at");
+  CREATE INDEX "access_token_created_at_idx" ON "access_token" USING btree ("created_at");
+  CREATE INDEX "buyers_access_sessions_order_idx" ON "buyers_access_sessions" USING btree ("_order");
+  CREATE INDEX "buyers_access_sessions_parent_id_idx" ON "buyers_access_sessions" USING btree ("_parent_id");
+  CREATE INDEX "buyers_access_updated_at_idx" ON "buyers_access" USING btree ("updated_at");
+  CREATE INDEX "buyers_access_created_at_idx" ON "buyers_access" USING btree ("created_at");
+  CREATE UNIQUE INDEX "buyers_access_email_idx" ON "buyers_access" USING btree ("email");
+  CREATE INDEX "buyers_access_rels_order_idx" ON "buyers_access_rels" USING btree ("order");
+  CREATE INDEX "buyers_access_rels_parent_idx" ON "buyers_access_rels" USING btree ("parent_id");
+  CREATE INDEX "buyers_access_rels_path_idx" ON "buyers_access_rels" USING btree ("path");
+  CREATE INDEX "buyers_access_rels_properties_id_idx" ON "buyers_access_rels" USING btree ("properties_id");
   CREATE UNIQUE INDEX "redirects_from_idx" ON "redirects" USING btree ("from");
   CREATE INDEX "redirects_updated_at_idx" ON "redirects" USING btree ("updated_at");
   CREATE INDEX "redirects_created_at_idx" ON "redirects" USING btree ("created_at");
@@ -1076,6 +1598,11 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   CREATE INDEX "payload_locked_documents_rels_media_id_idx" ON "payload_locked_documents_rels" USING btree ("media_id");
   CREATE INDEX "payload_locked_documents_rels_categories_id_idx" ON "payload_locked_documents_rels" USING btree ("categories_id");
   CREATE INDEX "payload_locked_documents_rels_users_id_idx" ON "payload_locked_documents_rels" USING btree ("users_id");
+  CREATE INDEX "payload_locked_documents_rels_properties_id_idx" ON "payload_locked_documents_rels" USING btree ("properties_id");
+  CREATE INDEX "payload_locked_documents_rels_regions_id_idx" ON "payload_locked_documents_rels" USING btree ("regions_id");
+  CREATE INDEX "payload_locked_documents_rels_suburbs_id_idx" ON "payload_locked_documents_rels" USING btree ("suburbs_id");
+  CREATE INDEX "payload_locked_documents_rels_access_token_id_idx" ON "payload_locked_documents_rels" USING btree ("access_token_id");
+  CREATE INDEX "payload_locked_documents_rels_buyers_access_id_idx" ON "payload_locked_documents_rels" USING btree ("buyers_access_id");
   CREATE INDEX "payload_locked_documents_rels_redirects_id_idx" ON "payload_locked_documents_rels" USING btree ("redirects_id");
   CREATE INDEX "payload_locked_documents_rels_forms_id_idx" ON "payload_locked_documents_rels" USING btree ("forms_id");
   CREATE INDEX "payload_locked_documents_rels_form_submissions_id_idx" ON "payload_locked_documents_rels" USING btree ("form_submissions_id");
@@ -1088,6 +1615,8 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   CREATE INDEX "payload_preferences_rels_parent_idx" ON "payload_preferences_rels" USING btree ("parent_id");
   CREATE INDEX "payload_preferences_rels_path_idx" ON "payload_preferences_rels" USING btree ("path");
   CREATE INDEX "payload_preferences_rels_users_id_idx" ON "payload_preferences_rels" USING btree ("users_id");
+  CREATE INDEX "payload_preferences_rels_access_token_id_idx" ON "payload_preferences_rels" USING btree ("access_token_id");
+  CREATE INDEX "payload_preferences_rels_buyers_access_id_idx" ON "payload_preferences_rels" USING btree ("buyers_access_id");
   CREATE INDEX "payload_migrations_updated_at_idx" ON "payload_migrations" USING btree ("updated_at");
   CREATE INDEX "payload_migrations_created_at_idx" ON "payload_migrations" USING btree ("created_at");
   CREATE INDEX "header_nav_items_order_idx" ON "header_nav_items" USING btree ("_order");
@@ -1103,7 +1632,16 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   CREATE INDEX "footer_rels_parent_idx" ON "footer_rels" USING btree ("parent_id");
   CREATE INDEX "footer_rels_path_idx" ON "footer_rels" USING btree ("path");
   CREATE INDEX "footer_rels_pages_id_idx" ON "footer_rels" USING btree ("pages_id");
-  CREATE INDEX "footer_rels_posts_id_idx" ON "footer_rels" USING btree ("posts_id");`)
+  CREATE INDEX "footer_rels_posts_id_idx" ON "footer_rels" USING btree ("posts_id");
+  CREATE INDEX "company_settings_social_media_order_idx" ON "company_settings_social_media" USING btree ("_order");
+  CREATE INDEX "company_settings_social_media_parent_id_idx" ON "company_settings_social_media" USING btree ("_parent_id");
+  CREATE INDEX "company_settings_social_media_icon_idx" ON "company_settings_social_media" USING btree ("icon_id");
+  CREATE INDEX "company_settings_brand_colours_order_idx" ON "company_settings_brand_colours" USING btree ("_order");
+  CREATE INDEX "company_settings_brand_colours_parent_id_idx" ON "company_settings_brand_colours" USING btree ("_parent_id");
+  CREATE INDEX "company_settings_logo_idx" ON "company_settings" USING btree ("logo_id");
+  CREATE INDEX "company_settings_logo_darkmode_idx" ON "company_settings" USING btree ("logo_darkmode_id");
+  CREATE INDEX "company_settings_favicon_idx" ON "company_settings" USING btree ("favicon_id");
+  CREATE INDEX "company_settings_favicon_darkmode_idx" ON "company_settings" USING btree ("favicon_darkmode_id");`)
 }
 
 export async function down({ db, payload, req }: MigrateDownArgs): Promise<void> {
@@ -1139,6 +1677,29 @@ export async function down({ db, payload, req }: MigrateDownArgs): Promise<void>
   DROP TABLE "categories" CASCADE;
   DROP TABLE "users_sessions" CASCADE;
   DROP TABLE "users" CASCADE;
+  DROP TABLE "properties_general_information_agent_notes" CASCADE;
+  DROP TABLE "properties_general_information_sale_history" CASCADE;
+  DROP TABLE "properties_general_information_images" CASCADE;
+  DROP TABLE "properties_general_information_comparable_sales" CASCADE;
+  DROP TABLE "properties_due_diligence_zone_data" CASCADE;
+  DROP TABLE "properties" CASCADE;
+  DROP TABLE "properties_rels" CASCADE;
+  DROP TABLE "_properties_v_version_general_information_agent_notes" CASCADE;
+  DROP TABLE "_properties_v_version_general_information_sale_history" CASCADE;
+  DROP TABLE "_properties_v_version_general_information_images" CASCADE;
+  DROP TABLE "_properties_v_version_general_information_comparable_sales" CASCADE;
+  DROP TABLE "_properties_v_version_due_diligence_zone_data" CASCADE;
+  DROP TABLE "_properties_v" CASCADE;
+  DROP TABLE "_properties_v_rels" CASCADE;
+  DROP TABLE "regions_community_economic_landscape" CASCADE;
+  DROP TABLE "regions_infrastructure_future_development" CASCADE;
+  DROP TABLE "regions" CASCADE;
+  DROP TABLE "suburbs_median_value_by_year" CASCADE;
+  DROP TABLE "suburbs" CASCADE;
+  DROP TABLE "access_token" CASCADE;
+  DROP TABLE "buyers_access_sessions" CASCADE;
+  DROP TABLE "buyers_access" CASCADE;
+  DROP TABLE "buyers_access_rels" CASCADE;
   DROP TABLE "redirects" CASCADE;
   DROP TABLE "redirects_rels" CASCADE;
   DROP TABLE "forms_blocks_checkbox" CASCADE;
@@ -1171,6 +1732,9 @@ export async function down({ db, payload, req }: MigrateDownArgs): Promise<void>
   DROP TABLE "footer_nav_items" CASCADE;
   DROP TABLE "footer" CASCADE;
   DROP TABLE "footer_rels" CASCADE;
+  DROP TABLE "company_settings_social_media" CASCADE;
+  DROP TABLE "company_settings_brand_colours" CASCADE;
+  DROP TABLE "company_settings" CASCADE;
   DROP TYPE "public"."enum_pages_hero_links_link_type";
   DROP TYPE "public"."enum_pages_hero_links_link_appearance";
   DROP TYPE "public"."enum_pages_blocks_cta_links_link_type";
@@ -1195,6 +1759,17 @@ export async function down({ db, payload, req }: MigrateDownArgs): Promise<void>
   DROP TYPE "public"."enum__pages_v_version_status";
   DROP TYPE "public"."enum_posts_status";
   DROP TYPE "public"."enum__posts_v_version_status";
+  DROP TYPE "public"."comp_type";
+  DROP TYPE "public"."enum_properties_due_diligence_zone_data_type";
+  DROP TYPE "public"."enum_properties_due_diligence_zone_data_effected";
+  DROP TYPE "public"."enum_properties_general_information_address_state";
+  DROP TYPE "public"."enum_properties_due_diligence_property_occupancy";
+  DROP TYPE "public"."enum_properties_status";
+  DROP TYPE "public"."enum__properties_v_version_due_diligence_zone_data_type";
+  DROP TYPE "public"."enum__properties_v_version_due_diligence_zone_data_effected";
+  DROP TYPE "public"."enum__properties_v_version_general_information_address_state";
+  DROP TYPE "public"."enum__properties_v_version_due_diligence_property_occupancy";
+  DROP TYPE "public"."enum__properties_v_version_status";
   DROP TYPE "public"."enum_redirects_to_type";
   DROP TYPE "public"."enum_forms_confirmation_type";
   DROP TYPE "public"."enum_payload_jobs_log_task_slug";

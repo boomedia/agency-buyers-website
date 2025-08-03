@@ -1,5 +1,5 @@
 {
-  "id": "8db1785f-1435-43b2-88f6-bfd8146062d1",
+  "id": "e8f2ef21-6732-4566-86c5-2e6abc0f6da3",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -5773,12 +5773,6 @@
           "notNull": false,
           "default": 30
         },
-        "value_proposition_purchase_cost_loan_amount_display": {
-          "name": "value_proposition_purchase_cost_loan_amount_display",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": false
-        },
         "value_proposition_purchase_cost_interest_rate": {
           "name": "value_proposition_purchase_cost_interest_rate",
           "type": "numeric",
@@ -5800,6 +5794,12 @@
         "value_proposition_purchase_cost_equity_release_interest_rate": {
           "name": "value_proposition_purchase_cost_equity_release_interest_rate",
           "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "value_proposition_purchase_cost_loan_amount_display": {
+          "name": "value_proposition_purchase_cost_loan_amount_display",
+          "type": "varchar",
           "primaryKey": false,
           "notNull": false
         },
@@ -5875,6 +5875,12 @@
           "primaryKey": false,
           "notNull": false
         },
+        "value_proposition_annual_expenses_repairs_and_maintenance": {
+          "name": "value_proposition_annual_expenses_repairs_and_maintenance",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
         "value_proposition_annual_expenses_pm_percentage": {
           "name": "value_proposition_annual_expenses_pm_percentage",
           "type": "numeric",
@@ -5884,12 +5890,6 @@
         "value_proposition_annual_expenses_pm_fees_display": {
           "name": "value_proposition_annual_expenses_pm_fees_display",
           "type": "varchar",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "value_proposition_annual_expenses_repairs_and_maintenance": {
-          "name": "value_proposition_annual_expenses_repairs_and_maintenance",
-          "type": "numeric",
           "primaryKey": false,
           "notNull": false
         },
@@ -5907,6 +5907,12 @@
         },
         "value_proposition_expected_results_expected_weekly_rent": {
           "name": "value_proposition_expected_results_expected_weekly_rent",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "value_proposition_expected_results_depreciation_potential": {
+          "name": "value_proposition_expected_results_depreciation_potential",
           "type": "numeric",
           "primaryKey": false,
           "notNull": false
@@ -5932,12 +5938,6 @@
         "value_proposition_expected_results_annual_net_yield_display": {
           "name": "value_proposition_expected_results_annual_net_yield_display",
           "type": "varchar",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "value_proposition_expected_results_depreciation_potential": {
-          "name": "value_proposition_expected_results_depreciation_potential",
-          "type": "numeric",
           "primaryKey": false,
           "notNull": false
         },
@@ -7008,12 +7008,6 @@
           "notNull": false,
           "default": 30
         },
-        "version_value_proposition_purchase_cost_loan_amount_display": {
-          "name": "version_value_proposition_purchase_cost_loan_amount_display",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": false
-        },
         "version_value_proposition_purchase_cost_interest_rate": {
           "name": "version_value_proposition_purchase_cost_interest_rate",
           "type": "numeric",
@@ -7035,6 +7029,12 @@
         "version_value_proposition_purchase_cost_equity_release_interest_rate": {
           "name": "version_value_proposition_purchase_cost_equity_release_interest_rate",
           "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version_value_proposition_purchase_cost_loan_amount_display": {
+          "name": "version_value_proposition_purchase_cost_loan_amount_display",
+          "type": "varchar",
           "primaryKey": false,
           "notNull": false
         },
@@ -7110,6 +7110,12 @@
           "primaryKey": false,
           "notNull": false
         },
+        "version_value_proposition_annual_expenses_repairs_and_maintenance": {
+          "name": "version_value_proposition_annual_expenses_repairs_and_maintenance",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
         "version_value_proposition_annual_expenses_pm_percentage": {
           "name": "version_value_proposition_annual_expenses_pm_percentage",
           "type": "numeric",
@@ -7119,12 +7125,6 @@
         "version_value_proposition_annual_expenses_pm_fees_display": {
           "name": "version_value_proposition_annual_expenses_pm_fees_display",
           "type": "varchar",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "version_value_proposition_annual_expenses_repairs_and_maintenance": {
-          "name": "version_value_proposition_annual_expenses_repairs_and_maintenance",
-          "type": "numeric",
           "primaryKey": false,
           "notNull": false
         },
@@ -7142,6 +7142,12 @@
         },
         "version_value_proposition_expected_results_expected_weekly_rent": {
           "name": "version_value_proposition_expected_results_expected_weekly_rent",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "version_value_proposition_expected_results_depreciation_potential": {
+          "name": "version_value_proposition_expected_results_depreciation_potential",
           "type": "numeric",
           "primaryKey": false,
           "notNull": false
@@ -7167,12 +7173,6 @@
         "version_value_proposition_expected_results_annual_net_yield_display": {
           "name": "version_value_proposition_expected_results_annual_net_yield_display",
           "type": "varchar",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "version_value_proposition_expected_results_depreciation_potential": {
-          "name": "version_value_proposition_expected_results_depreciation_potential",
-          "type": "numeric",
           "primaryKey": false,
           "notNull": false
         },
