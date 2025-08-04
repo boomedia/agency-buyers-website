@@ -16,6 +16,23 @@ export const Properties: CollectionConfig = {
   },
   hooks: {
     beforeChange: [
+      ({ data }) => {
+        // Convert empty strings to null for number fields to prevent PostgreSQL errors
+        const convertEmptyStrings = (obj: any): any => {
+          if (obj === '') return null
+          if (Array.isArray(obj)) return obj.map(convertEmptyStrings)
+          if (obj && typeof obj === 'object') {
+            const result: any = {}
+            for (const [key, value] of Object.entries(obj)) {
+              result[key] = convertEmptyStrings(value)
+            }
+            return result
+          }
+          return obj
+        }
+
+        return convertEmptyStrings(data)
+      },
       async ({ data, req }) => {
         // Auto-populate region from selected suburb
         if (data.generalInformation?.address?.suburbName && req.payload) {
