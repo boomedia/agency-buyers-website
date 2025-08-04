@@ -263,6 +263,7 @@ export const Properties: CollectionConfig = {
                           defaultValue: '',
                           relationTo: 'regions',
                           required: false,
+                          index: false,
                           admin: {
                             width: '50%',
                             description: 'Region (automatically populated from selected suburb)',

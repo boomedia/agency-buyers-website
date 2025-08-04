@@ -85,8 +85,20 @@ export default buildConfig({
     pool: {
       connectionString: process.env.POSTGRES_URL || '',
     },
+    migrationDir: path.resolve(dirname, 'migrations'),
   }),
-  collections: [Pages, Posts, Media, Categories, Users, Properties, Regions, Suburbs, AccessToken, BuyersAccess],
+  collections: [
+    Pages,
+    Posts,
+    Media,
+    Categories,
+    Users,
+    Properties,
+    Regions,
+    Suburbs,
+    AccessToken,
+    BuyersAccess,
+  ],
   cors: [getServerSideURL()].filter(Boolean),
   globals: [Header, Footer, CompanySettings],
   plugins: [
