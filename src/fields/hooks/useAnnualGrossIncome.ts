@@ -4,8 +4,10 @@ import { useWatchForm } from '@payloadcms/ui'
 
 export const useAnnualGrossIncome = () => {
   const form = useWatchForm()
-  const expectedWeeklyRent = form.getField('valueProposition.expectedResults.expectedWeeklyRent')
-    .value as number
+  const expectedWeeklyRentField = form.getField(
+    'valueProposition.expectedResults.expectedWeeklyRent',
+  )
+  const expectedWeeklyRent = expectedWeeklyRentField?.value as number
 
   return (expectedWeeklyRent ?? 0) * 52
 }

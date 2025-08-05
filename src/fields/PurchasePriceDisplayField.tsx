@@ -7,7 +7,8 @@ import { CustomField } from '@/fields/CustomField'
 
 const PurchasePriceDisplayField = ({ field }: TextFieldClientProps) => {
   const form = useWatchForm()
-  const purchasePrice = form.getField('generalInformation.purchasePrice').value as number
+  const purchasePriceField = form.getField('generalInformation.purchasePrice')
+  const purchasePrice = purchasePriceField?.value as number
 
   return (
     <CustomField field={field}>
