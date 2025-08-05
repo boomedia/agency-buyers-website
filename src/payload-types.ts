@@ -1004,8 +1004,8 @@ export interface Property {
      */
     currentWeeklyRent?: number | null;
   };
-  valueProposition?: {
-    purchaseCost?: {
+  valProp?: {
+    purchCost?: {
       /**
        * Calculated value equals Purchase Price from General Information
        */
@@ -1033,11 +1033,11 @@ export interface Property {
       /**
        * Calc: Purchase Price - Deposit Cash - Equity Release
        */
-      loanAmountDisplay?: string | null;
+      loanAmountDisp?: string | null;
       /**
        * Calc: Deposit Cash + Equity Release
        */
-      depositTotalDisplay?: string | null;
+      depositTotalDisp?: string | null;
       /**
        * Calc: Deposit Total as percentage of Purchase Price
        */
@@ -1069,9 +1069,9 @@ export interface Property {
       /**
        * Calc: Purchase Price + Stamp Duty + Renovations Cost + Building and Pest + Conveyancing + Bank Fees + (Lenders Mortgage Insurance / Loan Term)
        */
-      totalPurchaseCostDisp?: string | null;
+      totalCostDisp?: string | null;
     };
-    annualExpenses?: {
+    annualExp?: {
       /**
        * Annual AUD Currency
        */
@@ -1095,7 +1095,7 @@ export interface Property {
       /**
        * Calc: Property Management Percentage of Weekly Rent * 52
        */
-      pmFeesDisplay?: string | null;
+      pmFeesDisp?: string | null;
       /**
        * Calc: (Loan Amount - Equity Release × Interest Rate) + (Loan Amount - Deposit Cash × Equity Release Interest Rate) / Loan Term
        */
@@ -1105,11 +1105,11 @@ export interface Property {
        */
       totalExpensesDisp?: string | null;
     };
-    expectedResults?: {
+    expResults?: {
       /**
        * Expected Weekly rent as AUD Currency
        */
-      expectedWeeklyRent?: number | null;
+      expectedRent?: number | null;
       /**
        * AUD Currency Depreciation potential
        */
@@ -1133,19 +1133,19 @@ export interface Property {
       /**
        * Calc: Purchase price X 0.08
        */
-      equityAt8Display?: string | null;
+      equity8Disp?: string | null;
       /**
        * Calc: Purchase price X 0.1
        */
-      equityAt10Display?: string | null;
+      equity10Disp?: string | null;
       /**
        * Calc: Purchase price X 0.12
        */
-      equityAt12Display?: string | null;
+      equity12Disp?: string | null;
       /**
        * Calc: Purchase price X 0.16
        */
-      equityAt16Display?: string | null;
+      equity16Disp?: string | null;
     };
   };
   updatedAt: string;
@@ -1998,10 +1998,10 @@ export interface PropertiesSelect<T extends boolean = true> {
         lastRentalIncrease?: T;
         currentWeeklyRent?: T;
       };
-  valueProposition?:
+  valProp?:
     | T
     | {
-        purchaseCost?:
+        purchCost?:
           | T
           | {
               purchasePriceDisp?: T;
@@ -2010,8 +2010,8 @@ export interface PropertiesSelect<T extends boolean = true> {
               depositCash?: T;
               equityRelease?: T;
               equityReleaseRate?: T;
-              loanAmountDisplay?: T;
-              depositTotalDisplay?: T;
+              loanAmountDisp?: T;
+              depositTotalDisp?: T;
               depositPctDisp?: T;
               stampDuty?: T;
               renovationsCost?: T;
@@ -2019,9 +2019,9 @@ export interface PropertiesSelect<T extends boolean = true> {
               conveyancing?: T;
               bankFees?: T;
               lendersInsurance?: T;
-              totalPurchaseCostDisp?: T;
+              totalCostDisp?: T;
             };
-        annualExpenses?:
+        annualExp?:
           | T
           | {
               councilRates?: T;
@@ -2029,23 +2029,23 @@ export interface PropertiesSelect<T extends boolean = true> {
               utilities?: T;
               repairsMaintenance?: T;
               pmPercentage?: T;
-              pmFeesDisplay?: T;
+              pmFeesDisp?: T;
               loanRepaymentsDisp?: T;
               totalExpensesDisp?: T;
             };
-        expectedResults?:
+        expResults?:
           | T
           | {
-              expectedWeeklyRent?: T;
+              expectedRent?: T;
               depreciation?: T;
               grossIncomeDisp?: T;
               grossYieldDisp?: T;
               netIncomeDisp?: T;
               netYieldDisp?: T;
-              equityAt8Display?: T;
-              equityAt10Display?: T;
-              equityAt12Display?: T;
-              equityAt16Display?: T;
+              equity8Disp?: T;
+              equity10Disp?: T;
+              equity12Disp?: T;
+              equity16Disp?: T;
             };
       };
   updatedAt?: T;

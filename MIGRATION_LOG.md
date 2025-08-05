@@ -124,3 +124,26 @@ This document tracks the migration of Payload CMS collections from `agency-buyer
 
 ## Date Started
 2025-08-01
+
+## Versioning change isssue with field name length
+Summary of Changes Made
+I've shortened the following problematic field names to prevent PostgreSQL identifier length issues:
+
+Group Names (shortened to reduce prefix length):
+- valueProposition → valProp
+- purchaseCost → purchCost
+- annualExpenses → annualExp
+- expectedResults → expResults
+
+Field Names:
+- totalPurchaseCostDisp → totalCostDisp
+- loanAmountDisplay → loanAmountDisp
+- depositTotalDisplay → depositTotalDisp
+- pmFeesDisplay → pmFeesDisp
+- expectedWeeklyRent → expectedRent
+- equityAt8Display → equity8Disp
+- equityAt10Display → equity10Disp
+- equityAt12Display → equity12Disp
+- equityAt16Display → equity16Disp
+
+These changes ensure that when Payload CMS generates the database schema with versioning prefixes, all column names will stay within PostgreSQL's 63-character identifier limit. The display labels in the admin interface remain unchanged, so the user experience won't be affected.
