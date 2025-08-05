@@ -5,18 +5,14 @@ import { usePropertyManagementFees } from '@/fields/hooks/usePropertyManagementF
 
 export const useAnnualTotalExpenses = () => {
   const form = useWatchForm()
-  const councilRates = form.getField('valueProposition.annualExpenses.councilRates')
+  const councilRates = form.getField('valProp.annualExp.councilRates')?.value as number
+  const insuranceCosts = form.getField('valProp.annualExp.insuranceCosts')?.value as number
+  const utilities = form.getField('valProp.annualExp.utilities')?.value as number
+  const repairsAndMaintenance = form.getField('valProp.annualExp.repairsMaintenance')
     ?.value as number
-  const insuranceCosts = form.getField('valueProposition.annualExpenses.insuranceCosts')
+  const lendersMortgageInsurance = form.getField('valProp.purchCost.lendersInsurance')
     ?.value as number
-  const utilities = form.getField('valueProposition.annualExpenses.utilities')?.value as number
-  const repairsAndMaintenance = form.getField(
-    'valueProposition.annualExpenses.repairsAndMaintenance',
-  )?.value as number
-  const lendersMortgageInsurance = form.getField(
-    'valueProposition.purchaseCost.lendersMortgageInsurance',
-  )?.value as number
-  const loanTerm = form.getField('valueProposition.purchaseCost.loanTerm')?.value as number
+  const loanTerm = form.getField('valProp.purchCost.loanTerm')?.value as number
 
   const loanRepayments = useLoanRepayments()
   const propertyManagementFees = usePropertyManagementFees()

@@ -7,9 +7,9 @@ import { CustomField } from '@/fields/CustomField'
 
 const DepositPercentageDisplayField = ({ field }: TextFieldClientProps) => {
   const form = useWatchForm()
-  const purchasePriceField = form.getField('generalInformation.purchasePrice')
-  const depositCashField = form.getField('valueProposition.purchaseCost.depositCash')
-  const equityReleaseField = form.getField('valueProposition.purchaseCost.equityRelease')
+  const purchasePriceField = form.getField('info.purchasePrice')
+  const depositCashField = form.getField('valProp.purchCost.depositCash')
+  const equityReleaseField = form.getField('valProp.purchCost.equityRelease')
 
   const purchasePrice = purchasePriceField?.value as number
   const depositCash = depositCashField?.value as number

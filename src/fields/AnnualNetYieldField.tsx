@@ -9,7 +9,7 @@ import type { TextFieldClientProps } from 'payload'
 const AnnualNetYieldField = ({ field }: TextFieldClientProps) => {
   const form = useWatchForm()
   const annualNetIncome = useAnnualNetIncome()
-  const purchasePriceField = form.getField('generalInformation.purchasePrice')
+  const purchasePriceField = form.getField('info.purchasePrice')
   const purchasePrice = purchasePriceField?.value as number
 
   const annualNetYield = purchasePrice ? (annualNetIncome / purchasePrice) * 100 : 0

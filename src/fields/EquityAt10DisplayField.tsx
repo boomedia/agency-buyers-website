@@ -7,7 +7,7 @@ import { CustomField } from '@/fields/CustomField'
 
 const EquityAt10DisplayField = ({ field }: TextFieldClientProps) => {
   const form = useWatchForm()
-  const purchasePriceField = form.getField('generalInformation.purchasePrice')
+  const purchasePriceField = form.getField('info.purchasePrice')
   const purchasePrice = purchasePriceField?.value as number
 
   const calculateEquity = () => {

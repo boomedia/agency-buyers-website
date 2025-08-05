@@ -5,13 +5,11 @@ import { useLoanAmount } from '@/fields/hooks/useLoanAmount'
 export const useLoanRepayments = () => {
   const form = useWatchForm()
   const loanAmount = useLoanAmount()
-  const interestRate = form.getField('valueProposition.purchaseCost.interestRate')?.value as number
-  const equityRelease = form.getField('valueProposition.purchaseCost.equityRelease')
-    ?.value as number
-  const equityReleaseRate = form.getField('valueProposition.purchaseCost.equityReleaseInterestRate')
-    ?.value as number
-  const depositCash = form.getField('valueProposition.purchaseCost.depositCash')?.value as number
-  const loanTerm = form.getField('valueProposition.purchaseCost.loanTerm')?.value as number
+  const interestRate = form.getField('valProp.purchCost.interestRate')?.value as number
+  const equityRelease = form.getField('valProp.purchCost.equityRelease')?.value as number
+  const equityReleaseRate = form.getField('valProp.purchCost.equityReleaseRate')?.value as number
+  const depositCash = form.getField('valProp.purchCost.depositCash')?.value as number
+  const loanTerm = form.getField('valProp.purchCost.loanTerm')?.value as number
 
   // Calculate loan repayments based on the formula:
   // (Loan Amount - Equity Release × Interest Rate) + (Loan Amount - Deposit Cash × Equity Release Interest Rate) / Loan Term

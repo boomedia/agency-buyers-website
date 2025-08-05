@@ -188,14 +188,19 @@ export const Properties: CollectionConfig = {
                         beforeChange: [
                           ({ value, req }) => {
                             // Auto-populate with current user's name if field is empty
-                            if (!value && req.user && req.user.collection === 'users') {
-                              // Use the user's name field, or email as fallback
+                            if ((!value || value === '') && req.user) {
                               const user = req.user as any
                               return user.name || user.email || 'Unknown Agent'
                             }
                             return value
                           },
                         ],
+                      },
+                      defaultValue: ({ user }: { user: any }) => {
+                        if (user) {
+                          return user.name || user.email || 'Unknown Agent'
+                        }
+                        return ''
                       },
                       admin: {
                         description: 'Auto-filled with current logged-in user name',
