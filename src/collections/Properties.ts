@@ -35,13 +35,13 @@ export const Properties: CollectionConfig = {
       },
       async ({ data, req }) => {
         // Auto-populate region from selected suburb
-        if (data.generalInformation?.address?.suburbName && req.payload) {
+        if (data.info?.addr?.suburbName && req.payload) {
           try {
             // Handle both string IDs and objects
             const suburbId =
-              typeof data.generalInformation.address.suburbName === 'object'
-                ? data.generalInformation.address.suburbName.id
-                : data.generalInformation.address.suburbName
+              typeof data.info.addr.suburbName === 'object'
+                ? data.info.addr.suburbName.id
+                : data.info.addr.suburbName
 
             if (suburbId) {
               const suburb = await req.payload.findByID({
@@ -53,7 +53,7 @@ export const Properties: CollectionConfig = {
                 // Always update the region when suburb changes
                 const regionId =
                   typeof suburb.region === 'object' ? suburb.region.id : suburb.region
-                data.generalInformation.address.region = regionId
+                data.info.addr.region = regionId
               }
             }
           } catch (error) {
@@ -165,7 +165,7 @@ export const Properties: CollectionConfig = {
           label: 'General Information',
           fields: [
             {
-              name: 'generalInformation',
+              name: 'info', // Shortened from 'generalInformation'
               type: 'group',
               label: 'General Information',
               fields: [
@@ -251,7 +251,7 @@ export const Properties: CollectionConfig = {
                   ],
                 },
                 {
-                  name: 'address',
+                  name: 'addr', // Shortened from 'address'
                   type: 'group',
                   label: 'Address',
                   fields: [
@@ -636,7 +636,7 @@ export const Properties: CollectionConfig = {
                   label: 'Purchase Cost',
                   fields: [
                     {
-                      name: 'purchasePriceDisplay',
+                      name: 'purchasePriceDisp',
                       type: 'text',
                       label: 'Purchase Price (Display)',
                       admin: {
@@ -693,7 +693,7 @@ export const Properties: CollectionConfig = {
                           },
                         },
                         {
-                          name: 'equityReleaseInterestRate',
+                          name: 'equityReleaseRate',
                           type: 'number',
                           label: 'Equity Release Interest Rate',
                           admin: {
@@ -707,6 +707,7 @@ export const Properties: CollectionConfig = {
                     {
                       name: 'loanAmountDisplay',
                       type: 'text',
+                      dbName: 'loan_amount_disp',
                       label: 'Loan Amount (Display)',
                       admin: {
                         description: 'Calc: Purchase Price - Deposit Cash - Equity Release',
@@ -722,6 +723,7 @@ export const Properties: CollectionConfig = {
                         {
                           name: 'depositTotalDisplay',
                           type: 'text',
+                          dbName: 'deposit_total_disp',
                           label: 'Deposit Total (Display)',
                           admin: {
                             width: '50%',
@@ -733,8 +735,9 @@ export const Properties: CollectionConfig = {
                           },
                         },
                         {
-                          name: 'depositPercentageDisplay',
+                          name: 'depositPctDisp',
                           type: 'text',
+                          dbName: 'deposit_pct_disp',
                           label: 'Deposit Percentage (Display)',
                           admin: {
                             width: '50%',
@@ -806,7 +809,7 @@ export const Properties: CollectionConfig = {
                           },
                         },
                         {
-                          name: 'lendersMortgageInsurance',
+                          name: 'lendersInsurance',
                           type: 'number',
                           label: 'Lenders Mortgage Insurance',
                           admin: {
@@ -818,8 +821,9 @@ export const Properties: CollectionConfig = {
                       ],
                     },
                     {
-                      name: 'totalPurchaseCostDisplay',
+                      name: 'totalPurchaseCostDisp',
                       type: 'text',
+                      dbName: 'total_cost_disp',
                       label: 'Total Purchase Cost (Display)',
                       admin: {
                         description:
@@ -871,8 +875,9 @@ export const Properties: CollectionConfig = {
                           },
                         },
                         {
-                          name: 'repairsAndMaintenance',
+                          name: 'repairsMaintenance',
                           type: 'number',
+                          dbName: 'repairs_maint',
                           label: 'Repairs and Maintenance',
                           admin: {
                             width: '20%',
@@ -951,8 +956,9 @@ export const Properties: CollectionConfig = {
                           },
                         },
                         {
-                          name: 'depreciationPotential',
+                          name: 'depreciation',
                           type: 'number',
+                          dbName: 'depreciation',
                           label: 'Depreciation Potential',
                           admin: {
                             width: '50%',
@@ -966,8 +972,9 @@ export const Properties: CollectionConfig = {
                       type: 'row',
                       fields: [
                         {
-                          name: 'annualGrossIncomeDisplay',
+                          name: 'grossIncomeDisp',
                           type: 'text',
+                          dbName: 'gross_inc_disp',
                           label: 'Annual Gross Income (Display)',
                           admin: {
                             width: '50%',
@@ -979,8 +986,9 @@ export const Properties: CollectionConfig = {
                           },
                         },
                         {
-                          name: 'annualGrossYieldDisplay',
+                          name: 'grossYieldDisp',
                           type: 'text',
+                          dbName: 'gross_yield_disp',
                           label: 'Annual Gross Yield (Display)',
                           admin: {
                             width: '50%',
@@ -997,8 +1005,9 @@ export const Properties: CollectionConfig = {
                       type: 'row',
                       fields: [
                         {
-                          name: 'annualNetIncomeDisplay',
+                          name: 'netIncomeDisp',
                           type: 'text',
+                          dbName: 'net_inc_disp',
                           label: 'Annual Net Income (Display)',
                           admin: {
                             width: '50%',
@@ -1010,8 +1019,9 @@ export const Properties: CollectionConfig = {
                           },
                         },
                         {
-                          name: 'annualNetYieldDisplay',
+                          name: 'netYieldDisp',
                           type: 'text',
+                          dbName: 'net_yield_disp',
                           label: 'Annual Net Yield (Display)',
                           admin: {
                             width: '50%',
@@ -1030,6 +1040,7 @@ export const Properties: CollectionConfig = {
                         {
                           name: 'equityAt8Display',
                           type: 'text',
+                          dbName: 'equity_8_disp',
                           label: 'Equity at 8% (Display)',
                           admin: {
                             width: '25%',
@@ -1043,6 +1054,7 @@ export const Properties: CollectionConfig = {
                         {
                           name: 'equityAt10Display',
                           type: 'text',
+                          dbName: 'equity_10_disp',
                           label: 'Equity at 10% (Display)',
                           admin: {
                             width: '25%',
@@ -1056,6 +1068,7 @@ export const Properties: CollectionConfig = {
                         {
                           name: 'equityAt12Display',
                           type: 'text',
+                          dbName: 'equity_12_disp',
                           label: 'Equity at 12% (Display)',
                           admin: {
                             width: '25%',
@@ -1069,6 +1082,7 @@ export const Properties: CollectionConfig = {
                         {
                           name: 'equityAt16Display',
                           type: 'text',
+                          dbName: 'equity_16_disp',
                           label: 'Equity at 16% (Display)',
                           admin: {
                             width: '25%',

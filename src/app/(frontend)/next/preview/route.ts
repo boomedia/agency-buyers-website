@@ -28,7 +28,14 @@ export async function GET(
     return new Response('You are not allowed to preview this page', { status: 403 })
   }
 
-  if (!path || !collection || !slug) {
+  if (!path || !collection) {
+    return new Response('Insufficient search params', { status: 404 })
+  }
+
+  // For pages collection, empty slug should default to 'home'
+  const finalSlug = !slug && collection === 'pages' ? 'home' : slug
+
+  if (!finalSlug) {
     return new Response('Insufficient search params', { status: 404 })
   }
 

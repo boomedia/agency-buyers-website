@@ -41,8 +41,9 @@ export const Pages: CollectionConfig<'pages'> = {
     defaultColumns: ['title', 'slug', 'updatedAt'],
     livePreview: {
       url: ({ data, req }) => {
+        const slug = typeof data?.slug === 'string' ? data.slug : ''
         const path = generatePreviewPath({
-          slug: typeof data?.slug === 'string' ? data.slug : '',
+          slug,
           collection: 'pages',
           req,
         })
@@ -50,12 +51,14 @@ export const Pages: CollectionConfig<'pages'> = {
         return path
       },
     },
-    preview: (data, { req }) =>
-      generatePreviewPath({
-        slug: typeof data?.slug === 'string' ? data.slug : '',
+    preview: (data, { req }) => {
+      const slug = typeof data?.slug === 'string' ? data.slug : ''
+      return generatePreviewPath({
+        slug,
         collection: 'pages',
         req,
-      }),
+      })
+    },
     useAsTitle: 'title',
   },
   fields: [

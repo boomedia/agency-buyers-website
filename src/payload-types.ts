@@ -802,7 +802,7 @@ export interface Property {
    * Buyers who have this property in their portfolio. You can remove buyers from this list.
    */
   linkedBuyers?: (number | BuyersAccess)[] | null;
-  generalInformation?: {
+  info?: {
     heroImage?: (number | null) | Media;
     agentNotes?:
       | {
@@ -858,7 +858,7 @@ export interface Property {
      * AUD Currency
      */
     askingPrice?: number | null;
-    address?: {
+    addr?: {
       streetAddress?: string | null;
       /**
        * Suburb Name
@@ -1009,7 +1009,7 @@ export interface Property {
       /**
        * Calculated value equals Purchase Price from General Information
        */
-      purchasePriceDisplay?: string | null;
+      purchasePriceDisp?: string | null;
       /**
        * Years
        */
@@ -1029,7 +1029,7 @@ export interface Property {
       /**
        * Percentage
        */
-      equityReleaseInterestRate?: number | null;
+      equityReleaseRate?: number | null;
       /**
        * Calc: Purchase Price - Deposit Cash - Equity Release
        */
@@ -1041,7 +1041,7 @@ export interface Property {
       /**
        * Calc: Deposit Total as percentage of Purchase Price
        */
-      depositPercentageDisplay?: string | null;
+      depositPctDisp?: string | null;
       /**
        * AUD Currency
        */
@@ -1065,11 +1065,11 @@ export interface Property {
       /**
        * AUD Currency LMI
        */
-      lendersMortgageInsurance?: number | null;
+      lendersInsurance?: number | null;
       /**
        * Calc: Purchase Price + Stamp Duty + Renovations Cost + Building and Pest + Conveyancing + Bank Fees + (Lenders Mortgage Insurance / Loan Term)
        */
-      totalPurchaseCostDisplay?: string | null;
+      totalPurchaseCostDisp?: string | null;
     };
     annualExpenses?: {
       /**
@@ -1087,7 +1087,7 @@ export interface Property {
       /**
        * Annual AUD Currency
        */
-      repairsAndMaintenance?: number | null;
+      repairsMaintenance?: number | null;
       /**
        * Percentage of weekly rent
        */
@@ -1113,23 +1113,23 @@ export interface Property {
       /**
        * AUD Currency Depreciation potential
        */
-      depreciationPotential?: number | null;
+      depreciation?: number | null;
       /**
        * Calc: Expected Weekly rent X 52
        */
-      annualGrossIncomeDisplay?: string | null;
+      grossIncomeDisp?: string | null;
       /**
        * Calc: Annual Gross income / Purchase Price X 100
        */
-      annualGrossYieldDisplay?: string | null;
+      grossYieldDisp?: string | null;
       /**
        * Calc: Gross - Expenses
        */
-      annualNetIncomeDisplay?: string | null;
+      netIncomeDisp?: string | null;
       /**
        * Calc: Annual Net Income / Purchase Price X 100
        */
-      annualNetYieldDisplay?: string | null;
+      netYieldDisp?: string | null;
       /**
        * Calc: Purchase price X 0.08
        */
@@ -1921,7 +1921,7 @@ export interface UsersSelect<T extends boolean = true> {
 export interface PropertiesSelect<T extends boolean = true> {
   name?: T;
   linkedBuyers?: T;
-  generalInformation?:
+  info?:
     | T
     | {
         heroImage?: T;
@@ -1936,7 +1936,7 @@ export interface PropertiesSelect<T extends boolean = true> {
         videoUrl?: T;
         purchasePrice?: T;
         askingPrice?: T;
-        address?:
+        addr?:
           | T
           | {
               streetAddress?: T;
@@ -2004,22 +2004,22 @@ export interface PropertiesSelect<T extends boolean = true> {
         purchaseCost?:
           | T
           | {
-              purchasePriceDisplay?: T;
+              purchasePriceDisp?: T;
               loanTerm?: T;
               interestRate?: T;
               depositCash?: T;
               equityRelease?: T;
-              equityReleaseInterestRate?: T;
+              equityReleaseRate?: T;
               loanAmountDisplay?: T;
               depositTotalDisplay?: T;
-              depositPercentageDisplay?: T;
+              depositPctDisp?: T;
               stampDuty?: T;
               renovationsCost?: T;
               buildingAndPest?: T;
               conveyancing?: T;
               bankFees?: T;
-              lendersMortgageInsurance?: T;
-              totalPurchaseCostDisplay?: T;
+              lendersInsurance?: T;
+              totalPurchaseCostDisp?: T;
             };
         annualExpenses?:
           | T
@@ -2027,7 +2027,7 @@ export interface PropertiesSelect<T extends boolean = true> {
               councilRates?: T;
               insuranceCosts?: T;
               utilities?: T;
-              repairsAndMaintenance?: T;
+              repairsMaintenance?: T;
               pmPercentage?: T;
               pmFeesDisplay?: T;
               loanRepaymentsDisp?: T;
@@ -2037,11 +2037,11 @@ export interface PropertiesSelect<T extends boolean = true> {
           | T
           | {
               expectedWeeklyRent?: T;
-              depreciationPotential?: T;
-              annualGrossIncomeDisplay?: T;
-              annualGrossYieldDisplay?: T;
-              annualNetIncomeDisplay?: T;
-              annualNetYieldDisplay?: T;
+              depreciation?: T;
+              grossIncomeDisp?: T;
+              grossYieldDisp?: T;
+              netIncomeDisp?: T;
+              netYieldDisp?: T;
               equityAt8Display?: T;
               equityAt10Display?: T;
               equityAt12Display?: T;
