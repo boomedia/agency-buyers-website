@@ -1148,6 +1148,14 @@ export interface Property {
       equity16Disp?: string | null;
     };
   };
+  meta?: {
+    title?: string | null;
+    /**
+     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
+     */
+    image?: (number | null) | Media;
+    description?: string | null;
+  };
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -2047,6 +2055,13 @@ export interface PropertiesSelect<T extends boolean = true> {
               equity12Disp?: T;
               equity16Disp?: T;
             };
+      };
+  meta?:
+    | T
+    | {
+        title?: T;
+        image?: T;
+        description?: T;
       };
   updatedAt?: T;
   createdAt?: T;

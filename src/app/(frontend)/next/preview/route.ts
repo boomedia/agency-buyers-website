@@ -22,6 +22,7 @@ export async function GET(
   const path = searchParams.get('path')
   const collection = searchParams.get('collection') as CollectionSlug
   const slug = searchParams.get('slug')
+  const id = searchParams.get('id')
   const previewSecret = searchParams.get('previewSecret')
 
   if (previewSecret !== process.env.PREVIEW_SECRET) {
@@ -35,7 +36,14 @@ export async function GET(
   // For pages collection, empty slug should default to 'home'
   const finalSlug = !slug && collection === 'pages' ? 'home' : slug
 
-  if (!finalSlug) {
+  // For properties, we need either an ID or a slug, for others we need a slug
+  if (collection === 'properties') {
+    if (!id && !finalSlug) {
+      return new Response('Insufficient search params for properties - need id or slug', {
+        status: 404,
+      })
+    }
+  } else if (!finalSlug) {
     return new Response('Insufficient search params', { status: 404 })
   }
 
