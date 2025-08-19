@@ -13,6 +13,8 @@ import { property1 } from './property-1'
 import { property2 } from './property-2'
 import { regionBundaberg } from './region-bundaberg'
 import { suburbBundabergEast } from './suburb-bundaberg-east'
+import { logoLight, logoDark, iconFavicon } from './company-logos'
+import { companySettings } from './company-settings'
 import {
   propertyHeroImage,
   propertyImage1,
@@ -176,47 +178,42 @@ export const seed = async ({
     hospitalIconBuffer,
     newHomesBuffer,
     suburbHeroBuffer,
+    // logoLightBuffer,
+    // logoDarkBuffer,
+    // iconFaviconBuffer,
   ] = await Promise.allSettled([
-    // Original blog post images - keep existing PayloadCMS template images
-    fetchFileByURL(
-      'https://raw.githubusercontent.com/payloadcms/payload/refs/heads/main/templates/website/src/endpoints/seed/image-post1.webp',
-      'image-post1.webp',
-    ),
-    fetchFileByURL(
-      'https://raw.githubusercontent.com/payloadcms/payload/refs/heads/main/templates/website/src/endpoints/seed/image-post2.webp',
-      'image-post2.webp',
-    ),
-    fetchFileByURL(
-      'https://raw.githubusercontent.com/payloadcms/payload/refs/heads/main/templates/website/src/endpoints/seed/image-post3.webp',
-      'image-post3.webp',
-    ),
-    fetchFileByURL(
-      'https://raw.githubusercontent.com/payloadcms/payload/refs/heads/main/templates/website/src/endpoints/seed/image-hero1.webp',
-      'image-hero1.webp',
-    ),
-    // Property images - realistic real estate photos from Picsum
-    fetchFileByURL('https://picsum.photos/800/600?random=1', 'property-hero.jpg'),
-    fetchFileByURL('https://picsum.photos/800/600?random=2', 'property-image-1.jpg'),
-    fetchFileByURL('https://picsum.photos/800/600?random=3', 'property-image-2.jpg'),
-    fetchFileByURL('https://picsum.photos/800/600?random=4', 'property-image-3.jpg'),
-    // Comparable properties - different angles/styles
-    fetchFileByURL('https://picsum.photos/800/600?random=5', 'comparable-1.jpg'),
-    fetchFileByURL('https://picsum.photos/800/600?random=6', 'comparable-2.jpg'),
-    fetchFileByURL('https://picsum.photos/800/600?random=7', 'comparable-3.jpg'),
-    // Zone maps - wider landscape format for maps
-    fetchFileByURL('https://picsum.photos/1200/800?random=8', 'easement-map.jpg'),
-    fetchFileByURL('https://picsum.photos/1200/800?random=9', 'flood-map.jpg'),
-    fetchFileByURL('https://picsum.photos/1200/800?random=10', 'bushfire-map.jpg'),
-    fetchFileByURL('https://picsum.photos/1200/800?random=11', 'public-housing-map.jpg'),
-    // Region and suburb hero images - panoramic format
-    fetchFileByURL('https://picsum.photos/1600/900?random=12', 'bundaberg-hero.jpg'),
-    fetchFileByURL('https://picsum.photos/600/400?random=13', 'community-infographic.jpg'),
-    fetchFileByURL('https://picsum.photos/600/400?random=14', 'economic-infographic.jpg'),
-    fetchFileByURL('https://picsum.photos/600/400?random=15', 'employment-infographic.jpg'),
-    // Icon - smaller square format
-    fetchFileByURL('https://picsum.photos/400/400?random=16', 'hospital-icon.jpg'),
-    fetchFileByURL('https://picsum.photos/1200/800?random=17', 'new-homes-development.jpg'),
-    fetchFileByURL('https://picsum.photos/1600/900?random=18', 'suburb-hero.jpg'),
+    // Original blog post images - use local files from seed folder
+    readLocalFile('image-post1.webp'),
+    readLocalFile('image-post2.webp'),
+    readLocalFile('image-post3.webp'),
+    readLocalFile('image-hero1.webp'),
+    // Property images - use local seed property images
+    readLocalFile('seed-property-1.webp', 'property-hero.jpg'),
+    readLocalFile('seed-property-2.webp', 'property-image-1.jpg'),
+    readLocalFile('seed-property-1.webp', 'property-image-2.jpg'), // Reuse property 1 for variety
+    readLocalFile('seed-property-2.webp', 'property-image-3.jpg'), // Reuse property 2 for variety
+    // Comparable properties - use blog post images as fillers
+    readLocalFile('image-post1.webp', 'comparable-1.jpg'),
+    readLocalFile('image-post2.webp', 'comparable-2.jpg'),
+    readLocalFile('image-post3.webp', 'comparable-3.jpg'),
+    // Zone maps - use local PNG zone maps
+    readLocalFile('seed-easment.png', 'easement-map.jpg'),
+    readLocalFile('seed-flood.png', 'flood-map.jpg'),
+    readLocalFile('seed-bushfire.png', 'bushfire-map.jpg'),
+    readLocalFile('seed-housing.png', 'public-housing-map.jpg'),
+    // Region and suburb hero images - use available images as fillers
+    readLocalFile('seed-property-1.webp', 'bundaberg-hero.jpg'),
+    readLocalFile('image-post1.webp', 'community-infographic.jpg'),
+    readLocalFile('image-post2.webp', 'economic-infographic.jpg'),
+    readLocalFile('image-post3.webp', 'employment-infographic.jpg'),
+    // Icon - use a blog post image as filler
+    readLocalFile('image-post1.webp', 'hospital-icon.jpg'),
+    readLocalFile('seed-property-2.webp', 'new-homes-development.jpg'),
+    readLocalFile('seed-property-1.webp', 'suburb-hero.jpg'),
+    // Company logos - temporarily commented out for debugging
+    // readLocalFile('buyers-agency-logo-light.svg'),
+    // readLocalFile('buyers-agency-logo-dark.svg'),
+    // readLocalFile('icon-buyers-agency.svg'),
   ]).then((results) => {
     // Handle settled promises and provide fallbacks for failed requests
     return results.map((result, index) => {
@@ -254,6 +251,9 @@ export const seed = async ({
     hospitalIconDoc,
     newHomesDoc,
     suburbHeroDoc,
+    // logoLightDoc,
+    // logoDarkDoc,
+    // iconFaviconDoc,
   ] = await Promise.all([
     payload.create({
       collection: 'users',
@@ -374,6 +374,22 @@ export const seed = async ({
       data: suburbHeroImage,
       file: suburbHeroBuffer,
     }),
+    // Company logos - temporarily commented out for debugging
+    // payload.create({
+    //   collection: 'media',
+    //   data: logoLight,
+    //   file: logoLightBuffer,
+    // }),
+    // payload.create({
+    //   collection: 'media',
+    //   data: logoDark,
+    //   file: logoDarkBuffer,
+    // }),
+    // payload.create({
+    //   collection: 'media',
+    //   data: iconFavicon,
+    //   file: iconFaviconBuffer,
+    // }),
 
     payload.create({
       collection: 'categories',
@@ -745,9 +761,63 @@ export const seed = async ({
         ],
       },
     }),
+    payload.updateGlobal({
+      slug: 'company-settings',
+      data: companySettings({
+        // Temporarily remove logo references for debugging
+        // logoLight: logoLightDoc,
+        // logoDark: logoDarkDoc,
+        // favicon: iconFaviconDoc,
+      }),
+    }),
   ])
 
   payload.logger.info('Seeded database successfully!')
+}
+
+async function readLocalFile(filename: string, customName?: string): Promise<File> {
+  try {
+    const fs = require('fs')
+    const path = require('path')
+
+    // Use process.cwd() to get the project root, then navigate to the seed folder
+    const projectRoot = process.cwd()
+    const seedFolder = path.join(projectRoot, 'src', 'endpoints', 'seed')
+    const filePath = path.join(seedFolder, filename)
+
+    console.log(`Attempting to read file: ${filePath}`)
+    console.log(`File exists: ${fs.existsSync(filePath)}`)
+
+    if (!fs.existsSync(filePath)) {
+      throw new Error(`Local file not found: ${filePath}`)
+    }
+
+    const data = fs.readFileSync(filePath)
+    const finalName = customName || filename
+
+    // Determine MIME type from filename extension
+    const extension = finalName.split('.').pop()?.toLowerCase() || 'jpg'
+    let mimeType = 'image/jpeg' // default
+
+    if (extension === 'webp') {
+      mimeType = 'image/webp'
+    } else if (extension === 'png') {
+      mimeType = 'image/png'
+    } else if (extension === 'jpg' || extension === 'jpeg') {
+      mimeType = 'image/jpeg'
+    } else if (extension === 'svg') {
+      mimeType = 'image/svg+xml'
+    }
+
+    return {
+      name: finalName,
+      data: data,
+      mimetype: mimeType,
+      size: data.length,
+    }
+  } catch (error) {
+    throw new Error(`Failed to read local file ${filename}: ${error}`)
+  }
 }
 
 function createFallbackImage(filename: string): File {
@@ -797,6 +867,8 @@ async function fetchFileByURL(url: string, customName?: string): Promise<File> {
         mimeType = 'image/png'
       } else if (extension === 'jpg' || extension === 'jpeg') {
         mimeType = 'image/jpeg'
+      } else if (extension === 'svg') {
+        mimeType = 'image/svg+xml'
       }
 
       return {

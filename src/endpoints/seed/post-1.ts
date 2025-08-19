@@ -13,7 +13,7 @@ export const post1: (args: PostArgs) => RequiredDataFromCollectionSlug<'posts'> 
   author,
 }) => {
   return {
-    slug: 'digital-horizons',
+    slug: 'first-home-buyer-guide-australia',
     _status: 'published',
     authors: [author],
     content: {
@@ -29,7 +29,7 @@ export const post1: (args: PostArgs) => RequiredDataFromCollectionSlug<'posts'> 
                 format: 0,
                 mode: 'normal',
                 style: '',
-                text: 'Dive into the marvels of modern innovation, where the only constant is change. A journey where pixels and data converge to craft the future.',
+                text: 'Navigate the Australian property market with confidence. Your journey to homeownership starts here, where expert guidance meets local market knowledge.',
                 version: 1,
               },
             ],
@@ -57,7 +57,7 @@ export const post1: (args: PostArgs) => RequiredDataFromCollectionSlug<'posts'> 
                           format: 1,
                           mode: 'normal',
                           style: '',
-                          text: 'Disclaimer:',
+                          text: 'Important:',
                           version: 1,
                         },
                         {
@@ -66,7 +66,7 @@ export const post1: (args: PostArgs) => RequiredDataFromCollectionSlug<'posts'> 
                           format: 0,
                           mode: 'normal',
                           style: '',
-                          text: ' This content is fabricated and for demonstration purposes only. To edit this post, ',
+                          text: ' This content is for educational purposes only and should not be considered financial advice. Always consult with qualified professionals before making property investment decisions. ',
                           version: 1,
                         },
                         {
@@ -78,15 +78,15 @@ export const post1: (args: PostArgs) => RequiredDataFromCollectionSlug<'posts'> 
                               format: 0,
                               mode: 'normal',
                               style: '',
-                              text: 'navigate to the admin dashboard',
+                              text: 'Contact our team for personalised advice',
                               version: 1,
                             },
                           ],
                           direction: 'ltr',
                           fields: {
                             linkType: 'custom',
-                            newTab: true,
-                            url: '/admin',
+                            newTab: false,
+                            url: '/contact',
                           },
                           format: '',
                           indent: 0,
@@ -129,7 +129,7 @@ export const post1: (args: PostArgs) => RequiredDataFromCollectionSlug<'posts'> 
                 format: 0,
                 mode: 'normal',
                 style: '',
-                text: 'The Rise of AI and Machine Learning',
+                text: 'Understanding the First Home Owner Grant (FHOG)',
                 version: 1,
               },
             ],
@@ -148,7 +148,7 @@ export const post1: (args: PostArgs) => RequiredDataFromCollectionSlug<'posts'> 
                 format: 0,
                 mode: 'normal',
                 style: '',
-                text: 'We find ourselves in a transformative era where artificial intelligence (AI) stands at the forefront of technological evolution. The ripple effects of its advancements are reshaping industries at an unprecedented pace. No longer are businesses bound by the limitations of tedious, manual processes. Instead, sophisticated machines, fueled by vast amounts of historical data, are now capable of making decisions previously left to human intuition. These intelligent systems are not only optimizing operations but also pioneering innovative approaches, heralding a new age of business transformation worldwide. ',
+                text: "As a first home buyer in Australia, you're entering one of the most exciting chapters of your life. The property market can seem overwhelming, but with the right guidance and understanding of available grants and schemes, homeownership is within reach. The First Home Owner Grant varies by state, but it's designed to help you get your foot on the property ladder. In Queensland, for example, eligible buyers can receive up to $15,000 for new homes, while other states offer similar incentives. Understanding these opportunities is crucial to maximising your purchasing power and making informed decisions in today's competitive market.",
                 version: 1,
               },
             ],
@@ -167,7 +167,7 @@ export const post1: (args: PostArgs) => RequiredDataFromCollectionSlug<'posts'> 
                 format: 0,
                 mode: 'normal',
                 style: '',
-                text: 'To demonstrate basic AI functionality, here is a javascript snippet that makes a POST request to a generic AI API in order to generate text based on a prompt. ',
+                text: "Here's a simple checklist to help you prepare for your first property purchase in Australia:",
                 version: 1,
               },
             ],
@@ -180,9 +180,9 @@ export const post1: (args: PostArgs) => RequiredDataFromCollectionSlug<'posts'> 
           {
             type: 'block',
             fields: {
-              blockName: 'Generate Text',
+              blockName: 'First Home Buyer Checklist',
               blockType: 'code',
-              code: "async function generateText(prompt) {\n    const apiKey = 'your-api-key';\n    const apiUrl = 'https://api.example.com/generate-text';\n\n    const response = await fetch(apiUrl, {\n        method: 'POST',\n        headers: {\n            'Content-Type': 'application/json',\n            'Authorization': `Bearer ${apiKey}`\n        },\n        body: JSON.stringify({\n            model: 'text-generation-model',\n            prompt: prompt,\n            max_tokens: 50\n        })\n    });\n\n    const data = await response.json();\n    console.log(data.choices[0].text.trim());\n}\n\n// Example usage\ngenerateText(\"Once upon a time in a faraway land,\");\n",
+              code: "// First Home Buyer Checklist - Australia\n\nconst firstHomeBuyerChecklist = {\n    finances: {\n        depositSaved: '5-20% of property value',\n        preApproval: 'Secured from lender',\n        stampDuty: 'Calculated and budgeted',\n        inspectionFees: '$300-600 per property',\n        conveyancing: '$800-2000'\n    },\n    \n    research: {\n        locationAnalysis: 'Growth potential and amenities',\n        marketComparisons: 'Recent sales in area',\n        futureInfrastructure: 'Planned developments',\n        schoolZones: 'If applicable',\n        transportLinks: 'Public transport access'\n    },\n    \n    legal: {\n        contractReview: 'Qualified conveyancer',\n        buildingInspection: 'Professional assessment',\n        pestInspection: 'Especially for older homes',\n        strata: 'For units/townhouses',\n        cooling off: 'Understand your rights'\n    }\n};\n\nconsole.log('Your journey to homeownership starts here!');\n",
               language: 'javascript',
             },
             format: '',
@@ -197,7 +197,7 @@ export const post1: (args: PostArgs) => RequiredDataFromCollectionSlug<'posts'> 
                 format: 0,
                 mode: 'normal',
                 style: '',
-                text: 'IoT: Connecting the World Around Us',
+                text: 'Location, Location, Location: Why It Still Matters',
                 version: 1,
               },
             ],
@@ -216,7 +216,7 @@ export const post1: (args: PostArgs) => RequiredDataFromCollectionSlug<'posts'> 
                 format: 0,
                 mode: 'normal',
                 style: '',
-                text: "In today's rapidly evolving technological landscape, the Internet of Things (IoT) stands out as a revolutionary force. From transforming our residences with smart home systems to redefining transportation through connected cars, IoT's influence is palpable in nearly every facet of our daily lives.",
+                text: "In Australia's dynamic property market, the old adage 'location, location, location' remains as relevant as ever. When choosing your first home, consider proximity to employment hubs, quality schools, public transport, and future infrastructure developments. Areas like Brisbane's inner suburbs, Melbourne's growth corridors, and Sydney's emerging precincts offer excellent opportunities for both lifestyle and capital growth.",
                 version: 1,
               },
             ],
@@ -235,7 +235,7 @@ export const post1: (args: PostArgs) => RequiredDataFromCollectionSlug<'posts'> 
                 format: 0,
                 mode: 'normal',
                 style: '',
-                text: "This technology hinges on the seamless integration of devices and systems, allowing them to communicate and collaborate effortlessly. With each connected device, we move a step closer to a world where convenience and efficiency are embedded in the very fabric of our existence. As a result, we're transitioning into an era where our surroundings intuitively respond to our needs, heralding a smarter and more interconnected global community.",
+                text: "The Australian property market is uniquely positioned with strong population growth, particularly in major cities and regional centres. Understanding demographic trends, employment opportunities, and government infrastructure spending can give you a significant advantage. Our buyers agency specialises in identifying these emerging hotspots before they become mainstream, ensuring our clients secure properties with strong growth potential at today's prices.",
                 version: 1,
               },
             ],
@@ -258,7 +258,7 @@ export const post1: (args: PostArgs) => RequiredDataFromCollectionSlug<'posts'> 
           {
             type: 'block',
             fields: {
-              blockName: 'Dynamic Components',
+              blockName: 'Professional Guidance',
               blockType: 'banner',
               content: {
                 root: {
@@ -273,7 +273,7 @@ export const post1: (args: PostArgs) => RequiredDataFromCollectionSlug<'posts'> 
                           format: 0,
                           mode: 'normal',
                           style: '',
-                          text: "This content above is completely dynamic using custom layout building blocks configured in the CMS. This can be anything you'd like from rich text and images, to highly designed, complex components.",
+                          text: 'As your trusted buyers agency, we provide comprehensive support throughout your property journey. From initial market research and property selection to negotiation and settlement, our experienced team ensures you make informed decisions with confidence.',
                           version: 1,
                         },
                       ],
@@ -305,11 +305,11 @@ export const post1: (args: PostArgs) => RequiredDataFromCollectionSlug<'posts'> 
     heroImage: heroImage.id,
     meta: {
       description:
-        'Dive into the marvels of modern innovation, where the only constant is change. A journey where pixels and data converge to craft the future.',
+        'Navigate the Australian property market with confidence. Your journey to homeownership starts here, where expert guidance meets local market knowledge.',
       image: heroImage.id,
-      title: 'Digital Horizons: A Glimpse into Tomorrow',
+      title: "The Complete First Home Buyer's Guide to Australian Property",
     },
     relatedPosts: [], // this is populated by the seed script
-    title: 'Digital Horizons: A Glimpse into Tomorrow',
+    title: "The Complete First Home Buyer's Guide to Australian Property",
   }
 }

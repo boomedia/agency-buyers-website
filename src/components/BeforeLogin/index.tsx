@@ -3,8 +3,8 @@ import React from 'react'
 const BeforeLogin: React.FC = () => {
   return (
     <div>
-      <h3>Backend Login</h3>
-      <p>{' Website and Property database management.'}</p>
+      <h3>Buyers Agency Admin</h3>
+      <p>Property investment platform and database management.</p>
     </div>
   )
 }
