@@ -567,31 +567,31 @@ export const seed = async ({
       email: 'john.doe@example.com',
       name: 'John Doe',
       password: 'password123',
-      properties: [property1Doc.id, property2Doc.id], // Both properties
+      properties: [property1Doc.id, property2Doc.id], // Both properties - Experienced investor
     },
     {
       email: 'sarah.wilson@example.com',
       name: 'Sarah Wilson',
       password: 'password123',
-      properties: [property1Doc.id], // First property only
+      properties: [property1Doc.id], // First property only - New investor focused on flood-affected area
     },
     {
       email: 'michael.chen@example.com',
       name: 'Michael Chen',
       password: 'password123',
-      properties: [property2Doc.id], // Second property only
+      properties: [property2Doc.id], // Second property only - Prefers low-maintenance/vacant properties
     },
     {
       email: 'emma.thompson@example.com',
       name: 'Emma Thompson',
       password: 'password123',
-      properties: [property1Doc.id], // First property only
+      properties: [property1Doc.id], // First property only - Interested in value-add renovations
     },
     {
       email: 'david.johnson@example.com',
       name: 'David Johnson',
       password: 'password123',
-      properties: [], // No properties yet
+      properties: [], // No properties yet - Prospective buyer evaluating options
     },
   ]
 

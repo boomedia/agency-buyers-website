@@ -86,6 +86,7 @@ export default buildConfig({
       connectionString: process.env.POSTGRES_URL || '',
     },
     migrationDir: path.resolve(dirname, 'migrations'),
+    idType: 'uuid', // Use UUIDs instead of auto-incrementing integers
   }),
   collections: [
     Pages,

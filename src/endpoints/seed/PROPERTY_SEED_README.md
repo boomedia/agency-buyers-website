@@ -1,45 +1,59 @@
 # Property Seed Data
 
-This directory contains seed data for the Properties collection and related collections (Regions, Suburbs, Buyers Access).
+This directory contains enhanced seed data for the Properties collection and related collections (Regions, Suburbs, Buyers Access), updated to match the latest collections documentation.
 
 ## Files Created
 
 ### Property Data
 
-- `property-1.ts` - Main property: "61 Scotland Street Bundaberg East"
-- `property-2.ts` - Second property: "15 Walker Street Bundaberg East"
+- `property-1.ts` - Main property: "61 Scotland Street Bundaberg East" - **Enhanced with comprehensive due diligence data**
+- `property-2.ts` - Second property: "15 Walker Street Bundaberg East" - **Enhanced with detailed zone information**
 - `property-images.ts` - Image definitions for all property-related media
 
 ### Location Data
 
-- `region-bundaberg.ts` - Bundaberg Regional Council region data
+- `region-bundaberg.ts` - Bundaberg Regional Council region data - **Enhanced with additional infrastructure projects**
 - `suburb-bundaberg-east.ts` - Bundaberg East suburb data
 
 ### Updated Files
 
 - `index.ts` - Updated to include Properties, Regions, Suburbs, and Buyers Access collections in seeding
 
-## Data Structure
+## Data Structure Updates
 
-The seed data matches the JSON API structure provided and includes:
+The seed data has been enhanced to match the latest collections documentation and includes:
 
 ### Properties
 
-- **General Information**: Hero images, agent notes, video URLs, pricing, address details, property format, images, comparable sales
-- **Due Diligence**: Zone data (easement, flood, bushfire, public housing, train line, renovations), occupancy details, lease information
+- **General Information**: Hero images, agent notes, video URLs, pricing, address details, property format, images, **enhanced comparable sales with complete sale history**
+- **Due Diligence**: **Comprehensive zone data with rich text descriptions**, detailed explanations for:
+  - Easement analysis with title search confirmation
+  - Flood zone mapping with specific flood levels and insurance recommendations
+  - Bushfire risk assessment with QFES mapping references
+  - Public housing proximity analysis with impact assessments
+  - Train line distance analysis
+  - Renovation potential with cost/benefit analysis
 - **Value Proposition**: Purchase costs, annual expenses, expected results with calculated fields
 
 ### Regions
 
-- Community and economic landscape data
-- Infrastructure and future development information
+- **Enhanced Community and Economic Landscape**: Comprehensive demographic data and community profiles
+- **Expanded Infrastructure and Future Development**: Multiple major projects including:
+  - $1.2 billion Bundaberg Hospital expansion
+  - 1,000+ new homes approved with detailed development plans
+  - Bundaberg Ring Road Stage 2 extension
+  - Port of Bundaberg expansion for economic growth
+- **Versioning Support**: Now includes draft/published states with `_status` field
+- **Preview Functionality**: Basic preview support for future development
 - Rich text descriptions and media assets
 
 ### Suburbs
 
-- Regional associations
-- Median value trends by year
-- Vacancy rates and descriptions
+- Regional associations with automatic parent-child relationships
+- **Comprehensive median value trends** by year (2016-2025)
+- Vacancy rates and detailed descriptions
+- **Versioning Support**: Now includes draft/published states with `_status` field
+- **Preview Functionality**: Basic preview support for future development
 
 ### Buyers Access
 
@@ -47,13 +61,22 @@ The seed data matches the JSON API structure provided and includes:
 - **Authentication Ready**: All accounts use `password123` for testing
 - **Portfolio Variations**: Different access levels from no properties to full portfolio access
 
-## Key Features
+## Key Enhanced Features
 
-1. **Relationships**: Properties are properly linked to suburbs and regions
-2. **Media Assets**: Comprehensive image seeding for all visual elements
-3. **Rich Text**: Properly formatted rich text content matching the Lexical editor structure
-4. **Financial Calculations**: All financial fields are populated to demonstrate the calculation features
-5. **Zone Data**: Complete due diligence information with various zone types and effects
+1. **Enhanced Relationships**: Properties are properly linked to suburbs and regions with automatic region population
+2. **Comprehensive Media Assets**: Complete image seeding for all visual elements with zone mapping images
+3. **Rich Text Content**: Properly formatted rich text content matching the Lexical editor structure throughout
+4. **Detailed Financial Calculations**: All financial fields are populated to demonstrate the calculation features
+5. **Comprehensive Zone Data**: Complete due diligence information with:
+   - Detailed explanations for each zone type
+   - Rich text descriptions for buyer education
+   - Agent notes for internal reference
+   - Supporting URLs and documentation
+   - Visual mapping and evidence images
+6. **Complete Sale History**: Historical sale data for property valuation context
+7. **Enhanced Infrastructure Data**: Comprehensive regional development projects and community features
+8. **Market Analysis Data**: Detailed suburb trends and vacancy rate information
+9. **Versioning Support**: All real estate collections (Properties, Regions, Suburbs) now support draft/published states with autosave
 
 ## Usage
 
@@ -74,17 +97,17 @@ This will create a complete real estate portfolio with:
 - All associated media assets
 - Demo users and existing blog content
 
-## Buyers Access Demo Accounts
+## Enhanced Buyers Access Demo Accounts
 
-The seed data includes 5 realistic buyer accounts for testing authentication and property access:
+The seed data includes 5 realistic buyer accounts with diverse investment strategies for comprehensive testing:
 
-| Name | Email | Properties | Use Case |
-|------|-------|------------|----------|
-| **John Doe** | `john.doe@example.com` | Both properties | Full portfolio access |
-| **Sarah Wilson** | `sarah.wilson@example.com` | Property 1 only | Partial access testing |
-| **Michael Chen** | `michael.chen@example.com` | Property 2 only | Partial access testing |
-| **Emma Thompson** | `emma.thompson@example.com` | Property 1 only | Partial access testing |
-| **David Johnson** | `david.johnson@example.com` | No properties | New buyer (no access) |
+| Name | Email | Properties | Investment Profile |
+|------|-------|------------|-------------------|
+| **John Doe** | `john.doe@example.com` | Both properties | Experienced investor with diversified portfolio |
+| **Sarah Wilson** | `sarah.wilson@example.com` | Property 1 only | New investor interested in flood-affected areas |
+| **Michael Chen** | `michael.chen@example.com` | Property 2 only | Prefers low-maintenance/vacant properties |
+| **Emma Thompson** | `emma.thompson@example.com` | Property 1 only | Value-add investor focused on renovation potential |
+| **David Johnson** | `david.johnson@example.com` | No properties | Prospective buyer evaluating investment options |
 
 **All accounts use password:** `password123`
 

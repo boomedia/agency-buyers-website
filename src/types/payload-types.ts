@@ -1,6 +1,6 @@
 
 export interface Property {
-  id: number;
+  id: string; // Changed from number to string to support UUIDs
   name: string;
   generalInformation: {
     heroImage: {

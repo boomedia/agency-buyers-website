@@ -27,3 +27,57 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
+
+export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  try {
+    const { id } = await params
+    const payload = await getPayload({ config: configPromise })
+
+    const data = await request.json()
+
+    const property = await payload.update({
+      collection: 'properties',
+      id,
+      data,
+    })
+
+    if (!property) {
+      return NextResponse.json({ error: 'Property not found' }, { status: 404 })
+    }
+
+    // Transform the property data to match the expected interface
+    const transformedProperty = transformPropertyData(property)
+
+    return NextResponse.json(transformedProperty)
+  } catch (error) {
+    console.error('Error updating property:', error)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+  }
+}
+
+export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  try {
+    const { id } = await params
+    const payload = await getPayload({ config: configPromise })
+
+    const data = await request.json()
+
+    const property = await payload.update({
+      collection: 'properties',
+      id,
+      data,
+    })
+
+    if (!property) {
+      return NextResponse.json({ error: 'Property not found' }, { status: 404 })
+    }
+
+    // Transform the property data to match the expected interface
+    const transformedProperty = transformPropertyData(property)
+
+    return NextResponse.json(transformedProperty)
+  } catch (error) {
+    console.error('Error updating property:', error)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+  }
+}

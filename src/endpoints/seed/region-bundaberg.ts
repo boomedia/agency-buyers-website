@@ -22,6 +22,7 @@ export const regionBundaberg: (
 }) => {
   return {
     name: 'Bundaberg Regional Council',
+    _status: 'published',
     heroImage: heroImage.id,
     description: {
       root: {
@@ -215,7 +216,81 @@ export const regionBundaberg: (
                 children: [
                   {
                     mode: 'normal',
-                    text: 'The Bundaberg Regional Council has approved significant residential development to address housing demand.',
+                    text: 'The Bundaberg Regional Council has approved significant residential development to address housing demand. Major developments include Moore Park Beach estates, Innes Park coastal developments, and urban infill projects that will add over 1,000 new dwellings to the local market over the next 5 years.',
+                    type: 'text',
+                    style: '',
+                    detail: 0,
+                    format: 0,
+                    version: 1,
+                  },
+                ],
+                direction: 'ltr',
+                textStyle: '',
+                textFormat: 0,
+              },
+            ],
+            direction: 'ltr',
+          },
+        },
+      },
+      {
+        title: 'Bundaberg Ring Road Extension',
+        url: 'https://www.tmr.qld.gov.au/projects/bundaberg-ring-road',
+        image: null,
+        icon: null,
+        description: {
+          root: {
+            type: 'root',
+            format: '',
+            indent: 0,
+            version: 1,
+            children: [
+              {
+                type: 'paragraph',
+                format: '',
+                indent: 0,
+                version: 1,
+                children: [
+                  {
+                    mode: 'normal',
+                    text: 'Stage 2 of the Bundaberg Ring Road is planned to improve traffic flow and connectivity. The $45 million project will enhance access between residential areas and the CBD, reducing commute times and supporting continued residential development in outer suburbs.',
+                    type: 'text',
+                    style: '',
+                    detail: 0,
+                    format: 0,
+                    version: 1,
+                  },
+                ],
+                direction: 'ltr',
+                textStyle: '',
+                textFormat: 0,
+              },
+            ],
+            direction: 'ltr',
+          },
+        },
+      },
+      {
+        title: 'Bundaberg Port Expansion',
+        url: 'https://www.bundabergport.com.au/',
+        image: null,
+        icon: null,
+        description: {
+          root: {
+            type: 'root',
+            format: '',
+            indent: 0,
+            version: 1,
+            children: [
+              {
+                type: 'paragraph',
+                format: '',
+                indent: 0,
+                version: 1,
+                children: [
+                  {
+                    mode: 'normal',
+                    text: 'Port of Bundaberg is undergoing expansion to support increased agricultural exports and cruise ship visits. This infrastructure investment will create jobs and economic growth, positively impacting local property demand and values.',
                     type: 'text',
                     style: '',
                     detail: 0,

@@ -19,6 +19,14 @@ import {
   DialogTrigger,
 } from '~/components/ui/dialog'
 import type { Property } from '~/types/payload-types'
+import {
+  calculateAllPropertyMetrics,
+  calculateLoanAmount,
+  calculateDepositTotal,
+  calculateDepositPercentage,
+  formatAsCurrency,
+  formatAsPercentage,
+} from '~/utilities/propertyCalculations'
 
 interface EnhancedPropertyDetailsProps {
   property: Property
@@ -42,24 +50,18 @@ const formatDate = (dateString: string) => {
   })
 }
 
-// Calculation functions (matching backend logic)
-const calculateLoanAmount = (property: Property) => {
-  const purchasePrice = property.generalInformation.purchasePrice || 0
-  const depositCash = property.valueProposition.purchaseCost.depositCash || 0
-  const equityRelease = property.valueProposition.purchaseCost.equityRelease || 0
-  return purchasePrice - depositCash - equityRelease
+// Legacy calculation functions for backwards compatibility
+// These now use the utility module functions
+const calculateLoanAmount_legacy = (property: Property) => {
+  return calculateLoanAmount(property)
 }
 
-const calculateDepositTotal = (property: Property) => {
-  const depositCash = property.valueProposition.purchaseCost.depositCash || 0
-  const equityRelease = property.valueProposition.purchaseCost.equityRelease || 0
-  return depositCash + equityRelease
+const calculateDepositTotal_legacy = (property: Property) => {
+  return calculateDepositTotal(property)
 }
 
-const calculateDepositPercentage = (property: Property) => {
-  const purchasePrice = property.generalInformation.purchasePrice || 0
-  const depositTotal = calculateDepositTotal(property)
-  return purchasePrice ? (depositTotal / purchasePrice) * 100 : 0
+const calculateDepositPercentage_legacy = (property: Property) => {
+  return calculateDepositPercentage(property)
 }
 
 const calculateTotalPurchaseCost = (property: Property) => {
@@ -657,16 +659,7 @@ function DueDiligence({ property }: { property: Property }) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <svg className="w-5 h-5 text-orange-500" fill="currentColor" viewBox="0 0 20 20">
-            <path
-              fillRule="evenodd"
-              d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
-              clipRule="evenodd"
-            />
-          </svg>
-          Due Diligence
-        </CardTitle>
+        <CardTitle className="flex items-center gap-2">Due Diligence</CardTitle>
       </CardHeader>
       <CardContent>
         <Accordion type="single" collapsible className="w-full">
@@ -746,15 +739,13 @@ function DueDiligence({ property }: { property: Property }) {
 
 // ValueProposition Component
 function ValueProposition({ property }: { property: Property }) {
+  // Calculate all metrics using our utility functions
+  const metrics = calculateAllPropertyMetrics(property)
+
   return (
     <Card className="pb-1">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <svg className="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-            <path d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z" />
-          </svg>
-          Value Proposition
-        </CardTitle>
+        <CardTitle className="flex items-center gap-2">Value Proposition</CardTitle>
       </CardHeader>
       <CardContent className="p-4 md:p-6">
         <Tabs defaultValue="purchase-costs" className="w-full">
@@ -893,14 +884,75 @@ function ValueProposition({ property }: { property: Property }) {
                 <div className="flex justify-between">
                   <span className="text-gray-600 block">Annual Gross Income:</span>
                   <span>
-                    {formatPrice(property.valueProposition.expectedResults.expectedWeeklyRent * 52)}
+                    {property.valueProposition.expectedResults.annualGrossIncomeDisplay ||
+                      metrics.formatted.annualGrossIncome}
                   </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600 block">Annual Gross Yield:</span>
+                  <span>
+                    {property.valueProposition.expectedResults.annualGrossYieldDisplay ||
+                      metrics.formatted.annualGrossYield}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600 block">Annual Net Income:</span>
+                  <span>
+                    {property.valueProposition.expectedResults.annualNetIncomeDisplay ||
+                      metrics.formatted.annualNetIncome}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600 block">Annual Net Yield:</span>
+                  <span>
+                    {property.valueProposition.expectedResults.annualNetYieldDisplay ||
+                      metrics.formatted.annualNetYield}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600 block">Weekly Cash Flow:</span>
+                  <span>${(metrics.annualNetIncome / 52).toFixed(2)}/week</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600 block">Depreciation Potential:</span>
                   <span>
                     {formatPrice(property.valueProposition.expectedResults.depreciationPotential)}
                   </span>
+                </div>
+              </div>
+
+              {/* Equity Projections */}
+              <div className="border-t pt-4">
+                <h5 className="font-medium mb-3 text-gray-600">Equity Projections</h5>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600 block">8% Growth:</span>
+                    <span>
+                      {property.valueProposition.expectedResults.equityAt8Display ||
+                        metrics.formatted.equityAt8}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600 block">10% Growth:</span>
+                    <span>
+                      {property.valueProposition.expectedResults.equityAt10Display ||
+                        metrics.formatted.equityAt10}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600 block">12% Growth:</span>
+                    <span>
+                      {property.valueProposition.expectedResults.equityAt12Display ||
+                        metrics.formatted.equityAt12}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600 block">16% Growth:</span>
+                    <span>
+                      {property.valueProposition.expectedResults.equityAt16Display ||
+                        metrics.formatted.equityAt16}
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>

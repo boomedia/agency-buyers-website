@@ -5,7 +5,7 @@ import type { Property as ClientProperty } from '~/types/payload-types'
 export function transformPropertyData(payloadProperty: PayloadProperty): ClientProperty {
   // Map the Payload property structure to the expected client structure
   return {
-    id: typeof payloadProperty.id === 'string' ? parseInt(payloadProperty.id) : payloadProperty.id,
+    id: payloadProperty.id, // Keep as string/UUID, don't parse as integer
     name: payloadProperty.name,
     generalInformation: {
       heroImage: (payloadProperty as any).info?.heroImage || null,
@@ -43,63 +43,50 @@ export function transformPropertyData(payloadProperty: PayloadProperty): ClientP
     valueProposition: {
       purchaseCost: {
         purchasePriceDisplay:
-          (payloadProperty as any).valProp?.purchaseCost?.purchasePriceDisplay || null,
-        loanTerm: (payloadProperty as any).valProp?.purchaseCost?.loanTerm || 0,
-        loanAmountDisplay:
-          (payloadProperty as any).valProp?.purchaseCost?.loanAmountDisplay || null,
-        interestRate: (payloadProperty as any).valProp?.purchaseCost?.interestRate || 0,
-        depositCash: (payloadProperty as any).valProp?.purchaseCost?.depositCash || 0,
-        equityRelease: (payloadProperty as any).valProp?.purchaseCost?.equityRelease || 0,
+          (payloadProperty as any).valProp?.purchCost?.purchasePriceDisp || null,
+        loanTerm: (payloadProperty as any).valProp?.purchCost?.loanTerm || 0,
+        loanAmountDisplay: (payloadProperty as any).valProp?.purchCost?.loanAmountDisp || null,
+        interestRate: (payloadProperty as any).valProp?.purchCost?.interestRate || 0,
+        depositCash: (payloadProperty as any).valProp?.purchCost?.depositCash || 0,
+        equityRelease: (payloadProperty as any).valProp?.purchCost?.equityRelease || 0,
         equityReleaseInterestRate:
-          (payloadProperty as any).valProp?.purchaseCost?.equityReleaseInterestRate || 0,
-        depositTotalDisplay:
-          (payloadProperty as any).valProp?.purchaseCost?.depositTotalDisplay || null,
+          (payloadProperty as any).valProp?.purchCost?.equityReleaseRate || 0,
+        depositTotalDisplay: (payloadProperty as any).valProp?.purchCost?.depositTotalDisp || null,
         depositPercentageDisplay:
-          (payloadProperty as any).valProp?.purchaseCost?.depositPercentageDisplay || null,
-        stampDuty: (payloadProperty as any).valProp?.purchaseCost?.stampDuty || 0,
-        renovationsCost: (payloadProperty as any).valProp?.purchaseCost?.renovationsCost || 0,
-        buildingAndPest: (payloadProperty as any).valProp?.purchaseCost?.buildingAndPest || 0,
-        conveyancing: (payloadProperty as any).valProp?.purchaseCost?.conveyancing || 0,
-        bankFees: (payloadProperty as any).valProp?.purchaseCost?.bankFees || 0,
+          (payloadProperty as any).valProp?.purchCost?.depositPctDisp || null,
+        stampDuty: (payloadProperty as any).valProp?.purchCost?.stampDuty || 0,
+        renovationsCost: (payloadProperty as any).valProp?.purchCost?.renovationsCost || 0,
+        buildingAndPest: (payloadProperty as any).valProp?.purchCost?.buildingAndPest || 0,
+        conveyancing: (payloadProperty as any).valProp?.purchCost?.conveyancing || 0,
+        bankFees: (payloadProperty as any).valProp?.purchCost?.bankFees || 0,
         lendersMortgageInsurance:
-          (payloadProperty as any).valProp?.purchaseCost?.lendersMortgageInsurance || 0,
+          (payloadProperty as any).valProp?.purchCost?.lendersInsurance || 0,
         totalPurchaseCostDisplay:
-          (payloadProperty as any).valProp?.purchaseCost?.totalPurchaseCostDisplay || null,
+          (payloadProperty as any).valProp?.purchCost?.totalCostDisp || null,
       },
       annualExpenses: {
-        councilRates: (payloadProperty as any).valProp?.annualExpenses?.councilRates || 0,
-        insuranceCosts: (payloadProperty as any).valProp?.annualExpenses?.insuranceCosts || 0,
-        utilities: (payloadProperty as any).valProp?.annualExpenses?.utilities || 0,
-        pmPercentage: (payloadProperty as any).valProp?.annualExpenses?.pmPercentage || 0,
-        pmFeesDisplay: (payloadProperty as any).valProp?.annualExpenses?.pmFeesDisplay || null,
-        repairsAndMaintenance:
-          (payloadProperty as any).valProp?.annualExpenses?.repairsAndMaintenance || 0,
-        loanRepaymentsDisp:
-          (payloadProperty as any).valProp?.annualExpenses?.loanRepaymentsDisp || null,
-        totalExpensesDisp:
-          (payloadProperty as any).valProp?.annualExpenses?.totalExpensesDisp || null,
+        councilRates: (payloadProperty as any).valProp?.annualExp?.councilRates || 0,
+        insuranceCosts: (payloadProperty as any).valProp?.annualExp?.insuranceCosts || 0,
+        utilities: (payloadProperty as any).valProp?.annualExp?.utilities || 0,
+        pmPercentage: (payloadProperty as any).valProp?.annualExp?.pmPercentage || 0,
+        pmFeesDisplay: (payloadProperty as any).valProp?.annualExp?.pmFeesDisp || null,
+        repairsAndMaintenance: (payloadProperty as any).valProp?.annualExp?.repairsMaintenance || 0,
+        loanRepaymentsDisp: (payloadProperty as any).valProp?.annualExp?.loanRepaymentsDisp || null,
+        totalExpensesDisp: (payloadProperty as any).valProp?.annualExp?.totalExpensesDisp || null,
       },
       expectedResults: {
-        expectedWeeklyRent:
-          (payloadProperty as any).valProp?.expectedResults?.expectedWeeklyRent || 0,
+        expectedWeeklyRent: (payloadProperty as any).valProp?.expResults?.expectedRent || 0,
         annualGrossIncomeDisplay:
-          (payloadProperty as any).valProp?.expectedResults?.annualGrossIncomeDisplay || null,
+          (payloadProperty as any).valProp?.expResults?.grossIncomeDisp || null,
         annualGrossYieldDisplay:
-          (payloadProperty as any).valProp?.expectedResults?.annualGrossYieldDisplay || null,
-        annualNetIncomeDisplay:
-          (payloadProperty as any).valProp?.expectedResults?.annualNetIncomeDisplay || null,
-        annualNetYieldDisplay:
-          (payloadProperty as any).valProp?.expectedResults?.annualNetYieldDisplay || null,
-        depreciationPotential:
-          (payloadProperty as any).valProp?.expectedResults?.depreciationPotential || 0,
-        equityAt8Display:
-          (payloadProperty as any).valProp?.expectedResults?.equityAt8Display || null,
-        equityAt10Display:
-          (payloadProperty as any).valProp?.expectedResults?.equityAt10Display || null,
-        equityAt12Display:
-          (payloadProperty as any).valProp?.expectedResults?.equityAt12Display || null,
-        equityAt16Display:
-          (payloadProperty as any).valProp?.expectedResults?.equityAt16Display || null,
+          (payloadProperty as any).valProp?.expResults?.grossYieldDisp || null,
+        annualNetIncomeDisplay: (payloadProperty as any).valProp?.expResults?.netIncomeDisp || null,
+        annualNetYieldDisplay: (payloadProperty as any).valProp?.expResults?.netYieldDisp || null,
+        depreciationPotential: (payloadProperty as any).valProp?.expResults?.depreciation || 0,
+        equityAt8Display: (payloadProperty as any).valProp?.expResults?.equity8Disp || null,
+        equityAt10Display: (payloadProperty as any).valProp?.expResults?.equity10Disp || null,
+        equityAt12Display: (payloadProperty as any).valProp?.expResults?.equity12Disp || null,
+        equityAt16Display: (payloadProperty as any).valProp?.expResults?.equity16Disp || null,
       },
     },
     updatedAt: payloadProperty.updatedAt,

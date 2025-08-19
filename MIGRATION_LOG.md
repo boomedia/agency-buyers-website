@@ -75,6 +75,10 @@ This document tracks the migration of Payload CMS collections from `agency-buyer
 - Adding Real Estate admin group for better organization
 - All calculated fields and custom components included
 - Using existing naming conventions from agency-buyers-cms
+- 2025-08-19 Cleanup: Removed obsolete duplicate variant files (`page.client.new.tsx`, `page.client.backup.tsx`, `page.client.old.tsx`) for property archive and detail pages. Canonical implementations now live at:
+   - `src/app/(frontend)/properties/page.client.tsx`
+   - `src/app/(frontend)/properties/[id]/page.client.tsx`
+   Rationale: Variants were legacy experimentation snapshots; canonical files are supersets (include calculation helpers and styling). No imports referenced the removed variants (verified via repo search). This reduces duplication and maintenance surface.
 
 ## Migrated Files Summary
 
