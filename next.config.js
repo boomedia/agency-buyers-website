@@ -2,16 +2,22 @@ import { withPayload } from '@payloadcms/next/withPayload'
 
 import redirects from './redirects.js'
 
-const NEXT_PUBLIC_SERVER_URL =
-  process.env.NEXT_PUBLIC_SERVER_URL ||
-  (process.env.PRODUCTION_SERVER_URL ? `https://${process.env.PRODUCTION_SERVER_URL}` : null) ||
-  process.env.PRIVATE_ORIGIN_SERVER_URL ||
-  'http://localhost:3000'
+const NEXT_PUBLIC_SERVER_URL = process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000'
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
     remotePatterns: [
+      // Allow localhost for development
+      {
+        protocol: 'http',
+        hostname: 'localhost',
+      },
+      {
+        protocol: 'https',
+        hostname: 'localhost',
+      },
+      // Dynamic patterns from environment variables
       ...[NEXT_PUBLIC_SERVER_URL /* 'https://example.com' */].map((item) => {
         const url = new URL(item)
 

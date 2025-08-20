@@ -1,17 +1,7 @@
 import canUseDOM from './canUseDOM'
 
 export const getServerSideURL = () => {
-  let url = process.env.NEXT_PUBLIC_SERVER_URL
-
-  if (!url && process.env.PRODUCTION_SERVER_URL) {
-    return `https://${process.env.PRODUCTION_SERVER_URL}`
-  }
-
-  if (!url) {
-    url = 'http://localhost:3000'
-  }
-
-  return url
+  return process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000'
 }
 
 export const getClientSideURL = () => {
@@ -23,9 +13,5 @@ export const getClientSideURL = () => {
     return `${protocol}//${domain}${port ? `:${port}` : ''}`
   }
 
-  if (process.env.PRODUCTION_SERVER_URL) {
-    return `https://${process.env.PRODUCTION_SERVER_URL}`
-  }
-
-  return process.env.PUBLIC_SERVER_URL || ''
+  return process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000'
 }

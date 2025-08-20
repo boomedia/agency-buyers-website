@@ -3,14 +3,14 @@ declare global {
     interface ProcessEnv {
       PAYLOAD_SECRET: string
       PREVIEW_SECRET: string
-      PUBLIC_SERVER_URL: string
-      PRODUCTION_SERVER_URL: string
-      PRIVATE_ORIGIN_SERVER_URL: string
+      NEXT_PUBLIC_SERVER_URL: string
       DB_HOST: string
       DB_PORT: string
       DB_USER: string
       DB_PASSWORD: string
       DB_NAME: string
+      CMS_API_BASE_URL?: string
+      CMS_API_TOKEN?: string
     }
   }
 }
