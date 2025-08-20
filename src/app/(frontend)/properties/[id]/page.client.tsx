@@ -45,7 +45,12 @@ const formatPrice = (price: number) => {
 }
 
 const formatDate = (dateString: string) => {
-  return new Date(dateString).toLocaleDateString('en-AU', {
+  if (!dateString) return 'N/A'
+
+  const date = new Date(dateString)
+  if (isNaN(date.getTime())) return 'N/A'
+
+  return date.toLocaleDateString('en-AU', {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
@@ -139,6 +144,27 @@ const getRegionImage = (
   return '/img/generic-region.webp'
 }
 
+// Safe rich text renderer with object protection
+const safeRenderRichText = (
+  content: any,
+  fallbackText: string = 'No content available',
+): React.ReactNode => {
+  const renderedContent = renderRichText(content)
+
+  // Safety check to prevent rendering objects
+  if (
+    renderedContent &&
+    typeof renderedContent === 'object' &&
+    renderedContent.constructor === Object &&
+    !React.isValidElement(renderedContent)
+  ) {
+    console.warn('Raw object detected in rich text content, rendering fallback:', content)
+    return fallbackText
+  }
+
+  return renderedContent || fallbackText
+}
+
 // Single, comprehensive rich text rendering utility - handles all edge cases
 const renderRichText = (content: any): React.ReactNode => {
   // Handle null, undefined, or empty values
@@ -174,7 +200,7 @@ const renderRichText = (content: any): React.ReactNode => {
     return null
   }
 
-  const renderNode = (node: any, index: string | number): React.ReactNode => {
+  const renderNode = (node: any, index: number): React.ReactNode => {
     // Strict safety checks
     if (!node || typeof node !== 'object' || Array.isArray(node)) {
       return null
@@ -191,10 +217,10 @@ const renderRichText = (content: any): React.ReactNode => {
 
       // Apply text formatting only if text exists
       if (text && node.format) {
-        if (node.format & 1) text = <strong key={`bold-${index}`}>{text}</strong>
-        if (node.format & 2) text = <em key={`italic-${index}`}>{text}</em>
-        if (node.format & 8) text = <u key={`underline-${index}`}>{text}</u>
-        if (node.format & 16) text = <s key={`strike-${index}`}>{text}</s>
+        if (node.format & 1) text = <strong>{text}</strong> // Bold
+        if (node.format & 2) text = <em>{text}</em> // Italic
+        if (node.format & 8) text = <u>{text}</u> // Underline
+        if (node.format & 16) text = <s>{text}</s> // Strikethrough
       }
 
       return text
@@ -202,30 +228,38 @@ const renderRichText = (content: any): React.ReactNode => {
 
     // Handle paragraph nodes
     if (node.type === 'paragraph') {
-      const children =
-        node.children && Array.isArray(node.children)
-          ? node.children
-              .map((child: any, childIndex: number) => renderNode(child, `${index}-${childIndex}`))
-              .filter((child: any) => child !== null && child !== undefined)
-          : []
+      const children = node.children
+        ? node.children.map((child: any, childIndex: number) => renderNode(child, childIndex))
+        : []
 
-      return children.length > 0 ? (
-        <p key={`p-${index}`} className="mb-4 last:mb-0">
+      // Only render paragraph if it has content
+      if (
+        children.length === 0 ||
+        children.every((child: any) => child === null || child === undefined || child === '')
+      ) {
+        return null
+      }
+
+      return (
+        <p key={index} className="mb-4 last:mb-0">
           {children}
         </p>
-      ) : null
+      )
     }
 
     // Handle heading nodes
     if (node.type === 'heading') {
-      const children =
-        node.children && Array.isArray(node.children)
-          ? node.children
-              .map((child: any, childIndex: number) => renderNode(child, `${index}-${childIndex}`))
-              .filter((child: any) => child !== null && child !== undefined)
-          : []
+      const children = node.children
+        ? node.children.map((child: any, childIndex: number) => renderNode(child, childIndex))
+        : []
 
-      if (children.length === 0) return null
+      // Only render heading if it has content
+      if (
+        children.length === 0 ||
+        children.every((child: any) => child === null || child === undefined || child === '')
+      ) {
+        return null
+      }
 
       const HeadingTag = node.tag || 'h2'
       const headingClasses = {
@@ -240,7 +274,7 @@ const renderRichText = (content: any): React.ReactNode => {
       return React.createElement(
         HeadingTag,
         {
-          key: `heading-${index}`,
+          key: index,
           className: headingClasses[HeadingTag as keyof typeof headingClasses] || headingClasses.h2,
         },
         children,
@@ -249,18 +283,21 @@ const renderRichText = (content: any): React.ReactNode => {
 
     // Handle list nodes
     if (node.type === 'list') {
-      const children =
-        node.children && Array.isArray(node.children)
-          ? node.children
-              .map((child: any, childIndex: number) => renderNode(child, `${index}-${childIndex}`))
-              .filter((child: any) => child !== null && child !== undefined)
-          : []
+      const children = node.children
+        ? node.children.map((child: any, childIndex: number) => renderNode(child, childIndex))
+        : []
 
-      if (children.length === 0) return null
+      // Only render list if it has content
+      if (
+        children.length === 0 ||
+        children.every((child: any) => child === null || child === undefined)
+      ) {
+        return null
+      }
 
       const ListTag = node.listType === 'number' ? 'ol' : 'ul'
       return (
-        <ListTag key={`list-${index}`} className="list-disc list-inside mb-4 space-y-1">
+        <ListTag key={index} className="list-disc list-inside mb-4 space-y-1">
           {children}
         </ListTag>
       )
@@ -268,32 +305,43 @@ const renderRichText = (content: any): React.ReactNode => {
 
     // Handle list item nodes
     if (node.type === 'listitem') {
-      const children =
-        node.children && Array.isArray(node.children)
-          ? node.children
-              .map((child: any, childIndex: number) => renderNode(child, `${index}-${childIndex}`))
-              .filter((child: any) => child !== null && child !== undefined)
-          : []
+      const children = node.children
+        ? node.children.map((child: any, childIndex: number) => renderNode(child, childIndex))
+        : []
 
-      return children.length > 0 ? (
-        <li key={`li-${index}`} className="ml-4">
+      // Only render list item if it has content
+      if (
+        children.length === 0 ||
+        children.every((child: any) => child === null || child === undefined || child === '')
+      ) {
+        return null
+      }
+
+      return (
+        <li key={index} className="ml-4">
           {children}
         </li>
-      ) : null
+      )
     }
 
     // Handle link nodes
     if (node.type === 'link') {
-      const children =
-        node.children && Array.isArray(node.children)
-          ? node.children
-              .map((child: any, childIndex: number) => renderNode(child, `${index}-${childIndex}`))
-              .filter((child: any) => child !== null && child !== undefined)
-          : []
+      const children = node.children
+        ? node.children.map((child: any, childIndex: number) => renderNode(child, childIndex))
+        : []
 
-      return children.length > 0 && node.url ? (
+      // Only render link if it has content and URL
+      if (
+        !node.url ||
+        children.length === 0 ||
+        children.every((child: any) => child === null || child === undefined || child === '')
+      ) {
+        return null
+      }
+
+      return (
         <a
-          key={`link-${index}`}
+          key={index}
           href={node.url}
           target="_blank"
           rel="noopener noreferrer"
@@ -301,21 +349,29 @@ const renderRichText = (content: any): React.ReactNode => {
         >
           {children}
         </a>
-      ) : null
+      )
     }
 
     // Handle line breaks
     if (node.type === 'linebreak') {
-      return <br key={`br-${index}`} />
+      return <br key={index} />
     }
 
     // Fallback for unknown types with children
     if (node.children && Array.isArray(node.children)) {
-      const children = node.children
-        .map((child: any, childIndex: number) => renderNode(child, `${index}-${childIndex}`))
-        .filter((child: any) => child !== null && child !== undefined)
+      const children = node.children.map((child: any, childIndex: number) =>
+        renderNode(child, childIndex),
+      )
 
-      return children.length > 0 ? <div key={`unknown-${index}`}>{children}</div> : null
+      // Only render container if it has content
+      if (
+        children.length === 0 ||
+        children.every((child: any) => child === null || child === undefined)
+      ) {
+        return null
+      }
+
+      return <div key={index}>{children}</div>
     }
 
     // Unknown node type without children - return null to prevent object rendering
@@ -323,13 +379,30 @@ const renderRichText = (content: any): React.ReactNode => {
   }
 
   try {
-    const renderedChildren = content.root.children
-      .map((child: any, index: number) => renderNode(child, index))
-      .filter((child: any) => child !== null && child !== undefined)
+    const renderedChildren = content.root.children.map((child: any, index: number) =>
+      renderNode(child, index),
+    )
 
-    return renderedChildren.length > 0 ? (
-      <div className="rich-text-content">{renderedChildren}</div>
-    ) : null
+    // Filter out null/undefined and empty content
+    const validChildren = renderedChildren.filter(
+      (child: any) => child !== null && child !== undefined && child !== '',
+    )
+
+    // Final safety check - ensure no raw objects slip through
+    const safeChildren = validChildren.map((child: any, index: number) => {
+      if (
+        child &&
+        typeof child === 'object' &&
+        child.constructor === Object &&
+        !React.isValidElement(child)
+      ) {
+        console.warn('Raw object detected in rendered children, converting to string:', child)
+        return `[Object: ${Object.keys(child).join(', ')}]`
+      }
+      return child
+    })
+
+    return safeChildren.length > 0 ? <div className="rich-text-content">{safeChildren}</div> : null
   } catch (error) {
     console.warn('Error rendering rich text:', error, content)
     return null
@@ -606,7 +679,10 @@ function PropertyAgentSummary({ property }: { property: Property }) {
       </CardHeader>
       <CardContent>
         <div className="text-muted-foreground leading-relaxed">
-          {renderRichText(property.generalInformation.agentSummary) || 'No agent summary available'}
+          {safeRenderRichText(
+            property.generalInformation.agentSummary,
+            'No agent summary available',
+          )}
         </div>
       </CardContent>
     </Card>
@@ -855,7 +931,7 @@ function DueDiligence({ property }: { property: Property }) {
                     </div>
                   )}
                   <div className="text-sm text-muted-foreground">
-                    {renderRichText(zone.details)}
+                    {safeRenderRichText(zone.details, 'No details available')}
                   </div>
                   {zone.agentNotes && (
                     <div className="bg-primary/5 border-l-4 border-primary p-3 my-3">
@@ -1208,9 +1284,10 @@ const MarketInformation = ({ property }: { property: Property }) => {
                     (property.generalInformation.address.suburbName as any)?.description && (
                       <div>
                         <div className="text-sm text-muted-foreground leading-relaxed">
-                          {renderRichText(
+                          {safeRenderRichText(
                             (property.generalInformation.address.suburbName as any).description,
-                          ) || 'No description available'}
+                            'No description available',
+                          )}
                         </div>
                       </div>
                     )}
@@ -1347,9 +1424,10 @@ const MarketInformation = ({ property }: { property: Property }) => {
                     (property.generalInformation.address.region as any)?.description && (
                       <div>
                         <div className="text-sm text-muted-foreground leading-relaxed">
-                          {renderRichText(
+                          {safeRenderRichText(
                             (property.generalInformation.address.region as any).description,
-                          ) || 'No description available'}
+                            'No description available',
+                          )}
                         </div>
                       </div>
                     )}
