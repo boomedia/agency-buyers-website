@@ -1,5 +1,6 @@
 import { postgresAdapter } from '@payloadcms/db-postgres'
 import { gcsStorage } from '@payloadcms/storage-gcs'
+import { resendAdapter } from '@payloadcms/email-resend'
 
 import sharp from 'sharp'
 import path from 'path'
@@ -28,14 +29,7 @@ import { migrations } from './migrations'
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
-const {
-  NODE_ENV,
-  DB_HOST,
-  DB_PORT,
-  DB_USER,
-  DB_PASSWORD,
-  DB_NAME
-} = process.env
+const { NODE_ENV, DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_NAME, RESEND_API_KEY } = process.env
 
 export default buildConfig({
   admin: {
@@ -92,13 +86,18 @@ export default buildConfig({
   },
   // This config helps us configure global or default features that the other editors can inherit
   editor: defaultLexical,
+  email: resendAdapter({
+    defaultFromAddress: 'delivered@resend.dev', // Replace with your verified domain
+    defaultFromName: 'Agency Buyers',
+    apiKey: RESEND_API_KEY!,
+  }),
   db: postgresAdapter({
     pool: {
       user: DB_USER,
       password: DB_PASSWORD,
       host: DB_HOST,
       port: parseInt(DB_PORT!, 10),
-      database: DB_NAME
+      database: DB_NAME,
     },
     prodMigrations: migrations,
   }),
@@ -120,18 +119,18 @@ export default buildConfig({
     ...plugins,
     NODE_ENV === 'production'
       ? [
-        gcsStorage({
-          collections: {
-            media: true
-          },
-          bucket: process.env.GCS_BUCKET_NAME!,
-          options: {
-            apiEndpoint: process.env.GCS_ENDPOINT!,
-            projectId: process.env.GCS_PROJECT_ID!,
-          },
-        })
-      ]
-      : undefined
+          gcsStorage({
+            collections: {
+              media: true,
+            },
+            bucket: process.env.GCS_BUCKET_NAME!,
+            options: {
+              apiEndpoint: process.env.GCS_ENDPOINT!,
+              projectId: process.env.GCS_PROJECT_ID!,
+            },
+          }),
+        ]
+      : undefined,
   ].filter(Boolean) as Plugin[],
   secret: process.env.PAYLOAD_SECRET,
   sharp,
