@@ -48,8 +48,6 @@ The connection variables will automatically be setup for you on Vercel when thes
 
 You will be prompted to add the following secret values to your project. These should be long unguessable strong passwords, you can also use a password manager to generate one for these.
 
-CRON_SECRET - used for running cron on Vercel
-
 PAYLOAD_SECRET - used by Payload to sign secrets like JWT tokens
 
 PREVIEW_SECRET - used by Payload for secured live previews of your content

@@ -12,7 +12,7 @@ export async function Header() {
   try {
     companySettings = (await getCachedGlobal('company-settings', 1)()) as CompanySetting
   } catch (error) {
-    console.warn('Company settings not available, using fallback logos')
+    console.warn('Company settings not available, using fallback logos', error)
   }
 
   return <HeaderClient data={headerData} companySettings={companySettings} />
