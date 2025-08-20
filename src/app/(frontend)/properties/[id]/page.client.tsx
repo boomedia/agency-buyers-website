@@ -18,6 +18,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '~/components/ui/dialog'
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '~/components/ui/sheet'
+import { SuburbMedianChart } from '~/components/ui/suburb-median-chart'
 import type { Property } from '~/types/payload-types'
 import {
   calculateAllPropertyMetrics,
@@ -90,7 +92,248 @@ const calculateTotalPurchaseCost = (property: Property) => {
 
 const getImageUrl = (url: string) => {
   if (!url) return ''
-  return url.startsWith('http') ? url : `https://bat.hassen.com.au${url}`
+  return url.startsWith('http') ? url : url
+}
+
+// Error handling for image loading
+const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
+  const target = e.target as HTMLImageElement
+  target.style.display = 'none'
+  // Show a fallback or placeholder
+}
+
+// Location utility functions for Market Information
+const getSuburbName = (suburb: string | null | { name: string } | undefined): string | null => {
+  if (!suburb) return null
+  if (typeof suburb === 'string') return suburb
+  if (typeof suburb === 'object' && 'name' in suburb) return suburb.name
+  return null
+}
+
+const getRegionName = (region: string | null | { name: string } | undefined): string | null => {
+  if (!region) return null
+  if (typeof region === 'string') return region
+  if (typeof region === 'object' && 'name' in region) return region.name
+  return null
+}
+
+const getSuburbImage = (
+  suburb: string | null | { heroImage?: { url: string } } | undefined,
+): string => {
+  if (!suburb) return '/img/generic-suburb.webp'
+  if (typeof suburb === 'string') return '/img/generic-suburb.webp'
+  if (typeof suburb === 'object' && suburb.heroImage?.url) {
+    return getImageUrl(suburb.heroImage.url)
+  }
+  return '/img/generic-suburb.webp'
+}
+
+const getRegionImage = (
+  region: string | null | { heroImage?: { url: string } } | undefined,
+): string => {
+  if (!region) return '/img/generic-region.webp'
+  if (typeof region === 'string') return '/img/generic-region.webp'
+  if (typeof region === 'object' && region.heroImage?.url) {
+    return getImageUrl(region.heroImage.url)
+  }
+  return '/img/generic-region.webp'
+}
+
+// Single, comprehensive rich text rendering utility - handles all edge cases
+const renderRichText = (content: any): React.ReactNode => {
+  // Handle null, undefined, or empty values
+  if (!content) {
+    return null
+  }
+
+  // Handle simple string content
+  if (typeof content === 'string') {
+    return content
+  }
+
+  // Handle non-object content (numbers, booleans, etc.)
+  if (typeof content !== 'object') {
+    return String(content)
+  }
+
+  // Handle arrays - should not happen but protect against it
+  if (Array.isArray(content)) {
+    return null
+  }
+
+  // Check for Lexical editor format
+  if (!content.root || !content.root.children || !Array.isArray(content.root.children)) {
+    // If it's an object but not in Lexical format, try to extract meaningful content
+    if (content.text) {
+      return content.text
+    }
+    if (content.content) {
+      return renderRichText(content.content)
+    }
+    // Last resort - return null to prevent object rendering
+    return null
+  }
+
+  const renderNode = (node: any, index: string | number): React.ReactNode => {
+    // Strict safety checks
+    if (!node || typeof node !== 'object' || Array.isArray(node)) {
+      return null
+    }
+
+    // Handle text nodes
+    if (node.type === 'text') {
+      let text: React.ReactNode = node.text || ''
+
+      // Ensure text is a string
+      if (typeof text !== 'string') {
+        text = String(text)
+      }
+
+      // Apply text formatting only if text exists
+      if (text && node.format) {
+        if (node.format & 1) text = <strong key={`bold-${index}`}>{text}</strong>
+        if (node.format & 2) text = <em key={`italic-${index}`}>{text}</em>
+        if (node.format & 8) text = <u key={`underline-${index}`}>{text}</u>
+        if (node.format & 16) text = <s key={`strike-${index}`}>{text}</s>
+      }
+
+      return text
+    }
+
+    // Handle paragraph nodes
+    if (node.type === 'paragraph') {
+      const children =
+        node.children && Array.isArray(node.children)
+          ? node.children
+              .map((child: any, childIndex: number) => renderNode(child, `${index}-${childIndex}`))
+              .filter((child: any) => child !== null && child !== undefined)
+          : []
+
+      return children.length > 0 ? (
+        <p key={`p-${index}`} className="mb-4 last:mb-0">
+          {children}
+        </p>
+      ) : null
+    }
+
+    // Handle heading nodes
+    if (node.type === 'heading') {
+      const children =
+        node.children && Array.isArray(node.children)
+          ? node.children
+              .map((child: any, childIndex: number) => renderNode(child, `${index}-${childIndex}`))
+              .filter((child: any) => child !== null && child !== undefined)
+          : []
+
+      if (children.length === 0) return null
+
+      const HeadingTag = node.tag || 'h2'
+      const headingClasses = {
+        h1: 'text-3xl font-bold mb-4',
+        h2: 'text-2xl font-bold mb-3',
+        h3: 'text-xl font-bold mb-3',
+        h4: 'text-lg font-bold mb-2',
+        h5: 'text-base font-bold mb-2',
+        h6: 'text-sm font-bold mb-2',
+      }
+
+      return React.createElement(
+        HeadingTag,
+        {
+          key: `heading-${index}`,
+          className: headingClasses[HeadingTag as keyof typeof headingClasses] || headingClasses.h2,
+        },
+        children,
+      )
+    }
+
+    // Handle list nodes
+    if (node.type === 'list') {
+      const children =
+        node.children && Array.isArray(node.children)
+          ? node.children
+              .map((child: any, childIndex: number) => renderNode(child, `${index}-${childIndex}`))
+              .filter((child: any) => child !== null && child !== undefined)
+          : []
+
+      if (children.length === 0) return null
+
+      const ListTag = node.listType === 'number' ? 'ol' : 'ul'
+      return (
+        <ListTag key={`list-${index}`} className="list-disc list-inside mb-4 space-y-1">
+          {children}
+        </ListTag>
+      )
+    }
+
+    // Handle list item nodes
+    if (node.type === 'listitem') {
+      const children =
+        node.children && Array.isArray(node.children)
+          ? node.children
+              .map((child: any, childIndex: number) => renderNode(child, `${index}-${childIndex}`))
+              .filter((child: any) => child !== null && child !== undefined)
+          : []
+
+      return children.length > 0 ? (
+        <li key={`li-${index}`} className="ml-4">
+          {children}
+        </li>
+      ) : null
+    }
+
+    // Handle link nodes
+    if (node.type === 'link') {
+      const children =
+        node.children && Array.isArray(node.children)
+          ? node.children
+              .map((child: any, childIndex: number) => renderNode(child, `${index}-${childIndex}`))
+              .filter((child: any) => child !== null && child !== undefined)
+          : []
+
+      return children.length > 0 && node.url ? (
+        <a
+          key={`link-${index}`}
+          href={node.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-primary hover:text-primary/80 underline"
+        >
+          {children}
+        </a>
+      ) : null
+    }
+
+    // Handle line breaks
+    if (node.type === 'linebreak') {
+      return <br key={`br-${index}`} />
+    }
+
+    // Fallback for unknown types with children
+    if (node.children && Array.isArray(node.children)) {
+      const children = node.children
+        .map((child: any, childIndex: number) => renderNode(child, `${index}-${childIndex}`))
+        .filter((child: any) => child !== null && child !== undefined)
+
+      return children.length > 0 ? <div key={`unknown-${index}`}>{children}</div> : null
+    }
+
+    // Unknown node type without children - return null to prevent object rendering
+    return null
+  }
+
+  try {
+    const renderedChildren = content.root.children
+      .map((child: any, index: number) => renderNode(child, index))
+      .filter((child: any) => child !== null && child !== undefined)
+
+    return renderedChildren.length > 0 ? (
+      <div className="rich-text-content">{renderedChildren}</div>
+    ) : null
+  } catch (error) {
+    console.warn('Error rendering rich text:', error, content)
+    return null
+  }
 }
 
 const getEmbedUrl = (url: string) => {
@@ -128,6 +371,7 @@ const PropertyHero = ({ property, fullAddress }: { property: Property; fullAddre
               src={getImageUrl(property.generalInformation.heroImage.url)}
               alt={property.generalInformation.heroImage.alt || property.name}
               className="w-full h-96 object-cover"
+              onError={handleImageError}
             />
           ) : (
             <div className="w-full h-96 bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center">
@@ -177,7 +421,7 @@ const PropertyDetails = ({ property }: { property: Property }) => {
     label: string
   }) => (
     <div className="flex items-center gap-2 md:gap-4 py-1 md:py-0 px-1 md:px-2 border-0 md:border rounded-lg bg-card hover:shadow-md transition-all duration-200 hover:border-primary/20">
-      <div className="w-6 h-6 md:w-12 md:h-12 rounded-full flex items-center justify-center bg-primary/10 text-primary">
+      <div className="w-6 h-6 md:w-12 md:h-12 rounded-full flex items-center justify-center text-primary">
         {icon}
       </div>
       <div>
@@ -355,108 +599,6 @@ const PropertyDetails = ({ property }: { property: Property }) => {
 
 // PropertyAgentSummary Component
 function PropertyAgentSummary({ property }: { property: Property }) {
-  // Function to render rich text (lexical editor) format as HTML
-  const renderRichText = (richTextObj: any): React.ReactNode => {
-    if (!richTextObj || !richTextObj.root || !richTextObj.root.children) {
-      return null
-    }
-
-    const renderNode = (node: any, index: number): React.ReactNode => {
-      if (node.type === 'text') {
-        let text = node.text || ''
-
-        // Apply text formatting
-        if (node.format & 1) text = <strong key={index}>{text}</strong> // Bold
-        if (node.format & 2) text = <em key={index}>{text}</em> // Italic
-        if (node.format & 8) text = <u key={index}>{text}</u> // Underline
-        if (node.format & 16) text = <s key={index}>{text}</s> // Strikethrough
-
-        return text
-      }
-
-      if (node.type === 'paragraph') {
-        const children = node.children ? node.children.map(renderNode) : []
-        return (
-          <p key={index} className="mb-4 last:mb-0">
-            {children}
-          </p>
-        )
-      }
-
-      if (node.type === 'heading') {
-        const children = node.children ? node.children.map(renderNode) : []
-        const HeadingTag = node.tag || 'h2'
-
-        const headingClasses = {
-          h1: 'text-3xl font-bold mb-4',
-          h2: 'text-2xl font-bold mb-3',
-          h3: 'text-xl font-bold mb-3',
-          h4: 'text-lg font-bold mb-2',
-          h5: 'text-base font-bold mb-2',
-          h6: 'text-sm font-bold mb-2',
-        }
-
-        return React.createElement(
-          HeadingTag,
-          {
-            key: index,
-            className:
-              headingClasses[HeadingTag as keyof typeof headingClasses] || headingClasses.h2,
-          },
-          children,
-        )
-      }
-
-      if (node.type === 'list') {
-        const children = node.children ? node.children.map(renderNode) : []
-        const ListTag = node.listType === 'number' ? 'ol' : 'ul'
-        return (
-          <ListTag key={index} className="list-disc list-inside mb-4 space-y-1">
-            {children}
-          </ListTag>
-        )
-      }
-
-      if (node.type === 'listitem') {
-        const children = node.children ? node.children.map(renderNode) : []
-        return (
-          <li key={index} className="ml-4">
-            {children}
-          </li>
-        )
-      }
-
-      if (node.type === 'link') {
-        const children = node.children ? node.children.map(renderNode) : []
-        return (
-          <a
-            key={index}
-            href={node.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-primary hover:text-primary/80 underline"
-          >
-            {children}
-          </a>
-        )
-      }
-
-      // Handle line breaks
-      if (node.type === 'linebreak') {
-        return <br key={index} />
-      }
-
-      // Fallback for unknown types - render children if they exist
-      if (node.children) {
-        return <div key={index}>{node.children.map(renderNode)}</div>
-      }
-
-      return null
-    }
-
-    return <div className="rich-text-content">{richTextObj.root.children.map(renderNode)}</div>
-  }
-
   return (
     <Card>
       <CardHeader>
@@ -464,7 +606,7 @@ function PropertyAgentSummary({ property }: { property: Property }) {
       </CardHeader>
       <CardContent>
         <div className="text-muted-foreground leading-relaxed">
-          {renderRichText(property.generalInformation.agentSummary)}
+          {renderRichText(property.generalInformation.agentSummary) || 'No agent summary available'}
         </div>
       </CardContent>
     </Card>
@@ -618,9 +760,12 @@ function ComparableSales({ property }: { property: Property }) {
       </CardHeader>
       <CardContent className="space-y-4">
         {property.generalInformation.comparableSales.slice(0, 2).map((sale: any) => (
-          <div
+          <a
             key={sale.id}
-            className="border rounded-lg overflow-hidden bg-card hover:shadow-md transition-shadow hover:border-primary"
+            href={sale.link}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block border rounded-lg overflow-hidden bg-card hover:shadow-md transition-shadow hover:border-primary cursor-pointer"
           >
             {sale.heroImage && sale.heroImage.url ? (
               <img
@@ -638,16 +783,11 @@ function ComparableSales({ property }: { property: Property }) {
               <div className="text-lg font-bold text-primary mb-2">
                 {formatPrice(sale.salePrice)}
               </div>
-              <a
-                href={sale.link}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-primary hover:text-primary/80 text-xs font-medium"
-              >
+              <div className="text-primary hover:text-primary/80 text-xs font-medium">
                 View Listing →
-              </a>
+              </div>
             </div>
-          </div>
+          </a>
         ))}
       </CardContent>
     </Card>
@@ -686,17 +826,37 @@ function DueDiligence({ property }: { property: Property }) {
               <AccordionContent>
                 <div className="space-y-3">
                   {zone.image && zone.image.url ? (
-                    <img
-                      src={getImageUrl(zone.image.url)}
-                      alt={zone.image.alt || zone.type}
-                      className="w-full h-48 object-cover rounded mb-3"
-                    />
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <img
+                          src={getImageUrl(zone.image.url)}
+                          alt={zone.image.alt || zone.type}
+                          className="w-full h-48 object-cover rounded mb-3 cursor-pointer hover:opacity-90 transition-opacity"
+                        />
+                      </DialogTrigger>
+                      <DialogContent className="max-w-4xl overflow-hidden">
+                        <DialogHeader>
+                          <DialogTitle className="capitalize">
+                            {zone.type} - Zone Information
+                          </DialogTitle>
+                        </DialogHeader>
+                        <div className="w-full">
+                          <img
+                            src={getImageUrl(zone.image.url)}
+                            alt={zone.image.alt || zone.type}
+                            className="w-full h-auto max-h-[70vh] object-contain rounded-lg"
+                          />
+                        </div>
+                      </DialogContent>
+                    </Dialog>
                   ) : (
                     <div className="w-full h-48 bg-muted rounded flex items-center justify-center mb-3">
                       <span className="text-muted-foreground text-sm">No image available</span>
                     </div>
                   )}
-                  <div className="text-sm text-muted-foreground">{zone.details}</div>
+                  <div className="text-sm text-muted-foreground">
+                    {renderRichText(zone.details)}
+                  </div>
                   {zone.agentNotes && (
                     <div className="bg-primary/5 border-l-4 border-primary p-3 my-3">
                       <p className="text-sm text-foreground">
@@ -963,6 +1123,293 @@ function ValueProposition({ property }: { property: Property }) {
   )
 }
 
+// Market Information Component
+const MarketInformation = ({ property }: { property: Property }) => {
+  const suburbName = getSuburbName(property.generalInformation.address.suburbName)
+  const regionName = getRegionName(property.generalInformation.address.region)
+
+  if (!suburbName && !regionName) {
+    return null
+  }
+
+  return (
+    <Card className="pb-1">
+      <CardHeader>
+        <CardTitle>Market Information</CardTitle>
+      </CardHeader>
+      <CardContent className="p-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Suburb Information */}
+          {suburbName && (
+            <Sheet>
+              <SheetTrigger asChild>
+                <div className="block border rounded-lg overflow-hidden bg-card hover:shadow-md transition-shadow hover:border-primary cursor-pointer">
+                  <img
+                    src={getSuburbImage(property.generalInformation.address.suburbName)}
+                    alt={`${suburbName} suburb image`}
+                    className="w-full h-32 object-cover"
+                  />
+                  <div className="p-2">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h5 className="font-semibold text-sm mb-1">Suburb</h5>
+                        <div className="text-lg font-bold text-primary">{suburbName}</div>
+                      </div>
+                      <div className="inline-flex items-center gap-1 hover:text-primary text-xs font-medium transition-colors">
+                        View Details
+                        <svg
+                          className="w-3 h-3"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M9 5l7 7-7 7"
+                          />
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </SheetTrigger>
+              <SheetContent className="w-full sm:max-w-2xl overflow-hidden flex flex-col">
+                <SheetHeader className="p-0 px-4 pt-4">
+                  <SheetTitle className="font-semibold text-2xl">
+                    {suburbName} -{' '}
+                    <span className="uppercase">
+                      {property.generalInformation.address.state}{' '}
+                      {property.generalInformation.address.postcode}
+                    </span>
+                  </SheetTitle>
+                </SheetHeader>
+                <div className="flex-1 overflow-y-auto p-4 space-y-6">
+                  {/* Suburb Hero Image */}
+                  {typeof property.generalInformation.address.suburbName === 'object' &&
+                    (property.generalInformation.address.suburbName as any)?.heroImage && (
+                      <div className="w-full">
+                        <img
+                          src={getImageUrl(
+                            (property.generalInformation.address.suburbName as any).heroImage.url,
+                          )}
+                          alt={
+                            (property.generalInformation.address.suburbName as any).heroImage.alt ||
+                            `${suburbName} hero image`
+                          }
+                          className="w-full h-48 object-cover rounded-lg"
+                        />
+                      </div>
+                    )}
+
+                  {/* Suburb Description */}
+                  {typeof property.generalInformation.address.suburbName === 'object' &&
+                    (property.generalInformation.address.suburbName as any)?.description && (
+                      <div>
+                        <div className="text-sm text-muted-foreground leading-relaxed">
+                          {renderRichText(
+                            (property.generalInformation.address.suburbName as any).description,
+                          ) || 'No description available'}
+                        </div>
+                      </div>
+                    )}
+
+                  {/* Suburb Median Chart */}
+                  {typeof property.generalInformation.address.suburbName === 'object' &&
+                    (property.generalInformation.address.suburbName as any)?.medianValueByYear &&
+                    Array.isArray(
+                      (property.generalInformation.address.suburbName as any).medianValueByYear,
+                    ) &&
+                    (property.generalInformation.address.suburbName as any).medianValueByYear
+                      .length > 0 &&
+                    (property.generalInformation.address.suburbName as any).medianValueByYear.some(
+                      (yearData: any) =>
+                        (yearData.medianValue && yearData.medianValue > 0) ||
+                        (yearData.value && yearData.value > 0),
+                    ) && (
+                      <SuburbMedianChart
+                        data={(
+                          property.generalInformation.address.suburbName as any
+                        ).medianValueByYear
+                          .filter(
+                            (yearData: any) =>
+                              (yearData.medianValue && yearData.medianValue > 0) ||
+                              (yearData.value && yearData.value > 0),
+                          )
+                          .map((yearData: any) => ({
+                            year: yearData.year || '2024',
+                            value: yearData.medianValue || yearData.value || 0,
+                          }))}
+                        suburbName={suburbName || 'Unknown Suburb'}
+                        className="w-full"
+                      />
+                    )}
+
+                  {/* Fallback message when no detailed suburb data is available */}
+                  {typeof property.generalInformation.address.suburbName === 'string' && (
+                    <div className="text-center py-8">
+                      <div className="w-16 h-16 mx-auto mb-4 bg-muted rounded-full flex items-center justify-center">
+                        <svg
+                          className="w-8 h-8 text-muted-foreground"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                          />
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                          />
+                        </svg>
+                      </div>
+                      <h3 className="font-semibold text-lg mb-2">{suburbName}</h3>
+                      <p className="text-muted-foreground text-sm">
+                        Detailed suburb information is not available for this location.
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </SheetContent>
+            </Sheet>
+          )}
+
+          {/* Region Information */}
+          {regionName && (
+            <Sheet>
+              <SheetTrigger asChild>
+                <div className="block border rounded-lg overflow-hidden bg-card hover:shadow-md transition-shadow hover:border-primary cursor-pointer">
+                  <img
+                    src={getRegionImage(property.generalInformation.address.region)}
+                    alt={`${regionName} region image`}
+                    className="w-full h-32 object-cover"
+                  />
+                  <div className="p-2">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h5 className="font-semibold text-sm mb-1">Region</h5>
+                        <div className="text-lg font-bold text-primary">{regionName}</div>
+                      </div>
+                      <div className="inline-flex items-center gap-1 hover:text-primary text-xs font-medium transition-colors">
+                        View Details
+                        <svg
+                          className="w-3 h-3"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M9 5l7 7-7 7"
+                          />
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </SheetTrigger>
+              <SheetContent className="w-full sm:max-w-2xl overflow-hidden flex flex-col">
+                <SheetHeader className="p-0 px-4 pt-4">
+                  <SheetTitle className="font-semibold text-2xl">
+                    {regionName} -{' '}
+                    <span className="uppercase">{property.generalInformation.address.state}</span>
+                  </SheetTitle>
+                </SheetHeader>
+                <div className="flex-1 overflow-y-auto p-4 space-y-6">
+                  {/* Region Hero Image */}
+                  {typeof property.generalInformation.address.region === 'object' &&
+                    (property.generalInformation.address.region as any)?.heroImage && (
+                      <div className="w-full">
+                        <img
+                          src={getImageUrl(
+                            (property.generalInformation.address.region as any).heroImage.url,
+                          )}
+                          alt={
+                            (property.generalInformation.address.region as any).heroImage.alt ||
+                            `${regionName} hero image`
+                          }
+                          className="w-full h-48 object-cover rounded-lg"
+                        />
+                      </div>
+                    )}
+
+                  {/* Region Description */}
+                  {typeof property.generalInformation.address.region === 'object' &&
+                    (property.generalInformation.address.region as any)?.description && (
+                      <div>
+                        <div className="text-sm text-muted-foreground leading-relaxed">
+                          {renderRichText(
+                            (property.generalInformation.address.region as any).description,
+                          ) || 'No description available'}
+                        </div>
+                      </div>
+                    )}
+
+                  {/* Fallback message when no detailed region data is available */}
+                  {typeof property.generalInformation.address.region === 'string' && (
+                    <div className="text-center py-8">
+                      <div className="w-16 h-16 mx-auto mb-4 bg-muted rounded-full flex items-center justify-center">
+                        <svg
+                          className="w-8 h-8 text-muted-foreground"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"
+                          />
+                        </svg>
+                      </div>
+                      <h3 className="font-semibold text-lg mb-2">{regionName}</h3>
+                      <p className="text-muted-foreground text-sm">
+                        Detailed region information is not available for this location.
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </SheetContent>
+            </Sheet>
+          )}
+
+          {/* Fallback for when neither suburb nor region is available */}
+          {!suburbName && !regionName && (
+            <div className="col-span-full text-center py-2">
+              <div className="w-12 h-12 mx-auto mb-3 bg-muted rounded-full flex items-center justify-center">
+                <svg
+                  className="w-6 h-6 text-muted-foreground"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"
+                  />
+                </svg>
+              </div>
+              <p className="text-muted-foreground text-sm">Market information not available</p>
+            </div>
+          )}
+        </div>
+      </CardContent>
+    </Card>
+  )
+}
+
 export function EnhancedPropertyDetails({ property: typedProperty }: EnhancedPropertyDetailsProps) {
   const fullAddress = `${typedProperty.generalInformation.address.streetAddress}, ${typedProperty.generalInformation.address.postcode} ${typedProperty.generalInformation.address.state?.toUpperCase()}`
 
@@ -989,6 +1436,8 @@ export function EnhancedPropertyDetails({ property: typedProperty }: EnhancedPro
           <DueDiligence property={typedProperty} />
 
           <ValueProposition property={typedProperty} />
+
+          <MarketInformation property={typedProperty} />
         </div>
 
         {/* Desktop Sidebar */}

@@ -31,7 +31,7 @@ import {
 // Image URL utility function matching reference layouts
 const getImageUrl = (url: string) => {
   if (!url) return ''
-  return url.startsWith('http') ? url : `https://cms.hassen.com.au${url}`
+  return url.startsWith('http') ? url : url
 }
 
 // Price formatting utility matching reference layouts
@@ -43,6 +43,79 @@ const formatPrice = (price: number | null | undefined): string => {
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
   }).format(price)
+}
+
+// Location utility functions from reference layouts
+const getSuburbName = (suburb: string | null | { name: string } | undefined): string | null => {
+  if (!suburb) return null
+  if (typeof suburb === 'string') return suburb
+  if (typeof suburb === 'object' && 'name' in suburb) return suburb.name
+  return null
+}
+
+const getRegionName = (region: string | null | { name: string } | undefined): string | null => {
+  if (!region) return null
+  if (typeof region === 'string') return region
+  if (typeof region === 'object' && 'name' in region) return region.name
+  return null
+}
+
+const getSuburbImage = (
+  suburb: string | null | { heroImage?: { url: string } } | undefined,
+): string => {
+  if (!suburb) return '/img/generic-suburb.webp'
+  if (typeof suburb === 'string') return '/img/generic-suburb.webp'
+  if (typeof suburb === 'object' && suburb.heroImage?.url) {
+    return getImageUrl(suburb.heroImage.url)
+  }
+  return '/img/generic-suburb.webp'
+}
+
+const getRegionImage = (
+  region: string | null | { heroImage?: { url: string } } | undefined,
+): string => {
+  if (!region) return '/img/generic-region.webp'
+  if (typeof region === 'string') return '/img/generic-region.webp'
+  if (typeof region === 'object' && region.heroImage?.url) {
+    return getImageUrl(region.heroImage.url)
+  }
+  return '/img/generic-region.webp'
+}
+
+// Rich text rendering utility
+const renderRichText = (richTextObj: any): React.ReactNode => {
+  if (!richTextObj || !richTextObj.root || !richTextObj.root.children) {
+    return null
+  }
+
+  const renderNode = (node: any, index: number): React.ReactNode => {
+    if (node.type === 'text') {
+      let text: React.ReactNode = node.text || ''
+
+      // Apply text formatting
+      if (node.format & 1) text = <strong>{text}</strong> // Bold
+      if (node.format & 2) text = <em>{text}</em> // Italic
+      if (node.format & 8) text = <u>{text}</u> // Underline
+      if (node.format & 16) text = <s>{text}</s> // Strikethrough
+
+      return text
+    }
+
+    if (node.type === 'paragraph') {
+      const children = node.children
+        ? node.children.map((child: any, childIndex: number) => renderNode(child, childIndex))
+        : []
+      return (
+        <p key={index} className="mb-4 last:mb-0">
+          {children}
+        </p>
+      )
+    }
+
+    return null
+  }
+
+  return richTextObj.root.children.map((child: any, index: number) => renderNode(child, index))
 }
 
 interface Region {
@@ -63,6 +136,243 @@ interface PropertiesClientProps {
   properties: ClientProperty[]
   regions: Region[]
   suburbs: Suburb[]
+}
+
+// Market Information Component for property cards
+const MarketInformation = ({ property }: { property: ClientProperty }) => {
+  const suburbName = getSuburbName(property.generalInformation.address.suburbName)
+  const regionName = getRegionName(property.generalInformation.address.region)
+
+  if (!suburbName && !regionName) {
+    return null
+  }
+
+  return (
+    <div className="border-t pt-4">
+      <h4 className="font-semibold text-sm mb-3">Market Information</h4>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Suburb Information */}
+        {suburbName && (
+          <Sheet>
+            <SheetTrigger asChild>
+              <div className="block border rounded-lg overflow-hidden bg-card hover:shadow-md transition-shadow hover:border-primary cursor-pointer">
+                <img
+                  src={getSuburbImage(property.generalInformation.address.suburbName)}
+                  alt={`${suburbName} suburb image`}
+                  className="w-full h-24 object-cover"
+                />
+                <div className="p-3">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h5 className="font-semibold text-xs mb-1">Suburb</h5>
+                      <div className="text-sm font-bold text-primary">{suburbName}</div>
+                    </div>
+                    <div className="inline-flex items-center gap-1 hover:text-primary text-xs font-medium transition-colors">
+                      View Details
+                      <svg
+                        className="w-3 h-3"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M9 5l7 7-7 7"
+                        />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </SheetTrigger>
+            <SheetContent className="w-full sm:max-w-2xl overflow-hidden flex flex-col">
+              <SheetHeader className="p-0 px-4 pt-4">
+                <SheetTitle className="font-semibold text-2xl">
+                  {suburbName} -{' '}
+                  <span className="uppercase">
+                    {property.generalInformation.address.state}{' '}
+                    {property.generalInformation.address.postcode}
+                  </span>
+                </SheetTitle>
+              </SheetHeader>
+              <div className="flex-1 overflow-y-auto p-4 space-y-6">
+                {/* Suburb Hero Image */}
+                {typeof property.generalInformation.address.suburbName === 'object' &&
+                  (property.generalInformation.address.suburbName as any)?.heroImage && (
+                    <div className="w-full">
+                      <img
+                        src={getImageUrl(
+                          (property.generalInformation.address.suburbName as any).heroImage.url,
+                        )}
+                        alt={
+                          (property.generalInformation.address.suburbName as any).heroImage.alt ||
+                          `${suburbName} hero image`
+                        }
+                        className="w-full h-48 object-cover rounded-lg"
+                      />
+                    </div>
+                  )}
+
+                {/* Suburb Description */}
+                {typeof property.generalInformation.address.suburbName === 'object' &&
+                  (property.generalInformation.address.suburbName as any)?.description && (
+                    <div>
+                      <div className="text-sm text-muted-foreground leading-relaxed">
+                        {typeof (property.generalInformation.address.suburbName as any)
+                          .description === 'string'
+                          ? (property.generalInformation.address.suburbName as any).description
+                          : renderRichText(
+                              (property.generalInformation.address.suburbName as any).description,
+                            )}
+                      </div>
+                    </div>
+                  )}
+
+                {/* Fallback message when no detailed suburb data is available */}
+                {typeof property.generalInformation.address.suburbName === 'string' && (
+                  <div className="text-center py-8">
+                    <div className="w-16 h-16 mx-auto mb-4 bg-muted rounded-full flex items-center justify-center">
+                      <svg
+                        className="w-8 h-8 text-muted-foreground"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                        />
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                        />
+                      </svg>
+                    </div>
+                    <h3 className="font-semibold text-lg mb-2">{suburbName}</h3>
+                    <p className="text-muted-foreground text-sm">
+                      Detailed suburb information is not available for this location.
+                    </p>
+                  </div>
+                )}
+              </div>
+            </SheetContent>
+          </Sheet>
+        )}{' '}
+        {/* Region Information */}
+        {regionName && (
+          <Sheet>
+            <SheetTrigger asChild>
+              <div className="block border rounded-lg overflow-hidden bg-card hover:shadow-md transition-shadow hover:border-primary cursor-pointer">
+                <img
+                  src={getRegionImage(property.generalInformation.address.region)}
+                  alt={`${regionName} region image`}
+                  className="w-full h-24 object-cover"
+                />
+                <div className="p-3">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h5 className="font-semibold text-xs mb-1">Region</h5>
+                      <div className="text-sm font-bold text-primary">{regionName}</div>
+                    </div>
+                    <div className="inline-flex items-center gap-1 hover:text-primary text-xs font-medium transition-colors">
+                      View Details
+                      <svg
+                        className="w-3 h-3"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M9 5l7 7-7 7"
+                        />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </SheetTrigger>
+            <SheetContent className="w-full sm:max-w-2xl overflow-hidden flex flex-col">
+              <SheetHeader className="p-0 px-4 pt-4">
+                <SheetTitle className="font-semibold text-2xl">
+                  {regionName} -{' '}
+                  <span className="uppercase">{property.generalInformation.address.state}</span>
+                </SheetTitle>
+              </SheetHeader>
+              <div className="flex-1 overflow-y-auto p-4 space-y-6">
+                {/* Region Hero Image */}
+                {typeof property.generalInformation.address.region === 'object' &&
+                  (property.generalInformation.address.region as any)?.heroImage && (
+                    <div className="w-full">
+                      <img
+                        src={getImageUrl(
+                          (property.generalInformation.address.region as any).heroImage.url,
+                        )}
+                        alt={
+                          (property.generalInformation.address.region as any).heroImage.alt ||
+                          `${regionName} hero image`
+                        }
+                        className="w-full h-48 object-cover rounded-lg"
+                      />
+                    </div>
+                  )}
+
+                {/* Region Description */}
+                {typeof property.generalInformation.address.region === 'object' &&
+                  (property.generalInformation.address.region as any)?.description && (
+                    <div>
+                      <div className="text-sm text-muted-foreground leading-relaxed">
+                        {typeof (property.generalInformation.address.region as any).description ===
+                        'string'
+                          ? (property.generalInformation.address.region as any).description
+                          : renderRichText(
+                              (property.generalInformation.address.region as any).description,
+                            )}
+                      </div>
+                    </div>
+                  )}
+
+                {/* Fallback message when no detailed region data is available */}
+                {typeof property.generalInformation.address.region === 'string' && (
+                  <div className="text-center py-8">
+                    <div className="w-16 h-16 mx-auto mb-4 bg-muted rounded-full flex items-center justify-center">
+                      <svg
+                        className="w-8 h-8 text-muted-foreground"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"
+                        />
+                      </svg>
+                    </div>
+                    <h3 className="font-semibold text-lg mb-2">
+                      {getRegionName(property.generalInformation.address.region)}
+                    </h3>
+                    <p className="text-muted-foreground text-sm">
+                      Detailed region information is not available for this location.
+                    </p>
+                  </div>
+                )}
+              </div>
+            </SheetContent>
+          </Sheet>
+        )}
+      </div>
+    </div>
+  )
 }
 
 // Property Card Component matching reference layout patterns
