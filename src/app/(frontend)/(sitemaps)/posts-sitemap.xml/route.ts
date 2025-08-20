@@ -5,6 +5,10 @@ import { unstable_cache } from 'next/cache'
 
 const getPostsSitemap = unstable_cache(
   async () => {
+    if (process.env.SKIP_PAYLOAD_DB === 'true') {
+      return []
+    }
+
     const payload = await getPayload({ config })
     const SITE_URL = process.env.NEXT_PUBLIC_SERVER_URL || 'https://example.com'
 

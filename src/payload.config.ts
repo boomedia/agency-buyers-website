@@ -4,7 +4,7 @@ import { resendAdapter } from '@payloadcms/email-resend'
 
 import sharp from 'sharp'
 import path from 'path'
-import { buildConfig, Plugin } from 'payload'
+import { buildConfig } from 'payload'
 import { fileURLToPath } from 'url'
 
 import { Categories } from './collections/Categories'
@@ -117,7 +117,7 @@ export default buildConfig({
   globals: [Header, Footer, CompanySettings],
   plugins: [
     ...plugins,
-    NODE_ENV === 'production'
+    ...(NODE_ENV === 'production'
       ? [
           gcsStorage({
             collections: {
@@ -130,8 +130,8 @@ export default buildConfig({
             },
           }),
         ]
-      : undefined,
-  ].filter(Boolean) as Plugin[],
+      : []),
+  ],
   secret: process.env.PAYLOAD_SECRET,
   sharp,
   typescript: {

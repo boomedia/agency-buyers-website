@@ -19,6 +19,21 @@ type Args = {
 
 export default async function Page({ params: paramsPromise }: Args) {
   const { pageNumber } = await paramsPromise
+
+  if (process.env.SKIP_PAYLOAD_DB === 'true') {
+    return (
+      <div className="pt-24 pb-24">
+        <PageClient />
+        <div className="container mb-16">
+          <div className="prose dark:prose-invert max-w-none">
+            <h1>Posts</h1>
+            <p>Database connection disabled during build.</p>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   const payload = await getPayload({ config: configPromise })
 
   const sanitizedPageNumber = Number(pageNumber)
@@ -70,6 +85,10 @@ export async function generateMetadata({ params: paramsPromise }: Args): Promise
 }
 
 export async function generateStaticParams() {
+  if (process.env.SKIP_PAYLOAD_DB === 'true') {
+    return []
+  }
+
   const payload = await getPayload({ config: configPromise })
   const { totalDocs } = await payload.count({
     collection: 'posts',

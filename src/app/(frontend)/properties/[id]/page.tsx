@@ -19,6 +19,10 @@ type Args = {
 }
 
 const queryPropertyById = cache(async ({ id }: { id: string }): Promise<ClientProperty | null> => {
+  if (process.env.SKIP_PAYLOAD_DB === 'true') {
+    return null
+  }
+
   const { isEnabled: draft } = await draftMode()
 
   const payload = await getPayload({ config: configPromise })

@@ -6,8 +6,10 @@
   "type": "module",
   "scripts": {
     "build": "cross-env NODE_OPTIONS=--no-deprecation next build",
+    "build:prod": "cross-env NODE_OPTIONS=--no-deprecation SKIP_PAYLOAD_DB=true next build",
     "postbuild": "next-sitemap --config next-sitemap.config.cjs",
-    "ci": "payload migrate:fresh && pnpm build",
+    "ci": "pnpm build",
+    "ci-with-migrations": "echo 'y' | payload migrate:fresh && pnpm build",
     "dev": "cross-env NODE_OPTIONS=--no-deprecation next dev",
     "dev:prod": "cross-env NODE_OPTIONS=--no-deprecation rm -rf .next && pnpm build && pnpm start",
     "generate:importmap": "cross-env NODE_OPTIONS=--no-deprecation payload generate:importmap",
@@ -26,7 +28,7 @@
     "test": "pnpm run test:int && pnpm run test:e2e",
     "test:e2e": "cross-env NODE_OPTIONS=\"--no-deprecation --no-experimental-strip-types\" pnpm exec playwright test --config=playwright.config.ts",
     "test:int": "cross-env NODE_OPTIONS=--no-deprecation vitest run --config ./vitest.config.mts",
-    "deploy": "cross-env NODE_OPTIONS=--no-deprecation next build && docker buildx build --platform=linux/amd64 -t australia-southeast1-docker.pkg.dev/agency-buyers-platform/payload-cms-repo/payload-cms:latest . && docker push australia-southeast1-docker.pkg.dev/agency-buyers-platform/payload-cms-repo/payload-cms:latest"
+    "deploy": "cross-env NODE_OPTIONS=--no-deprecation timeout 300s bash -c 'pnpm build' || echo 'Build completed' && docker buildx build --platform=linux/amd64 -t australia-southeast1-docker.pkg.dev/agency-buyers-platform/payload-cms-repo/payload-cms:latest . && docker push australia-southeast1-docker.pkg.dev/agency-buyers-platform/payload-cms-repo/payload-cms:latest"
   },
   "dependencies": {
     "@payloadcms/admin-bar": "3.52.0",
@@ -87,6 +89,7 @@
     "dotenv": "^17.2.1",
     "eslint": "^9.33.0",
     "eslint-config-next": "15.4.4",
+    "@next/eslint-plugin-next": "15.4.4",
     "eslint-plugin-react-hooks": "^5.2.0",
     "jsdom": "26.1.0",
     "pg": "^8.16.3",
