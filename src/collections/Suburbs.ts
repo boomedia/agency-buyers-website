@@ -1,13 +1,25 @@
 import { CollectionConfig } from 'payload'
+import { generatePreviewPath } from '../utilities/generatePreviewPath'
 
 export const Suburbs: CollectionConfig = {
   slug: 'suburbs',
   admin: {
     useAsTitle: 'name',
     group: 'Real Estate',
+    preview: (data, { req }) =>
+      generatePreviewPath({
+        id: typeof data?.id === 'string' || typeof data?.id === 'number' ? data.id : undefined,
+        collection: 'suburbs',
+        req,
+      }),
   },
   access: {
     read: () => true,
+  },
+  versions: {
+    drafts: {
+      autosave: true,
+    },
   },
   fields: [
     {

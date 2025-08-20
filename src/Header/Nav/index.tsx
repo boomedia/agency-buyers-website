@@ -11,9 +11,21 @@ import { SearchIcon } from 'lucide-react'
 export const HeaderNav: React.FC<{ data: HeaderType }> = ({ data }) => {
   const navItems = data?.navItems || []
 
+  // Manually add the "Properties" link
+  const propertiesLink = {
+    link: {
+      type: 'custom' as const,
+      url: '/properties',
+      label: 'Properties',
+      newTab: false,
+    }
+  }
+
+  const allNavItems = [...navItems, propertiesLink];
+
   return (
     <nav className="flex gap-3 items-center">
-      {navItems.map(({ link }, i) => {
+      {allNavItems.map(({ link }, i) => {
         return <CMSLink key={i} {...link} appearance="link" />
       })}
       <Link href="/search">

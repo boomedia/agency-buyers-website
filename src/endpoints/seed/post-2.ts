@@ -7,7 +7,7 @@ export const post2: (args: PostArgs) => RequiredDataFromCollectionSlug<'posts'> 
   author,
 }) => {
   return {
-    slug: 'global-gaze',
+    slug: 'investment-property-strategies-australia',
     _status: 'published',
     authors: [author],
     content: {
@@ -23,7 +23,7 @@ export const post2: (args: PostArgs) => RequiredDataFromCollectionSlug<'posts'> 
                 format: 0,
                 mode: 'normal',
                 style: '',
-                text: 'Explore the untold and overlooked. A magnified view into the corners of the world, where every story deserves its spotlight.',
+                text: 'Build wealth through strategic property investment. Discover proven strategies used by successful Australian property investors to create lasting financial freedom.',
                 version: 1,
               },
             ],
@@ -51,7 +51,7 @@ export const post2: (args: PostArgs) => RequiredDataFromCollectionSlug<'posts'> 
                           format: 1,
                           mode: 'normal',
                           style: '',
-                          text: 'Disclaimer:',
+                          text: 'Investment Warning:',
                           version: 1,
                         },
                         {
@@ -60,7 +60,7 @@ export const post2: (args: PostArgs) => RequiredDataFromCollectionSlug<'posts'> 
                           format: 0,
                           mode: 'normal',
                           style: '',
-                          text: ' This content is fabricated and for demonstration purposes only. To edit this post, ',
+                          text: ' Property investment carries risks including market fluctuations, vacancy periods, and interest rate changes. This content is general information only and should not replace professional financial advice. ',
                           version: 1,
                         },
                         {
@@ -72,15 +72,15 @@ export const post2: (args: PostArgs) => RequiredDataFromCollectionSlug<'posts'> 
                               format: 0,
                               mode: 'normal',
                               style: '',
-                              text: 'navigate to the admin dashboard.',
+                              text: 'Speak with our investment specialists today.',
                               version: 1,
                             },
                           ],
                           direction: 'ltr',
                           fields: {
                             linkType: 'custom',
-                            newTab: true,
-                            url: '/admin',
+                            newTab: false,
+                            url: '/contact',
                           },
                           format: '',
                           indent: 0,
@@ -114,7 +114,7 @@ export const post2: (args: PostArgs) => RequiredDataFromCollectionSlug<'posts'> 
                 format: 0,
                 mode: 'normal',
                 style: '',
-                text: 'The Power of Resilience: Stories of Recovery and Hope',
+                text: 'The Power of Positive Gearing: Maximising Cash Flow and Growth',
                 version: 1,
               },
             ],
@@ -133,7 +133,7 @@ export const post2: (args: PostArgs) => RequiredDataFromCollectionSlug<'posts'> 
                 format: 0,
                 mode: 'normal',
                 style: '',
-                text: "Throughout history, regions across the globe have faced the devastating impact of natural disasters, the turbulence of political unrest, and the challenging ripples of economic downturns. In these moments of profound crisis, an often-underestimated force emerges: the indomitable resilience of the human spirit. These aren't just tales of mere survival, but stories of communities forging bonds, uniting with a collective purpose, and demonstrating an innate ability to overcome.",
+                text: "In Australia's diverse property investment landscape, successful investors understand that building wealth isn't just about buying any property—it's about strategic selection, timing, and management. Whether you're considering your first investment property or expanding an existing portfolio, the fundamentals remain constant: location, rental yield, capital growth potential, and your personal financial circumstances must all align to create a winning investment strategy.",
                 version: 1,
               },
             ],
@@ -162,7 +162,7 @@ export const post2: (args: PostArgs) => RequiredDataFromCollectionSlug<'posts'> 
                 format: 0,
                 mode: 'normal',
                 style: '',
-                text: 'From neighbors forming makeshift rescue teams during floods to entire cities rallying to rebuild after economic collapse, the essence of humanity is most evident in these acts of solidarity. As we delve into these narratives, we witness the transformative power of community spirit, where adversity becomes a catalyst for growth, unity, and a brighter, rebuilt future.',
+                text: "Our buyers agency has witnessed countless success stories where clients have built substantial wealth through carefully selected investment properties. From young professionals purchasing their first investment unit in Brisbane's booming rental market to established investors diversifying into regional growth areas like Toowoomba and the Gold Coast hinterland, the key is understanding market cycles, demographic trends, and infrastructure development. With record migration to Australia and continued urbanisation, strategic property investment remains one of the most reliable wealth-building vehicles for everyday Australians.",
                 version: 1,
               },
             ],
@@ -175,7 +175,7 @@ export const post2: (args: PostArgs) => RequiredDataFromCollectionSlug<'posts'> 
           {
             type: 'block',
             fields: {
-              blockName: 'Dynamic components',
+              blockName: 'Expert Investment Guidance',
               blockType: 'banner',
               content: {
                 root: {
@@ -190,7 +190,7 @@ export const post2: (args: PostArgs) => RequiredDataFromCollectionSlug<'posts'> 
                           format: 0,
                           mode: 'normal',
                           style: '',
-                          text: "This content above is completely dynamic using custom layout building blocks configured in the CMS. This can be anything you'd like from rich text and images, to highly designed, complex components.",
+                          text: 'Our investment property specialists work exclusively for you, not developers or vendors. We conduct thorough due diligence, analyse rental yields, assess growth potential, and negotiate on your behalf to secure the best possible investment outcomes.',
                           version: 1,
                         },
                       ],
@@ -222,11 +222,11 @@ export const post2: (args: PostArgs) => RequiredDataFromCollectionSlug<'posts'> 
     heroImage: heroImage.id,
     meta: {
       description:
-        'Explore the untold and overlooked. A magnified view into the corners of the world, where every story deserves its spotlight.',
+        'Build wealth through strategic property investment. Discover proven strategies used by successful Australian property investors to create lasting financial freedom.',
       image: heroImage.id,
-      title: 'Global Gaze: Beyond the Headlines',
+      title: 'Smart Investment Property Strategies for Australian Investors',
     },
     relatedPosts: [], // this is populated by the seed script
-    title: 'Global Gaze: Beyond the Headlines',
+    title: 'Smart Investment Property Strategies for Australian Investors',
   }
 }

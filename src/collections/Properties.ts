@@ -1,10 +1,36 @@
 import { CollectionConfig } from 'payload'
+import { generatePreviewPath } from '../utilities/generatePreviewPath'
+import { revalidateProperty, revalidateDelete } from './Properties/hooks/revalidateProperty'
+import {
+  MetaDescriptionField,
+  MetaImageField,
+  MetaTitleField,
+  OverviewField,
+  PreviewField,
+} from '@payloadcms/plugin-seo/fields'
 
 export const Properties: CollectionConfig = {
   slug: 'properties',
   admin: {
     useAsTitle: 'name',
     group: 'Real Estate',
+    livePreview: {
+      url: ({ data, req }) => {
+        const path = generatePreviewPath({
+          id: typeof data?.id === 'string' || typeof data?.id === 'number' ? data.id : undefined,
+          collection: 'properties',
+          req,
+        })
+
+        return path
+      },
+    },
+    preview: (data, { req }) =>
+      generatePreviewPath({
+        id: typeof data?.id === 'string' || typeof data?.id === 'number' ? data.id : undefined,
+        collection: 'properties',
+        req,
+      }),
   },
   access: {
     read: () => true,
@@ -137,7 +163,9 @@ export const Properties: CollectionConfig = {
           }
         }
       },
+      revalidateProperty,
     ],
+    afterDelete: [revalidateDelete],
   },
   fields: [
     {
@@ -1089,6 +1117,32 @@ export const Properties: CollectionConfig = {
                 },
               ],
             },
+          ],
+        },
+        {
+          name: 'meta',
+          label: 'SEO',
+          fields: [
+            OverviewField({
+              titlePath: 'meta.title',
+              descriptionPath: 'meta.description',
+              imagePath: 'meta.image',
+            }),
+            MetaTitleField({
+              hasGenerateFn: true,
+            }),
+            MetaImageField({
+              relationTo: 'media',
+            }),
+            MetaDescriptionField({}),
+            PreviewField({
+              // if the `generateUrl` function is configured
+              hasGenerateFn: true,
+
+              // field paths to match the target field for data
+              titlePath: 'meta.title',
+              descriptionPath: 'meta.description',
+            }),
           ],
         },
       ],

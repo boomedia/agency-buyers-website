@@ -104,8 +104,16 @@ export const property2: (args: Property2Args) => RequiredDataFromCollectionSlug<
       },
       saleHistory: [
         {
-          year: 2018,
-          value: 285000,
+          year: 2020,
+          salePrice: 365000,
+        },
+        {
+          year: 2017,
+          salePrice: 295000,
+        },
+        {
+          year: 2013,
+          salePrice: 235000,
         },
       ],
       format: {
@@ -135,7 +143,37 @@ export const property2: (args: Property2Args) => RequiredDataFromCollectionSlug<
         {
           type: 'easement',
           effected: 'no',
-          details: null,
+          details: {
+            root: {
+              type: 'root',
+              format: '',
+              indent: 0,
+              version: 1,
+              children: [
+                {
+                  type: 'paragraph',
+                  format: '',
+                  indent: 0,
+                  version: 1,
+                  children: [
+                    {
+                      mode: 'normal',
+                      text: 'Title search confirms no easements affecting this property. Clear boundaries and unrestricted land use.',
+                      type: 'text',
+                      style: '',
+                      detail: 0,
+                      format: 0,
+                      version: 1,
+                    },
+                  ],
+                  direction: 'ltr',
+                  textStyle: '',
+                  textFormat: 0,
+                },
+              ],
+              direction: 'ltr',
+            },
+          },
           agentNotes: null,
           url: null,
           image: easementImage.id,
@@ -143,7 +181,37 @@ export const property2: (args: Property2Args) => RequiredDataFromCollectionSlug<
         {
           type: 'flood',
           effected: 'no',
-          details: null,
+          details: {
+            root: {
+              type: 'root',
+              format: '',
+              indent: 0,
+              version: 1,
+              children: [
+                {
+                  type: 'paragraph',
+                  format: '',
+                  indent: 0,
+                  version: 1,
+                  children: [
+                    {
+                      mode: 'normal',
+                      text: 'Property is located outside the defined flood area. Excellent elevation provides natural flood protection. Standard insurance rates apply.',
+                      type: 'text',
+                      style: '',
+                      detail: 0,
+                      format: 0,
+                      version: 1,
+                    },
+                  ],
+                  direction: 'ltr',
+                  textStyle: '',
+                  textFormat: 0,
+                },
+              ],
+              direction: 'ltr',
+            },
+          },
           agentNotes: null,
           url: 'https://mapping.bundaberg.qld.gov.au/flood-mapping',
           image: floodImage.id,
