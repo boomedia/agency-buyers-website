@@ -473,16 +473,16 @@ function PropertyAgentSummary({ property }: { property: Property }) {
         <CardTitle>Agent Summary</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="text-muted-foreground leading-relaxed">
+        <div className="prose prose-sm max-w-none">
           {(() => {
             const agentSummary = property.generalInformation.agentSummary
 
             if (!agentSummary) {
-              return 'No agent summary available'
+              return <p className="text-muted-foreground">No agent summary available</p>
             }
 
             if (typeof agentSummary === 'string') {
-              return agentSummary
+              return <p>{agentSummary}</p>
             } else if (agentSummary && typeof agentSummary === 'object') {
               // More robust validation for Lexical editor state
               if (
@@ -493,18 +493,18 @@ function PropertyAgentSummary({ property }: { property: Property }) {
                 agentSummary.root.children.length >= 0 // Allow empty arrays
               ) {
                 try {
-                  return <RichText data={agentSummary} enableGutter={false} enableProse={false} />
+                  return <RichText data={agentSummary} enableGutter={false} enableProse={true} />
                 } catch (error) {
                   console.error('Error rendering agent summary with RichText:', error)
-                  return 'Agent summary format not supported'
+                  return <p className="text-muted-foreground">Agent summary format not supported</p>
                 }
               } else {
                 // Try to extract text content if it's not a proper Lexical format
                 console.warn('Invalid Lexical format for agent summary:', agentSummary)
-                return 'Agent summary not available'
+                return <p className="text-muted-foreground">Agent summary not available</p>
               }
             }
-            return 'No agent summary available'
+            return <p className="text-muted-foreground">No agent summary available</p>
           })()}
         </div>
       </CardContent>

@@ -8,6 +8,18 @@ import {
   OverviewField,
   PreviewField,
 } from '@payloadcms/plugin-seo/fields'
+import {
+  BlocksFeature,
+  FixedToolbarFeature,
+  HeadingFeature,
+  HorizontalRuleFeature,
+  InlineToolbarFeature,
+  lexicalEditor,
+  UnorderedListFeature,
+  OrderedListFeature,
+  LinkFeature,
+  ChecklistFeature,
+} from '@payloadcms/richtext-lexical'
 import { anyone } from '../access/anyone'
 import { authenticated } from '../access/authenticated'
 
@@ -290,6 +302,23 @@ export const Properties: CollectionConfig<'properties'> = {
                   name: 'agentSummary',
                   type: 'richText',
                   label: 'Agent Summary',
+                  editor: lexicalEditor({
+                    features: ({ rootFeatures }) => {
+                      return [
+                        ...rootFeatures,
+                        HeadingFeature({ enabledHeadingSizes: ['h1', 'h2', 'h3', 'h4'] }),
+                        UnorderedListFeature(),
+                        OrderedListFeature(),
+                        LinkFeature({
+                          enabledCollections: ['pages', 'posts'],
+                        }),
+                        ChecklistFeature(),
+                        FixedToolbarFeature(),
+                        InlineToolbarFeature(),
+                        HorizontalRuleFeature(),
+                      ]
+                    },
+                  }),
                 },
                 {
                   type: 'row',
