@@ -5,7 +5,7 @@ import type { Property as ClientProperty } from '~/types/payload-types'
 export function transformPropertyData(payloadProperty: PayloadProperty): ClientProperty {
   // Map the Payload property structure to the expected client structure
   return {
-    id: payloadProperty.id, // Keep as string/UUID, don't parse as integer
+    id: String(payloadProperty.id), // Keep as string/UUID, don't parse as integer
     name: payloadProperty.name,
     generalInformation: {
       heroImage: (payloadProperty as any).info?.heroImage || null,

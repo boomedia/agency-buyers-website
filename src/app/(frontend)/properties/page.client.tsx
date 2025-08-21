@@ -20,6 +20,7 @@ import {
 } from '~/components/ui/accordion'
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '~/components/ui/sheet'
 import { Slider } from '~/components/ui/slider'
+import RichText from '~/components/RichText'
 import type { Property as ClientProperty } from '~/types/payload-types'
 import {
   calculateAnnualGrossYield,
@@ -80,42 +81,6 @@ const getRegionImage = (
     return getImageUrl(region.heroImage.url)
   }
   return '/img/generic-region.webp'
-}
-
-// Rich text rendering utility
-const renderRichText = (richTextObj: any): React.ReactNode => {
-  if (!richTextObj || !richTextObj.root || !richTextObj.root.children) {
-    return null
-  }
-
-  const renderNode = (node: any, index: number): React.ReactNode => {
-    if (node.type === 'text') {
-      let text: React.ReactNode = node.text || ''
-
-      // Apply text formatting
-      if (node.format & 1) text = <strong>{text}</strong> // Bold
-      if (node.format & 2) text = <em>{text}</em> // Italic
-      if (node.format & 8) text = <u>{text}</u> // Underline
-      if (node.format & 16) text = <s>{text}</s> // Strikethrough
-
-      return text
-    }
-
-    if (node.type === 'paragraph') {
-      const children = node.children
-        ? node.children.map((child: any, childIndex: number) => renderNode(child, childIndex))
-        : []
-      return (
-        <p key={index} className="mb-4 last:mb-0">
-          {children}
-        </p>
-      )
-    }
-
-    return null
-  }
-
-  return richTextObj.root.children.map((child: any, index: number) => renderNode(child, index))
 }
 
 interface Region {
@@ -220,12 +185,48 @@ const MarketInformation = ({ property }: { property: ClientProperty }) => {
                   (property.generalInformation.address.suburbName as any)?.description && (
                     <div>
                       <div className="text-sm text-muted-foreground leading-relaxed">
-                        {typeof (property.generalInformation.address.suburbName as any)
-                          .description === 'string'
-                          ? (property.generalInformation.address.suburbName as any).description
-                          : renderRichText(
-                              (property.generalInformation.address.suburbName as any).description,
-                            )}
+                        {(() => {
+                          const description = (
+                            property.generalInformation.address.suburbName as any
+                          ).description
+
+                          if (typeof description === 'string') {
+                            return description
+                          } else if (description && typeof description === 'object') {
+                            // More robust validation for Lexical editor state
+                            if (
+                              description.root &&
+                              typeof description.root === 'object' &&
+                              description.root.children &&
+                              Array.isArray(description.root.children) &&
+                              description.root.children.length >= 0 // Allow empty arrays
+                            ) {
+                              try {
+                                return (
+                                  <RichText
+                                    data={description}
+                                    enableGutter={false}
+                                    enableProse={false}
+                                  />
+                                )
+                              } catch (error) {
+                                console.error(
+                                  'Error rendering suburb description with RichText:',
+                                  error,
+                                )
+                                return 'Description format not supported'
+                              }
+                            } else {
+                              // Try to extract text content if it's not a proper Lexical format
+                              console.warn(
+                                'Invalid Lexical format for suburb description:',
+                                description,
+                              )
+                              return 'Description not available'
+                            }
+                          }
+                          return 'Description not available'
+                        })()}
                       </div>
                     </div>
                   )}
@@ -330,12 +331,47 @@ const MarketInformation = ({ property }: { property: ClientProperty }) => {
                   (property.generalInformation.address.region as any)?.description && (
                     <div>
                       <div className="text-sm text-muted-foreground leading-relaxed">
-                        {typeof (property.generalInformation.address.region as any).description ===
-                        'string'
-                          ? (property.generalInformation.address.region as any).description
-                          : renderRichText(
-                              (property.generalInformation.address.region as any).description,
-                            )}
+                        {(() => {
+                          const description = (property.generalInformation.address.region as any)
+                            .description
+
+                          if (typeof description === 'string') {
+                            return description
+                          } else if (description && typeof description === 'object') {
+                            // More robust validation for Lexical editor state
+                            if (
+                              description.root &&
+                              typeof description.root === 'object' &&
+                              description.root.children &&
+                              Array.isArray(description.root.children) &&
+                              description.root.children.length >= 0 // Allow empty arrays
+                            ) {
+                              try {
+                                return (
+                                  <RichText
+                                    data={description}
+                                    enableGutter={false}
+                                    enableProse={false}
+                                  />
+                                )
+                              } catch (error) {
+                                console.error(
+                                  'Error rendering region description with RichText:',
+                                  error,
+                                )
+                                return 'Description format not supported'
+                              }
+                            } else {
+                              // Try to extract text content if it's not a proper Lexical format
+                              console.warn(
+                                'Invalid Lexical format for region description:',
+                                description,
+                              )
+                              return 'Description not available'
+                            }
+                          }
+                          return 'Description not available'
+                        })()}
                       </div>
                     </div>
                   )}

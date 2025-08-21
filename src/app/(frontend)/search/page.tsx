@@ -15,6 +15,21 @@ type Args = {
 }
 export default async function Page({ searchParams: searchParamsPromise }: Args) {
   const { q: query } = await searchParamsPromise
+
+  if (process.env.SKIP_PAYLOAD_DB === 'true') {
+    return (
+      <div className="pt-24 pb-24">
+        <PageClient />
+        <div className="container mb-16">
+          <div className="prose dark:prose-invert max-w-none">
+            <h1>Search</h1>
+            <p>Database connection disabled during build.</p>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   const payload = await getPayload({ config: configPromise })
 
   const posts = await payload.find({

@@ -110,7 +110,7 @@ export interface Config {
     'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
   };
   db: {
-    defaultIDType: string;
+    defaultIDType: number;
   };
   globals: {
     header: Header;
@@ -203,7 +203,7 @@ export interface BuyersAccessAuthOperations {
  * via the `definition` "pages".
  */
 export interface Page {
-  id: string;
+  id: number;
   title: string;
   hero: {
     type: 'none' | 'highImpact' | 'mediumImpact' | 'lowImpact';
@@ -230,11 +230,11 @@ export interface Page {
             reference?:
               | ({
                   relationTo: 'pages';
-                  value: string | Page;
+                  value: number | Page;
                 } | null)
               | ({
                   relationTo: 'posts';
-                  value: string | Post;
+                  value: number | Post;
                 } | null);
             url?: string | null;
             label: string;
@@ -246,7 +246,7 @@ export interface Page {
           id?: string | null;
         }[]
       | null;
-    media?: (string | null) | Media;
+    media?: (number | null) | Media;
   };
   layout: (CallToActionBlock | ContentBlock | MediaBlock | ArchiveBlock | FormBlock)[];
   meta?: {
@@ -254,7 +254,7 @@ export interface Page {
     /**
      * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
      */
-    image?: (string | null) | Media;
+    image?: (number | null) | Media;
     description?: string | null;
   };
   publishedAt?: string | null;
@@ -269,9 +269,9 @@ export interface Page {
  * via the `definition` "posts".
  */
 export interface Post {
-  id: string;
+  id: number;
   title: string;
-  heroImage?: (string | null) | Media;
+  heroImage?: (number | null) | Media;
   content: {
     root: {
       type: string;
@@ -287,18 +287,18 @@ export interface Post {
     };
     [k: string]: unknown;
   };
-  relatedPosts?: (string | Post)[] | null;
-  categories?: (string | Category)[] | null;
+  relatedPosts?: (number | Post)[] | null;
+  categories?: (number | Category)[] | null;
   meta?: {
     title?: string | null;
     /**
      * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
      */
-    image?: (string | null) | Media;
+    image?: (number | null) | Media;
     description?: string | null;
   };
   publishedAt?: string | null;
-  authors?: (string | User)[] | null;
+  authors?: (number | User)[] | null;
   populatedAuthors?:
     | {
         id?: string | null;
@@ -316,7 +316,7 @@ export interface Post {
  * via the `definition` "media".
  */
 export interface Media {
-  id: string;
+  id: number;
   alt?: string | null;
   caption?: {
     root: {
@@ -408,14 +408,14 @@ export interface Media {
  * via the `definition` "categories".
  */
 export interface Category {
-  id: string;
+  id: number;
   title: string;
   slug?: string | null;
   slugLock?: boolean | null;
-  parent?: (string | null) | Category;
+  parent?: (number | null) | Category;
   breadcrumbs?:
     | {
-        doc?: (string | null) | Category;
+        doc?: (number | null) | Category;
         url?: string | null;
         label?: string | null;
         id?: string | null;
@@ -429,7 +429,7 @@ export interface Category {
  * via the `definition` "users".
  */
 export interface User {
-  id: string;
+  id: number;
   name?: string | null;
   updatedAt: string;
   createdAt: string;
@@ -477,11 +477,11 @@ export interface CallToActionBlock {
           reference?:
             | ({
                 relationTo: 'pages';
-                value: string | Page;
+                value: number | Page;
               } | null)
             | ({
                 relationTo: 'posts';
-                value: string | Post;
+                value: number | Post;
               } | null);
           url?: string | null;
           label: string;
@@ -527,11 +527,11 @@ export interface ContentBlock {
           reference?:
             | ({
                 relationTo: 'pages';
-                value: string | Page;
+                value: number | Page;
               } | null)
             | ({
                 relationTo: 'posts';
-                value: string | Post;
+                value: number | Post;
               } | null);
           url?: string | null;
           label: string;
@@ -552,7 +552,7 @@ export interface ContentBlock {
  * via the `definition` "MediaBlock".
  */
 export interface MediaBlock {
-  media: string | Media;
+  media: number | Media;
   id?: string | null;
   blockName?: string | null;
   blockType: 'mediaBlock';
@@ -579,12 +579,12 @@ export interface ArchiveBlock {
   } | null;
   populateBy?: ('collection' | 'selection') | null;
   relationTo?: 'posts' | null;
-  categories?: (string | Category)[] | null;
+  categories?: (number | Category)[] | null;
   limit?: number | null;
   selectedDocs?:
     | {
         relationTo: 'posts';
-        value: string | Post;
+        value: number | Post;
       }[]
     | null;
   id?: string | null;
@@ -596,7 +596,7 @@ export interface ArchiveBlock {
  * via the `definition` "FormBlock".
  */
 export interface FormBlock {
-  form: string | Form;
+  form: number | Form;
   enableIntro?: boolean | null;
   introContent?: {
     root: {
@@ -622,7 +622,7 @@ export interface FormBlock {
  * via the `definition` "forms".
  */
 export interface Form {
-  id: string;
+  id: number;
   title: string;
   fields?:
     | (
@@ -796,14 +796,14 @@ export interface Form {
  * via the `definition` "properties".
  */
 export interface Property {
-  id: string;
+  id: number;
   name: string;
   /**
    * Buyers who have this property in their portfolio. You can remove buyers from this list.
    */
-  linkedBuyers?: (string | BuyersAccess)[] | null;
+  linkedBuyers?: (number | BuyersAccess)[] | null;
   info?: {
-    heroImage?: (string | null) | Media;
+    heroImage?: (number | null) | Media;
     agentNotes?:
       | {
           /**
@@ -863,11 +863,11 @@ export interface Property {
       /**
        * Suburb Name
        */
-      suburbName?: (string | null) | Suburb;
+      suburbName?: (number | null) | Suburb;
       /**
        * Region (automatically populated from selected suburb)
        */
-      region?: (string | null) | Region;
+      region?: (number | null) | Region;
       postcode?: string | null;
       state?: ('nsw' | 'vic' | 'qld' | 'wa' | 'sa' | 'tas' | 'act' | 'nt') | null;
     };
@@ -900,7 +900,7 @@ export interface Property {
      */
     images?:
       | {
-          image: string | Media;
+          image: number | Media;
           id?: string | null;
         }[]
       | null;
@@ -925,7 +925,7 @@ export interface Property {
           /**
            * Image
            */
-          heroImage?: (string | null) | Media;
+          heroImage?: (number | null) | Media;
           id?: string | null;
         }[]
       | null;
@@ -989,7 +989,7 @@ export interface Property {
            * Web link to more information in new window
            */
           url?: string | null;
-          image?: (string | null) | Media;
+          image?: (number | null) | Media;
           id?: string | null;
         }[]
       | null;
@@ -1153,7 +1153,7 @@ export interface Property {
     /**
      * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
      */
-    image?: (string | null) | Media;
+    image?: (number | null) | Media;
     description?: string | null;
   };
   updatedAt: string;
@@ -1165,12 +1165,12 @@ export interface Property {
  * via the `definition` "buyers-access".
  */
 export interface BuyersAccess {
-  id: string;
+  id: number;
   name?: string | null;
   /**
    * Select properties that are part of this buyer's portfolio
    */
-  properties?: (string | Property)[] | null;
+  properties?: (number | Property)[] | null;
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -1194,17 +1194,17 @@ export interface BuyersAccess {
  * via the `definition` "suburbs".
  */
 export interface Suburb {
-  id: string;
+  id: number;
   name: string;
   /**
    * Suburbs are in Regions
    */
-  region: string | Region;
+  region: number | Region;
   /**
    * Vacancy rate as a percentage (e.g., 0.7 for 0.7%)
    */
   vacancyRate?: number | null;
-  heroImage?: (string | null) | Media;
+  heroImage?: (number | null) | Media;
   description?: {
     root: {
       type: string;
@@ -1239,12 +1239,12 @@ export interface Suburb {
  * via the `definition` "regions".
  */
 export interface Region {
-  id: string;
+  id: number;
   /**
    * Region Name also called Local Government Area LGA
    */
   name: string;
-  heroImage?: (string | null) | Media;
+  heroImage?: (number | null) | Media;
   description?: {
     root: {
       type: string;
@@ -1268,8 +1268,8 @@ export interface Region {
     | {
         title: string;
         url?: string | null;
-        image?: (string | null) | Media;
-        icon?: (string | null) | Media;
+        image?: (number | null) | Media;
+        icon?: (number | null) | Media;
         description?: {
           root: {
             type: string;
@@ -1292,8 +1292,8 @@ export interface Region {
     | {
         title: string;
         url?: string | null;
-        image?: (string | null) | Media;
-        icon?: (string | null) | Media;
+        image?: (number | null) | Media;
+        icon?: (number | null) | Media;
         description?: {
           root: {
             type: string;
@@ -1321,7 +1321,7 @@ export interface Region {
  * via the `definition` "access-token".
  */
 export interface AccessToken {
-  id: string;
+  id: number;
   name: string;
   updatedAt: string;
   createdAt: string;
@@ -1334,7 +1334,7 @@ export interface AccessToken {
  * via the `definition` "redirects".
  */
 export interface Redirect {
-  id: string;
+  id: number;
   /**
    * You will need to rebuild the website when changing this field.
    */
@@ -1344,11 +1344,11 @@ export interface Redirect {
     reference?:
       | ({
           relationTo: 'pages';
-          value: string | Page;
+          value: number | Page;
         } | null)
       | ({
           relationTo: 'posts';
-          value: string | Post;
+          value: number | Post;
         } | null);
     url?: string | null;
   };
@@ -1360,8 +1360,8 @@ export interface Redirect {
  * via the `definition` "form-submissions".
  */
 export interface FormSubmission {
-  id: string;
-  form: string | Form;
+  id: number;
+  form: number | Form;
   submissionData?:
     | {
         field: string;
@@ -1379,18 +1379,18 @@ export interface FormSubmission {
  * via the `definition` "search".
  */
 export interface Search {
-  id: string;
+  id: number;
   title?: string | null;
   priority?: number | null;
   doc: {
     relationTo: 'posts';
-    value: string | Post;
+    value: number | Post;
   };
   slug?: string | null;
   meta?: {
     title?: string | null;
     description?: string | null;
-    image?: (string | null) | Media;
+    image?: (number | null) | Media;
   };
   categories?:
     | {
@@ -1408,7 +1408,7 @@ export interface Search {
  * via the `definition` "payload-jobs".
  */
 export interface PayloadJob {
-  id: string;
+  id: number;
   /**
    * Input data provided to the job
    */
@@ -1500,81 +1500,81 @@ export interface PayloadJob {
  * via the `definition` "payload-locked-documents".
  */
 export interface PayloadLockedDocument {
-  id: string;
+  id: number;
   document?:
     | ({
         relationTo: 'pages';
-        value: string | Page;
+        value: number | Page;
       } | null)
     | ({
         relationTo: 'posts';
-        value: string | Post;
+        value: number | Post;
       } | null)
     | ({
         relationTo: 'media';
-        value: string | Media;
+        value: number | Media;
       } | null)
     | ({
         relationTo: 'categories';
-        value: string | Category;
+        value: number | Category;
       } | null)
     | ({
         relationTo: 'users';
-        value: string | User;
+        value: number | User;
       } | null)
     | ({
         relationTo: 'properties';
-        value: string | Property;
+        value: number | Property;
       } | null)
     | ({
         relationTo: 'regions';
-        value: string | Region;
+        value: number | Region;
       } | null)
     | ({
         relationTo: 'suburbs';
-        value: string | Suburb;
+        value: number | Suburb;
       } | null)
     | ({
         relationTo: 'access-token';
-        value: string | AccessToken;
+        value: number | AccessToken;
       } | null)
     | ({
         relationTo: 'buyers-access';
-        value: string | BuyersAccess;
+        value: number | BuyersAccess;
       } | null)
     | ({
         relationTo: 'redirects';
-        value: string | Redirect;
+        value: number | Redirect;
       } | null)
     | ({
         relationTo: 'forms';
-        value: string | Form;
+        value: number | Form;
       } | null)
     | ({
         relationTo: 'form-submissions';
-        value: string | FormSubmission;
+        value: number | FormSubmission;
       } | null)
     | ({
         relationTo: 'search';
-        value: string | Search;
+        value: number | Search;
       } | null)
     | ({
         relationTo: 'payload-jobs';
-        value: string | PayloadJob;
+        value: number | PayloadJob;
       } | null);
   globalSlug?: string | null;
   user:
     | {
         relationTo: 'users';
-        value: string | User;
+        value: number | User;
       }
     | {
         relationTo: 'access-token';
-        value: string | AccessToken;
+        value: number | AccessToken;
       }
     | {
         relationTo: 'buyers-access';
-        value: string | BuyersAccess;
+        value: number | BuyersAccess;
       };
   updatedAt: string;
   createdAt: string;
@@ -1584,19 +1584,19 @@ export interface PayloadLockedDocument {
  * via the `definition` "payload-preferences".
  */
 export interface PayloadPreference {
-  id: string;
+  id: number;
   user:
     | {
         relationTo: 'users';
-        value: string | User;
+        value: number | User;
       }
     | {
         relationTo: 'access-token';
-        value: string | AccessToken;
+        value: number | AccessToken;
       }
     | {
         relationTo: 'buyers-access';
-        value: string | BuyersAccess;
+        value: number | BuyersAccess;
       };
   key?: string | null;
   value?:
@@ -1616,7 +1616,7 @@ export interface PayloadPreference {
  * via the `definition` "payload-migrations".
  */
 export interface PayloadMigration {
-  id: string;
+  id: number;
   name?: string | null;
   batch?: number | null;
   updatedAt: string;
@@ -2419,7 +2419,7 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
  * via the `definition` "header".
  */
 export interface Header {
-  id: string;
+  id: number;
   navItems?:
     | {
         link: {
@@ -2428,11 +2428,11 @@ export interface Header {
           reference?:
             | ({
                 relationTo: 'pages';
-                value: string | Page;
+                value: number | Page;
               } | null)
             | ({
                 relationTo: 'posts';
-                value: string | Post;
+                value: number | Post;
               } | null);
           url?: string | null;
           label: string;
@@ -2448,7 +2448,7 @@ export interface Header {
  * via the `definition` "footer".
  */
 export interface Footer {
-  id: string;
+  id: number;
   navItems?:
     | {
         link: {
@@ -2457,11 +2457,11 @@ export interface Footer {
           reference?:
             | ({
                 relationTo: 'pages';
-                value: string | Page;
+                value: number | Page;
               } | null)
             | ({
                 relationTo: 'posts';
-                value: string | Post;
+                value: number | Post;
               } | null);
           url?: string | null;
           label: string;
@@ -2477,7 +2477,7 @@ export interface Footer {
  * via the `definition` "company-settings".
  */
 export interface CompanySetting {
-  id: string;
+  id: number;
   companyName: string;
   motto?: string | null;
   /**
@@ -2502,11 +2502,11 @@ export interface CompanySetting {
   /**
    * Image SVG or PNG
    */
-  logo?: (string | null) | Media;
+  logo?: (number | null) | Media;
   /**
    * Image SVG or PNG
    */
-  logoDarkmode?: (string | null) | Media;
+  logoDarkmode?: (number | null) | Media;
   /**
    * Video URL
    */
@@ -2514,11 +2514,11 @@ export interface CompanySetting {
   /**
    * Image SVG or PNG
    */
-  favicon?: (string | null) | Media;
+  favicon?: (number | null) | Media;
   /**
    * Image SVG or PNG
    */
-  faviconDarkmode?: (string | null) | Media;
+  faviconDarkmode?: (number | null) | Media;
   /**
    * AU Phone Number
    */
@@ -2550,7 +2550,7 @@ export interface CompanySetting {
     | {
         platform: string;
         url: string;
-        icon?: (string | null) | Media;
+        icon?: (number | null) | Media;
         id?: string | null;
       }[]
     | null;
@@ -2666,14 +2666,14 @@ export interface TaskSchedulePublish {
     doc?:
       | ({
           relationTo: 'pages';
-          value: string | Page;
+          value: number | Page;
         } | null)
       | ({
           relationTo: 'posts';
-          value: string | Post;
+          value: number | Post;
         } | null);
     global?: string | null;
-    user?: (string | null) | User;
+    user?: (number | null) | User;
   };
   output?: unknown;
 }

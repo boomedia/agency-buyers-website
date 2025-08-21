@@ -15,6 +15,10 @@ const getImageUrl = (url: string) => {
 }
 
 const queryProperties = cache(async (): Promise<ClientProperty[]> => {
+  if (process.env.SKIP_PAYLOAD_DB === 'true') {
+    return []
+  }
+
   const payload = await getPayload({ config: configPromise })
 
   try {
@@ -33,6 +37,10 @@ const queryProperties = cache(async (): Promise<ClientProperty[]> => {
 })
 
 const queryRegions = cache(async (): Promise<Region[]> => {
+  if (process.env.SKIP_PAYLOAD_DB === 'true') {
+    return []
+  }
+
   const payload = await getPayload({ config: configPromise })
 
   try {
@@ -50,6 +58,10 @@ const queryRegions = cache(async (): Promise<Region[]> => {
 })
 
 const querySuburbs = cache(async (): Promise<Suburb[]> => {
+  if (process.env.SKIP_PAYLOAD_DB === 'true') {
+    return []
+  }
+
   const payload = await getPayload({ config: configPromise })
 
   try {

@@ -5,11 +5,12 @@ import { unstable_cache } from 'next/cache'
 
 const getPagesSitemap = unstable_cache(
   async () => {
+    if (process.env.SKIP_PAYLOAD_DB === 'true') {
+      return []
+    }
+
     const payload = await getPayload({ config })
-    const SITE_URL =
-      process.env.NEXT_PUBLIC_SERVER_URL ||
-      process.env.VERCEL_PROJECT_PRODUCTION_URL ||
-      'https://example.com'
+    const SITE_URL = process.env.NEXT_PUBLIC_SERVER_URL || 'https://example.com'
 
     const results = await payload.find({
       collection: 'pages',

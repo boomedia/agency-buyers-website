@@ -9,14 +9,24 @@ import { CMSLink } from '@/components/Link'
 import { Logo } from '@/components/Logo/Logo'
 
 export async function Footer() {
-  const footerData: Footer = await getCachedGlobal('footer', 1)()
+  if (process.env.SKIP_PAYLOAD_DB === 'true') {
+    return (
+      <footer className="mt-auto border-t border-border bg-black dark:bg-card text-white">
+        <div className="container py-8">
+          <div className="text-center text-sm text-gray-400">Agency Buyers Footer</div>
+        </div>
+      </footer>
+    )
+  }
+
+  const footerData: Footer = (await getCachedGlobal('footer', 1)()) as Footer
 
   // Try to get company settings, but don't fail if they're not available
   let companySettings: CompanySetting | null = null
   try {
     companySettings = (await getCachedGlobal('company-settings', 1)()) as CompanySetting
   } catch (error) {
-    console.warn('Company settings not available, using fallback logos')
+    console.warn('Company settings not available, using fallback logos', error)
   }
 
   const navItems = footerData?.navItems || []

@@ -2,9 +2,15 @@ declare global {
   namespace NodeJS {
     interface ProcessEnv {
       PAYLOAD_SECRET: string
-      DATABASE_URI: string
+      PREVIEW_SECRET: string
       NEXT_PUBLIC_SERVER_URL: string
-      VERCEL_PROJECT_PRODUCTION_URL: string
+      DB_HOST: string
+      DB_PORT: string
+      DB_USER: string
+      DB_PASSWORD: string
+      DB_NAME: string
+      CMS_API_BASE_URL?: string
+      CMS_API_TOKEN?: string
     }
   }
 }

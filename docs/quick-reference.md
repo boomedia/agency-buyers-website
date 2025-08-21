@@ -237,10 +237,8 @@ npm run payload migrate
 ### REST API Endpoints
 ```
 GET    /api/properties       # List properties
-GET    /api/properties/:id   # Get property
-POST   /api/properties       # Create property
-PATCH  /api/properties/:id   # Update property
-DELETE /api/properties/:id   # Delete property
+
+Note: Individual property operations (GET/PATCH/PUT/DELETE by ID) are handled by Payload CMS's built-in API endpoints at `/admin/api/properties/:id` to ensure proper autosave functionality and data validation.
 ```
 
 ### Authentication Headers

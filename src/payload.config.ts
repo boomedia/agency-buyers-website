@@ -1,9 +1,10 @@
-import { vercelBlobStorage } from '@payloadcms/storage-vercel-blob'
-import { vercelPostgresAdapter } from '@payloadcms/db-vercel-postgres'
+import { postgresAdapter } from '@payloadcms/db-postgres'
+import { gcsStorage } from '@payloadcms/storage-gcs'
+import { resendAdapter } from '@payloadcms/email-resend'
 
-import sharp from 'sharp' // sharp-import
+import sharp from 'sharp'
 import path from 'path'
-import { buildConfig, PayloadRequest } from 'payload'
+import { buildConfig } from 'payload'
 import { fileURLToPath } from 'url'
 
 import { Categories } from './collections/Categories'
@@ -23,8 +24,12 @@ import { plugins } from './plugins'
 import { defaultLexical } from '@/fields/defaultLexical'
 import { getServerSideURL } from './utilities/getURL'
 
+import { migrations } from './migrations'
+
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
+
+const { NODE_ENV, DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_NAME, RESEND_API_KEY } = process.env
 
 export default buildConfig({
   admin: {
@@ -81,12 +86,20 @@ export default buildConfig({
   },
   // This config helps us configure global or default features that the other editors can inherit
   editor: defaultLexical,
-  db: vercelPostgresAdapter({
+  email: resendAdapter({
+    defaultFromAddress: 'delivered@resend.dev', // Replace with your verified domain
+    defaultFromName: 'Agency Buyers',
+    apiKey: RESEND_API_KEY!,
+  }),
+  db: postgresAdapter({
     pool: {
-      connectionString: process.env.POSTGRES_URL || '',
+      user: DB_USER,
+      password: DB_PASSWORD,
+      host: DB_HOST,
+      port: parseInt(DB_PORT!, 10),
+      database: DB_NAME,
     },
-    migrationDir: path.resolve(dirname, 'migrations'),
-    idType: 'uuid', // Use UUIDs instead of auto-incrementing integers
+    prodMigrations: migrations,
   }),
   collections: [
     Pages,
@@ -104,31 +117,24 @@ export default buildConfig({
   globals: [Header, Footer, CompanySettings],
   plugins: [
     ...plugins,
-    vercelBlobStorage({
-      collections: {
-        media: true,
-      },
-      token: process.env.BLOB_READ_WRITE_TOKEN || '',
-    }),
+    ...(NODE_ENV === 'production'
+      ? [
+          gcsStorage({
+            collections: {
+              media: true,
+            },
+            bucket: process.env.GCS_BUCKET_NAME!,
+            options: {
+              apiEndpoint: process.env.GCS_ENDPOINT!,
+              projectId: process.env.GCS_PROJECT_ID!,
+            },
+          }),
+        ]
+      : []),
   ],
   secret: process.env.PAYLOAD_SECRET,
   sharp,
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),
-  },
-  jobs: {
-    access: {
-      run: ({ req }: { req: PayloadRequest }): boolean => {
-        // Allow logged in users to execute this endpoint (default)
-        if (req.user) return true
-
-        // If there is no logged in user, then check
-        // for the Vercel Cron secret to be present as an
-        // Authorization header:
-        const authHeader = req.headers.get('authorization')
-        return authHeader === `Bearer ${process.env.CRON_SECRET}`
-      },
-    },
-    tasks: [],
   },
 })

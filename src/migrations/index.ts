@@ -1,4 +1,9 @@
-// Clean slate - no migrations for development
+import * as migration_20250820_035858_init from './20250820_035858_init';
+
 export const migrations = [
-  // Migrations will be added here when ready for production
-]
+  {
+    up: migration_20250820_035858_init.up,
+    down: migration_20250820_035858_init.down,
+    name: '20250820_035858_init'
+  },
+];
