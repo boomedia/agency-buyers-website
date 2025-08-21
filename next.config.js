@@ -6,6 +6,17 @@ const NEXT_PUBLIC_SERVER_URL = process.env.NEXT_PUBLIC_SERVER_URL || 'http://loc
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Docker build optimization
+  output: 'standalone',
+
+  // Skip static optimization during build when database is not available
+  ...(process.env.SKIP_PAYLOAD_DB === 'true' && {
+    experimental: {
+      // Disable static generation for dynamic routes during build
+      staticWorkerRequestDeduplication: false,
+    },
+  }),
+
   images: {
     remotePatterns: [
       // Allow localhost for development
@@ -48,7 +59,6 @@ const nextConfig = {
     return webpackConfig
   },
   reactStrictMode: true,
-  output: 'standalone',
   redirects,
 }
 

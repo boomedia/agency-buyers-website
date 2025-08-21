@@ -26,17 +26,10 @@ COPY . .
 # Learn more here: https://nextjs.org/telemetry
 # Uncomment the following line in case you want to disable telemetry during the build.
 ENV NEXT_TELEMETRY_DISABLED=1
-ENV SKIP_PAYLOAD_DB=true
 
-# Set dummy environment variables for build time
-ENV PAYLOAD_SECRET=build-time-secret
-ENV PREVIEW_SECRET=build-time-preview
-ENV NEXT_PUBLIC_SERVER_URL=http://localhost:3000
-ENV DB_HOST=localhost
-ENV DB_PORT=5432
-ENV DB_USER=postgres
-ENV DB_PASSWORD=postgres
-ENV DB_NAME=agency-buyers-cms
+# Skip all external dependencies during build
+ENV SKIP_PAYLOAD_DB=true
+ENV NODE_ENV=production
 
 RUN corepack enable pnpm && pnpm run build:prod
 
