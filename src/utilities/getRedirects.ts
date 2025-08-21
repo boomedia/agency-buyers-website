@@ -1,10 +1,11 @@
 import configPromise from '@payload-config'
 import { getPayload } from 'payload'
 import { unstable_cache } from 'next/cache'
+import { Redirect } from '@/payload-types'
 
 export async function getRedirects(depth = 1) {
   if (process.env.SKIP_PAYLOAD_DB === 'true') {
-    return []
+    return [] as Redirect[]
   }
 
   const payload = await getPayload({ config: configPromise })
