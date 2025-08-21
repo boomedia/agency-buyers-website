@@ -1,7 +1,9 @@
-import { CollectionConfig } from 'payload'
+import type { CollectionConfig } from 'payload'
 import { generatePreviewPath } from '../utilities/generatePreviewPath'
+import { anyone } from '../access/anyone'
+import { authenticated } from '../access/authenticated'
 
-export const Suburbs: CollectionConfig = {
+export const Suburbs: CollectionConfig<'suburbs'> = {
   slug: 'suburbs',
   admin: {
     useAsTitle: 'name',
@@ -14,7 +16,16 @@ export const Suburbs: CollectionConfig = {
       }),
   },
   access: {
-    read: () => true,
+    create: authenticated,
+    delete: authenticated,
+    read: anyone,
+    update: authenticated,
+  },
+  defaultPopulate: {
+    name: true,
+    region: true,
+    heroImage: true,
+    vacancyRate: true,
   },
   versions: {
     drafts: {

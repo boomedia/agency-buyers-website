@@ -1,4 +1,4 @@
-import { CollectionConfig } from 'payload'
+import type { CollectionConfig } from 'payload'
 import { generatePreviewPath } from '../utilities/generatePreviewPath'
 import { revalidateProperty, revalidateDelete } from './Properties/hooks/revalidateProperty'
 import {
@@ -8,8 +8,10 @@ import {
   OverviewField,
   PreviewField,
 } from '@payloadcms/plugin-seo/fields'
+import { anyone } from '../access/anyone'
+import { authenticated } from '../access/authenticated'
 
-export const Properties: CollectionConfig = {
+export const Properties: CollectionConfig<'properties'> = {
   slug: 'properties',
   admin: {
     useAsTitle: 'name',
@@ -33,7 +35,19 @@ export const Properties: CollectionConfig = {
       }),
   },
   access: {
-    read: () => true,
+    create: authenticated,
+    delete: authenticated,
+    read: anyone,
+    update: authenticated,
+  },
+  // This config controls what's populated by default when a property is referenced
+  defaultPopulate: {
+    name: true,
+    info: {
+      heroImage: true,
+      purchasePrice: true,
+      askingPrice: true,
+    },
   },
   versions: {
     drafts: {
