@@ -28,6 +28,11 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'localhost',
       },
+      // Allow CMS domain for production images
+      {
+        protocol: 'https',
+        hostname: 'cms.hassen.com.au',
+      },
       // Dynamic patterns from environment variables
       ...[NEXT_PUBLIC_SERVER_URL /* 'https://example.com' */].map((item) => {
         const url = new URL(item)
