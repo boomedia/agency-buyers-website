@@ -477,10 +477,6 @@ function PropertyAgentSummary({ property }: { property: Property }) {
           {(() => {
             const agentSummary = property.generalInformation.agentSummary
 
-            // Debug logging
-            console.log('Agent summary type:', typeof agentSummary)
-            console.log('Agent summary data:', agentSummary)
-
             if (!agentSummary) {
               return 'No agent summary available'
             }
@@ -760,10 +756,6 @@ function DueDiligence({ property }: { property: Property }) {
                   <div className="text-sm text-muted-foreground">
                     {(() => {
                       const details = zone.details
-
-                      // Debug logging
-                      console.log('Zone details type:', typeof details)
-                      console.log('Zone details data:', details)
 
                       if (typeof details === 'string') {
                         return details
@@ -1142,10 +1134,6 @@ const MarketInformation = ({ property }: { property: Property }) => {
                               property.generalInformation.address.suburbName as any
                             ).description
 
-                            // Debug logging
-                            console.log('Suburb description type:', typeof description)
-                            console.log('Suburb description data:', description)
-
                             if (typeof description === 'string') {
                               return description
                             } else if (description && typeof description === 'object') {
@@ -1322,10 +1310,6 @@ const MarketInformation = ({ property }: { property: Property }) => {
                           {(() => {
                             const description = (property.generalInformation.address.region as any)
                               .description
-
-                            // Debug logging
-                            console.log('Region description type:', typeof description)
-                            console.log('Region description data:', description)
 
                             if (typeof description === 'string') {
                               return description

@@ -31,15 +31,6 @@ export const Logo = (props: Props) => {
   // Convert priority string to boolean for Media component
   const priorityBoolean = priority === 'high'
 
-  // Debug logging
-  console.log('Logo Debug:', {
-    hasLogoLight: !!logoLight?.url,
-    hasLogoDark: !!logoDark?.url,
-    alwaysLight,
-    logoLightUrl: logoLight?.url,
-    logoDarkUrl: logoDark?.url,
-  })
-
   // If we have company logos from database, use them
   if (logoLight?.url || logoDark?.url) {
     // If alwaysLight is true (footer), only show light logo

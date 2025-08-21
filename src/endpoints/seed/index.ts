@@ -787,9 +787,6 @@ async function readLocalFile(filename: string, customName?: string): Promise<Fil
     const seedFolder = path.join(projectRoot, 'src', 'endpoints', 'seed')
     const filePath = path.join(seedFolder, filename)
 
-    console.log(`Attempting to read file: ${filePath}`)
-    console.log(`File exists: ${fs.existsSync(filePath)}`)
-
     if (!fs.existsSync(filePath)) {
       throw new Error(`Local file not found: ${filePath}`)
     }

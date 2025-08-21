@@ -18,7 +18,6 @@ export const VideoMedia: React.FC<MediaProps> = (props) => {
     if (video) {
       video.addEventListener('suspend', () => {
         // setShowFallback(true);
-        // console.warn('Video was suspended, rendering fallback image.')
       })
     }
   }, [])

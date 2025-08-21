@@ -190,10 +190,6 @@ const MarketInformation = ({ property }: { property: ClientProperty }) => {
                             property.generalInformation.address.suburbName as any
                           ).description
 
-                          // Debug logging
-                          console.log('Suburb description type:', typeof description)
-                          console.log('Suburb description data:', description)
-
                           if (typeof description === 'string') {
                             return description
                           } else if (description && typeof description === 'object') {
@@ -338,10 +334,6 @@ const MarketInformation = ({ property }: { property: ClientProperty }) => {
                         {(() => {
                           const description = (property.generalInformation.address.region as any)
                             .description
-
-                          // Debug logging
-                          console.log('Region description type:', typeof description)
-                          console.log('Region description data:', description)
 
                           if (typeof description === 'string') {
                             return description
