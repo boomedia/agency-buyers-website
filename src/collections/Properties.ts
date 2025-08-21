@@ -43,9 +43,23 @@ export const Properties: CollectionConfig = {
   hooks: {
     beforeChange: [
       ({ data }) => {
-        // Convert empty strings to null for number fields to prevent PostgreSQL errors
+        // Convert empty strings and invalid number values to null for number fields to prevent PostgreSQL errors
         const convertEmptyStrings = (obj: any): any => {
-          if (obj === '') return null
+          if (obj === '' || obj === '-' || obj === null || obj === undefined) return null
+
+          // Handle invalid number strings that could cause JSON parsing errors
+          if (typeof obj === 'string') {
+            // Check if it's supposed to be a number but has invalid format
+            const trimmed = obj.trim()
+            if (trimmed === '' || trimmed === '-' || trimmed === '.' || /^-+$/.test(trimmed)) {
+              return null
+            }
+            // If it's a number string with just a minus or invalid format, return null
+            if (/^-?\.?$/.test(trimmed) || /^-+\.?$/.test(trimmed)) {
+              return null
+            }
+          }
+
           if (Array.isArray(obj)) return obj.map(convertEmptyStrings)
           if (obj && typeof obj === 'object') {
             const result: any = {}

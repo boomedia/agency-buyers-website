@@ -20,6 +20,7 @@ import {
 } from '~/components/ui/dialog'
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '~/components/ui/sheet'
 import { SuburbMedianChart } from '~/components/ui/suburb-median-chart'
+import RichText from '~/components/RichText'
 import type { Property } from '~/types/payload-types'
 import {
   calculateAllPropertyMetrics,
@@ -144,32 +145,14 @@ const getRegionImage = (
   return '/img/generic-region.webp'
 }
 
-// Safe rich text renderer with object protection
+// Safe rich text renderer using Payload's RichText component
 const safeRenderRichText = (
   content: any,
   fallbackText: string = 'No content available',
 ): React.ReactNode => {
-  const renderedContent = renderRichText(content)
-
-  // Safety check to prevent rendering objects
-  if (
-    renderedContent &&
-    typeof renderedContent === 'object' &&
-    renderedContent.constructor === Object &&
-    !React.isValidElement(renderedContent)
-  ) {
-    console.warn('Raw object detected in rich text content, rendering fallback:', content)
-    return fallbackText
-  }
-
-  return renderedContent || fallbackText
-}
-
-// Single, comprehensive rich text rendering utility - handles all edge cases
-const renderRichText = (content: any): React.ReactNode => {
   // Handle null, undefined, or empty values
   if (!content) {
-    return null
+    return fallbackText
   }
 
   // Handle simple string content
@@ -177,236 +160,48 @@ const renderRichText = (content: any): React.ReactNode => {
     return content
   }
 
-  // Handle non-object content (numbers, booleans, etc.)
+  // Handle non-object content
   if (typeof content !== 'object') {
     return String(content)
   }
 
-  // Handle arrays - should not happen but protect against it
-  if (Array.isArray(content)) {
-    return null
+  // Check if it's a proper Lexical editor state
+  if (content.root && content.root.children && Array.isArray(content.root.children)) {
+    try {
+      return <RichText data={content} enableGutter={false} enableProse={false} />
+    } catch (error) {
+      console.error('Error rendering rich text with RichText component:', error)
+      return fallbackText
+    }
   }
 
-  // Check for Lexical editor format
-  if (!content.root || !content.root.children || !Array.isArray(content.root.children)) {
-    // If it's an object but not in Lexical format, try to extract meaningful content
-    if (content.text) {
-      return content.text
+  // If it's an object but not in Lexical format, try to extract meaningful content
+  if (content.text) {
+    return content.text
+  }
+  if (content.content) {
+    // Recursively call with improved validation for nested content
+    if (content.content && typeof content.content === 'object') {
+      if (
+        content.content.root &&
+        typeof content.content.root === 'object' &&
+        content.content.root.children &&
+        Array.isArray(content.content.root.children)
+      ) {
+        try {
+          return <RichText data={content.content} enableGutter={false} enableProse={false} />
+        } catch (error) {
+          console.error('Error rendering nested rich text:', error)
+          return fallbackText
+        }
+      }
+      return String(content.content)
     }
-    if (content.content) {
-      return renderRichText(content.content)
-    }
-    // Last resort - return null to prevent object rendering
-    return null
+    return String(content.content)
   }
 
-  const renderNode = (node: any, index: number): React.ReactNode => {
-    // Strict safety checks
-    if (!node || typeof node !== 'object' || Array.isArray(node)) {
-      return null
-    }
-
-    // Handle text nodes
-    if (node.type === 'text') {
-      let text: React.ReactNode = node.text || ''
-
-      // Ensure text is a string
-      if (typeof text !== 'string') {
-        text = String(text)
-      }
-
-      // Apply text formatting only if text exists
-      if (text && node.format) {
-        if (node.format & 1) text = <strong>{text}</strong> // Bold
-        if (node.format & 2) text = <em>{text}</em> // Italic
-        if (node.format & 8) text = <u>{text}</u> // Underline
-        if (node.format & 16) text = <s>{text}</s> // Strikethrough
-      }
-
-      return text
-    }
-
-    // Handle paragraph nodes
-    if (node.type === 'paragraph') {
-      const children = node.children
-        ? node.children.map((child: any, childIndex: number) => renderNode(child, childIndex))
-        : []
-
-      // Only render paragraph if it has content
-      if (
-        children.length === 0 ||
-        children.every((child: any) => child === null || child === undefined || child === '')
-      ) {
-        return null
-      }
-
-      return (
-        <p key={index} className="mb-4 last:mb-0">
-          {children}
-        </p>
-      )
-    }
-
-    // Handle heading nodes
-    if (node.type === 'heading') {
-      const children = node.children
-        ? node.children.map((child: any, childIndex: number) => renderNode(child, childIndex))
-        : []
-
-      // Only render heading if it has content
-      if (
-        children.length === 0 ||
-        children.every((child: any) => child === null || child === undefined || child === '')
-      ) {
-        return null
-      }
-
-      const HeadingTag = node.tag || 'h2'
-      const headingClasses = {
-        h1: 'text-3xl font-bold mb-4',
-        h2: 'text-2xl font-bold mb-3',
-        h3: 'text-xl font-bold mb-3',
-        h4: 'text-lg font-bold mb-2',
-        h5: 'text-base font-bold mb-2',
-        h6: 'text-sm font-bold mb-2',
-      }
-
-      return React.createElement(
-        HeadingTag,
-        {
-          key: index,
-          className: headingClasses[HeadingTag as keyof typeof headingClasses] || headingClasses.h2,
-        },
-        children,
-      )
-    }
-
-    // Handle list nodes
-    if (node.type === 'list') {
-      const children = node.children
-        ? node.children.map((child: any, childIndex: number) => renderNode(child, childIndex))
-        : []
-
-      // Only render list if it has content
-      if (
-        children.length === 0 ||
-        children.every((child: any) => child === null || child === undefined)
-      ) {
-        return null
-      }
-
-      const ListTag = node.listType === 'number' ? 'ol' : 'ul'
-      return (
-        <ListTag key={index} className="list-disc list-inside mb-4 space-y-1">
-          {children}
-        </ListTag>
-      )
-    }
-
-    // Handle list item nodes
-    if (node.type === 'listitem') {
-      const children = node.children
-        ? node.children.map((child: any, childIndex: number) => renderNode(child, childIndex))
-        : []
-
-      // Only render list item if it has content
-      if (
-        children.length === 0 ||
-        children.every((child: any) => child === null || child === undefined || child === '')
-      ) {
-        return null
-      }
-
-      return (
-        <li key={index} className="ml-4">
-          {children}
-        </li>
-      )
-    }
-
-    // Handle link nodes
-    if (node.type === 'link') {
-      const children = node.children
-        ? node.children.map((child: any, childIndex: number) => renderNode(child, childIndex))
-        : []
-
-      // Only render link if it has content and URL
-      if (
-        !node.url ||
-        children.length === 0 ||
-        children.every((child: any) => child === null || child === undefined || child === '')
-      ) {
-        return null
-      }
-
-      return (
-        <a
-          key={index}
-          href={node.url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-primary hover:text-primary/80 underline"
-        >
-          {children}
-        </a>
-      )
-    }
-
-    // Handle line breaks
-    if (node.type === 'linebreak') {
-      return <br key={index} />
-    }
-
-    // Fallback for unknown types with children
-    if (node.children && Array.isArray(node.children)) {
-      const children = node.children.map((child: any, childIndex: number) =>
-        renderNode(child, childIndex),
-      )
-
-      // Only render container if it has content
-      if (
-        children.length === 0 ||
-        children.every((child: any) => child === null || child === undefined)
-      ) {
-        return null
-      }
-
-      return <div key={index}>{children}</div>
-    }
-
-    // Unknown node type without children - return null to prevent object rendering
-    return null
-  }
-
-  try {
-    const renderedChildren = content.root.children.map((child: any, index: number) =>
-      renderNode(child, index),
-    )
-
-    // Filter out null/undefined and empty content
-    const validChildren = renderedChildren.filter(
-      (child: any) => child !== null && child !== undefined && child !== '',
-    )
-
-    // Final safety check - ensure no raw objects slip through
-    const safeChildren = validChildren.map((child: any, index: number) => {
-      if (
-        child &&
-        typeof child === 'object' &&
-        child.constructor === Object &&
-        !React.isValidElement(child)
-      ) {
-        console.warn('Raw object detected in rendered children, converting to string:', child)
-        return `[Object: ${Object.keys(child).join(', ')}]`
-      }
-      return child
-    })
-
-    return safeChildren.length > 0 ? <div className="rich-text-content">{safeChildren}</div> : null
-  } catch (error) {
-    console.warn('Error rendering rich text:', error, content)
-    return null
-  }
+  console.warn('Invalid rich text format:', content)
+  return fallbackText
 }
 
 const getEmbedUrl = (url: string) => {
@@ -679,10 +474,42 @@ function PropertyAgentSummary({ property }: { property: Property }) {
       </CardHeader>
       <CardContent>
         <div className="text-muted-foreground leading-relaxed">
-          {safeRenderRichText(
-            property.generalInformation.agentSummary,
-            'No agent summary available',
-          )}
+          {(() => {
+            const agentSummary = property.generalInformation.agentSummary
+
+            // Debug logging
+            console.log('Agent summary type:', typeof agentSummary)
+            console.log('Agent summary data:', agentSummary)
+
+            if (!agentSummary) {
+              return 'No agent summary available'
+            }
+
+            if (typeof agentSummary === 'string') {
+              return agentSummary
+            } else if (agentSummary && typeof agentSummary === 'object') {
+              // More robust validation for Lexical editor state
+              if (
+                agentSummary.root &&
+                typeof agentSummary.root === 'object' &&
+                agentSummary.root.children &&
+                Array.isArray(agentSummary.root.children) &&
+                agentSummary.root.children.length >= 0 // Allow empty arrays
+              ) {
+                try {
+                  return <RichText data={agentSummary} enableGutter={false} enableProse={false} />
+                } catch (error) {
+                  console.error('Error rendering agent summary with RichText:', error)
+                  return 'Agent summary format not supported'
+                }
+              } else {
+                // Try to extract text content if it's not a proper Lexical format
+                console.warn('Invalid Lexical format for agent summary:', agentSummary)
+                return 'Agent summary not available'
+              }
+            }
+            return 'No agent summary available'
+          })()}
         </div>
       </CardContent>
     </Card>
@@ -931,15 +758,41 @@ function DueDiligence({ property }: { property: Property }) {
                     </div>
                   )}
                   <div className="text-sm text-muted-foreground">
-                    {safeRenderRichText(zone.details, 'No details available')}
+                    {(() => {
+                      const details = zone.details
+
+                      // Debug logging
+                      console.log('Zone details type:', typeof details)
+                      console.log('Zone details data:', details)
+
+                      if (typeof details === 'string') {
+                        return details
+                      } else if (details && typeof details === 'object') {
+                        // More robust validation for Lexical editor state
+                        if (
+                          details.root &&
+                          typeof details.root === 'object' &&
+                          details.root.children &&
+                          Array.isArray(details.root.children) &&
+                          details.root.children.length >= 0 // Allow empty arrays
+                        ) {
+                          try {
+                            return (
+                              <RichText data={details} enableGutter={false} enableProse={false} />
+                            )
+                          } catch (error) {
+                            console.error('Error rendering zone details with RichText:', error)
+                            return 'Details format not supported'
+                          }
+                        } else {
+                          // Try to extract text content if it's not a proper Lexical format
+                          console.warn('Invalid Lexical format for zone details:', details)
+                          return 'Details not available'
+                        }
+                      }
+                      return 'No details available'
+                    })()}
                   </div>
-                  {zone.agentNotes && (
-                    <div className="bg-primary/5 border-l-4 border-primary p-3 my-3">
-                      <p className="text-sm text-foreground">
-                        <strong>Agent Note:</strong> {zone.agentNotes}
-                      </p>
-                    </div>
-                  )}
                   {zone.url && (
                     <a
                       href={zone.url}
@@ -1284,10 +1137,52 @@ const MarketInformation = ({ property }: { property: Property }) => {
                     (property.generalInformation.address.suburbName as any)?.description && (
                       <div>
                         <div className="text-sm text-muted-foreground leading-relaxed">
-                          {safeRenderRichText(
-                            (property.generalInformation.address.suburbName as any).description,
-                            'No description available',
-                          )}
+                          {(() => {
+                            const description = (
+                              property.generalInformation.address.suburbName as any
+                            ).description
+
+                            // Debug logging
+                            console.log('Suburb description type:', typeof description)
+                            console.log('Suburb description data:', description)
+
+                            if (typeof description === 'string') {
+                              return description
+                            } else if (description && typeof description === 'object') {
+                              // More robust validation for Lexical editor state
+                              if (
+                                description.root &&
+                                typeof description.root === 'object' &&
+                                description.root.children &&
+                                Array.isArray(description.root.children) &&
+                                description.root.children.length >= 0 // Allow empty arrays
+                              ) {
+                                try {
+                                  return (
+                                    <RichText
+                                      data={description}
+                                      enableGutter={false}
+                                      enableProse={false}
+                                    />
+                                  )
+                                } catch (error) {
+                                  console.error(
+                                    'Error rendering suburb description with RichText:',
+                                    error,
+                                  )
+                                  return 'Description format not supported'
+                                }
+                              } else {
+                                // Try to extract text content if it's not a proper Lexical format
+                                console.warn(
+                                  'Invalid Lexical format for suburb description:',
+                                  description,
+                                )
+                                return 'Description not available'
+                              }
+                            }
+                            return 'Description not available'
+                          })()}
                         </div>
                       </div>
                     )}
@@ -1424,10 +1319,51 @@ const MarketInformation = ({ property }: { property: Property }) => {
                     (property.generalInformation.address.region as any)?.description && (
                       <div>
                         <div className="text-sm text-muted-foreground leading-relaxed">
-                          {safeRenderRichText(
-                            (property.generalInformation.address.region as any).description,
-                            'No description available',
-                          )}
+                          {(() => {
+                            const description = (property.generalInformation.address.region as any)
+                              .description
+
+                            // Debug logging
+                            console.log('Region description type:', typeof description)
+                            console.log('Region description data:', description)
+
+                            if (typeof description === 'string') {
+                              return description
+                            } else if (description && typeof description === 'object') {
+                              // More robust validation for Lexical editor state
+                              if (
+                                description.root &&
+                                typeof description.root === 'object' &&
+                                description.root.children &&
+                                Array.isArray(description.root.children) &&
+                                description.root.children.length >= 0 // Allow empty arrays
+                              ) {
+                                try {
+                                  return (
+                                    <RichText
+                                      data={description}
+                                      enableGutter={false}
+                                      enableProse={false}
+                                    />
+                                  )
+                                } catch (error) {
+                                  console.error(
+                                    'Error rendering region description with RichText:',
+                                    error,
+                                  )
+                                  return 'Description format not supported'
+                                }
+                              } else {
+                                // Try to extract text content if it's not a proper Lexical format
+                                console.warn(
+                                  'Invalid Lexical format for region description:',
+                                  description,
+                                )
+                                return 'Description not available'
+                              }
+                            }
+                            return 'Description not available'
+                          })()}
                         </div>
                       </div>
                     )}
