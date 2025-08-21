@@ -172,7 +172,7 @@ export const Properties: CollectionConfig<'properties'> = {
                       data: {
                         properties: [...propertyIds, doc.id],
                       },
-                      context: { skipPropertySync: true }, // Prevent reverse sync
+                      context: { skipBuyerSync: true }, // Prevent reverse sync
                     })
                   }
                 }

@@ -57,7 +57,7 @@ export const BuyersAccess: CollectionConfig = {
                       data: {
                         linkedBuyers: [...buyerIds, doc.id],
                       },
-                      context: { skipBuyerSync: true }, // Prevent reverse sync
+                      context: { skipPropertySync: true }, // Prevent reverse sync
                     })
                   }
                 }
@@ -92,7 +92,7 @@ export const BuyersAccess: CollectionConfig = {
                     data: {
                       linkedBuyers: updatedBuyers,
                     },
-                    context: { skipBuyerSync: true }, // Prevent reverse sync
+                    context: { skipPropertySync: true }, // Prevent reverse sync
                   })
                 }
               } catch (propertyError) {
