@@ -118,9 +118,10 @@ export const Properties: CollectionConfig<'properties'> = {
       },
     ],
     afterChange: [
-      async ({ doc, previousDoc, req }) => {
+      async ({ doc, previousDoc, req, context }) => {
         // Sync linkedBuyers relationship with BuyersAccess collection
-        if (req.payload && doc.linkedBuyers !== undefined) {
+        // Skip sync if this update is coming from a buyer relationship sync to prevent infinite loops
+        if (req.payload && doc.linkedBuyers !== undefined && !context?.skipBuyerSync) {
           try {
             const currentBuyerIds = Array.isArray(doc.linkedBuyers)
               ? doc.linkedBuyers.map((buyer: any) => (typeof buyer === 'object' ? buyer.id : buyer))
@@ -140,50 +141,63 @@ export const Properties: CollectionConfig<'properties'> = {
 
             // Add this property to new buyers
             for (const buyerId of buyersToAdd) {
-              const buyer = await req.payload.findByID({
-                collection: 'buyers-access',
-                id: buyerId,
-              })
+              try {
+                const buyer = await req.payload.findByID({
+                  collection: 'buyers-access',
+                  id: buyerId,
+                })
 
-              if (buyer) {
-                const currentProperties = Array.isArray(buyer.properties) ? buyer.properties : []
-                const propertyIds = currentProperties.map((prop: any) =>
-                  typeof prop === 'object' ? prop.id : prop,
-                )
+                if (buyer) {
+                  const currentProperties = Array.isArray(buyer.properties) ? buyer.properties : []
+                  const propertyIds = currentProperties.map((prop: any) =>
+                    typeof prop === 'object' ? prop.id : prop,
+                  )
 
-                if (!propertyIds.includes(doc.id)) {
-                  await req.payload.update({
-                    collection: 'buyers-access',
-                    id: buyerId,
-                    data: {
-                      properties: [...propertyIds, doc.id],
-                    },
-                  })
+                  if (!propertyIds.includes(doc.id)) {
+                    await req.payload.update({
+                      collection: 'buyers-access',
+                      id: buyerId,
+                      data: {
+                        properties: [...propertyIds, doc.id],
+                      },
+                      context: { skipPropertySync: true }, // Prevent reverse sync
+                    })
+                  }
                 }
+              } catch (buyerError) {
+                console.warn(`Could not add property ${doc.id} to buyer ${buyerId}:`, buyerError)
               }
             }
 
             // Remove this property from removed buyers
             for (const buyerId of buyersToRemove) {
-              const buyer = await req.payload.findByID({
-                collection: 'buyers-access',
-                id: buyerId,
-              })
-
-              if (buyer) {
-                const currentProperties = Array.isArray(buyer.properties) ? buyer.properties : []
-                const propertyIds = currentProperties.map((prop: any) =>
-                  typeof prop === 'object' ? prop.id : prop,
-                )
-                const updatedProperties = propertyIds.filter((id: any) => id !== doc.id)
-
-                await req.payload.update({
+              try {
+                const buyer = await req.payload.findByID({
                   collection: 'buyers-access',
                   id: buyerId,
-                  data: {
-                    properties: updatedProperties,
-                  },
                 })
+
+                if (buyer) {
+                  const currentProperties = Array.isArray(buyer.properties) ? buyer.properties : []
+                  const propertyIds = currentProperties.map((prop: any) =>
+                    typeof prop === 'object' ? prop.id : prop,
+                  )
+                  const updatedProperties = propertyIds.filter((id: any) => id !== doc.id)
+
+                  await req.payload.update({
+                    collection: 'buyers-access',
+                    id: buyerId,
+                    data: {
+                      properties: updatedProperties,
+                    },
+                    context: { skipPropertySync: true }, // Prevent reverse sync
+                  })
+                }
+              } catch (buyerError) {
+                console.warn(
+                  `Could not remove property ${doc.id} from buyer ${buyerId}:`,
+                  buyerError,
+                )
               }
             }
           } catch (error) {
