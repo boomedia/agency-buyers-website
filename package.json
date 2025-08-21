@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "build": "cross-env NODE_OPTIONS=--no-deprecation next build",
-    "build:prod": "cross-env NODE_OPTIONS=--no-deprecation SKIP_PAYLOAD_DB=true next build",
+    "build:prod": "cross-env NODE_OPTIONS=--no-deprecation NODE_ENV=production payload generate:importmap && cross-env NODE_OPTIONS=--no-deprecation SKIP_PAYLOAD_DB=true next build",
     "postbuild": "next-sitemap --config next-sitemap.config.cjs",
     "ci": "pnpm build",
     "ci-with-migrations": "echo 'y' | payload migrate:fresh && pnpm build",
