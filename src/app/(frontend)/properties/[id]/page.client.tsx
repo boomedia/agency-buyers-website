@@ -662,7 +662,7 @@ function ComparableSales({ property }: { property: Property }) {
         <CardTitle>Comparable Sales</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        {property.generalInformation.comparableSales.slice(0, 2).map((sale: any) => (
+        {property.generalInformation.comparableSales.map((sale: any) => (
           <a
             key={sale.id}
             href={sale.link}
