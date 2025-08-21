@@ -273,3 +273,43 @@ The application is now successfully building and ready for deployment to Google 
 
 *Last updated: August 21, 2025*
 *Issue resolved in: feat/deploy-setup branch*
+
+## Addendum: Next.js 15 revalidatePath Issue
+
+### Additional Problem Discovered
+After resolving the Docker build database connection issue, a new runtime error was discovered related to Next.js 15's stricter revalidation requirements:
+
+```
+ERROR: Route /admin/[[...segments]] used "revalidatePath /properties/1" during render which is unsupported. 
+To ensure revalidation is performed consistently it must always happen outside of renders and cached functions.
+```
+
+### Root Cause
+Next.js 15 introduced stricter rules about when `revalidatePath` and `revalidateTag` can be called. These functions cannot be called synchronously during render or in cached functions, which was happening in Payload CMS collection hooks.
+
+### Solution Applied
+Modified all collection revalidation hooks to defer revalidation using `setTimeout`:
+
+**Files Updated:**
+- `src/collections/Properties/hooks/revalidateProperty.ts`
+- `src/collections/Pages/hooks/revalidatePage.ts` 
+- `src/collections/Posts/hooks/revalidatePost.ts`
+
+**Pattern Applied:**
+```typescript
+// Before (caused error)
+revalidatePath(path)
+revalidateTag('collection-tag')
+
+// After (fixed)
+setTimeout(() => {
+  try {
+    revalidatePath(path)
+    revalidateTag('collection-tag')
+  } catch (error) {
+    payload.logger.error(`Failed to revalidate:`, error)
+  }
+}, 0)
+```
+
+This ensures revalidation happens outside the render cycle while maintaining the same functionality.

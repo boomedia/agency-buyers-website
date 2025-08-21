@@ -6,6 +6,7 @@ import { contact as contactPageData } from './contact-page'
 import { home } from './home'
 import { image1 } from './image-1'
 import { image2 } from './image-2'
+import { image3 } from './image-3'
 import { imageHero1 } from './image-hero-1'
 import { post1 } from './post-1'
 import { post2 } from './post-2'
@@ -276,7 +277,7 @@ export const seed = async ({
     }),
     payload.create({
       collection: 'media',
-      data: image2,
+      data: image3,
       file: image3Buffer,
     }),
     payload.create({
@@ -796,6 +797,12 @@ async function readLocalFile(filename: string, customName?: string): Promise<Fil
     const data = fs.readFileSync(filePath)
     const finalName = customName || filename
 
+    // Ensure unique filename by adding a timestamp if we're using a custom name
+    // This prevents conflicts when the same source file is used multiple times
+    const uniqueName = customName
+      ? `${Date.now()}-${Math.random().toString(36).substr(2, 9)}-${finalName}`
+      : finalName
+
     // Determine MIME type from filename extension
     const extension = finalName.split('.').pop()?.toLowerCase() || 'jpg'
     let mimeType = 'image/jpeg' // default
@@ -811,7 +818,7 @@ async function readLocalFile(filename: string, customName?: string): Promise<Fil
     }
 
     return {
-      name: finalName,
+      name: uniqueName,
       data: data,
       mimetype: mimeType,
       size: data.length,
