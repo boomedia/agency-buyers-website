@@ -65,13 +65,10 @@ export const seed = async ({
 }): Promise<void> => {
   payload.logger.info('Seeding database...')
 
-  // we need to clear the media directory before seeding
-  // as well as the collections and globals
-  // this is because while `yarn seed` drops the database
-  // the custom `/api/seed` endpoint does not
+  // Clear collections and globals
   payload.logger.info(`— Clearing collections and globals...`)
 
-  // clear the database
+  // Clear the database navigation first
   await Promise.all([
     payload.updateGlobal({
       slug: 'header',
@@ -95,16 +92,16 @@ export const seed = async ({
     }),
   ])
 
-  // Delete collections sequentially to avoid deadlocks, especially for related collections
+  // Delete collections sequentially to avoid deadlocks
   payload.logger.info(`— Clearing collections sequentially...`)
 
-  // Delete in reverse dependency order: properties first, then suburbs, then regions
+  // Delete in correct dependency order to avoid referential integrity issues
   const collectionsToDelete = [
-    'buyers-access', // Delete buyers-access first (has foreign key to properties)
-    'properties', // Delete properties second (has foreign keys to suburbs/regions)
-    'suburbs', // Delete suburbs third (has foreign key to regions)
-    'regions', // Delete regions fourth (no dependencies)
-    'categories', // Then other collections
+    'properties', // Delete properties first (they reference suburbs, regions, buyers)
+    'buyers-access', // Then buyers (no dependencies on others)
+    'suburbs', // Then suburbs (they reference regions)
+    'regions', // Then regions (no dependencies)
+    'categories',
     'media',
     'pages',
     'posts',
@@ -116,30 +113,84 @@ export const seed = async ({
   for (const collection of collectionsToDelete) {
     if (collections.includes(collection as any)) {
       try {
-        await payload.db.deleteMany({ collection: collection as any, req, where: {} })
-        payload.logger.info(`   ✓ Cleared ${collection}`)
-        // Small delay to prevent database contention
-        await new Promise((resolve) => setTimeout(resolve, 100))
+        // Count existing records before clearing
+        const existingCount = await payload.count({
+          collection: collection as any,
+        })
+
+        payload.logger.info(
+          `   → Clearing ${collection}... (${existingCount.totalDocs} existing records)`,
+        )
+
+        // Delete all records by first finding them, then deleting by ID
+        // This ensures proper hook execution and validation
+        let page = 1
+        let totalDeleted = 0
+
+        while (true) {
+          const records = await payload.find({
+            collection: collection as any,
+            limit: 100, // Use smaller batches for reliability
+            page: page,
+            depth: 0,
+          })
+
+          if (records.docs.length === 0) {
+            break // No more records to delete
+          }
+
+          const recordIds = records.docs
+            .map((doc) => doc.id)
+            .filter((id) => id && id !== '' && typeof id !== 'undefined') // Filter out empty/invalid IDs
+
+          if (recordIds.length === 0) {
+            // If no valid IDs, but we found records, there might be invalid ID records
+            if (records.docs.length > 0) {
+              payload.logger.info(
+                `   → Found ${records.docs.length} records with invalid IDs in ${collection}, attempting direct deletion...`,
+              )
+              await payload.db.deleteMany({
+                collection: collection as any,
+                where: {},
+              })
+              totalDeleted += records.docs.length
+            }
+            break // Exit the pagination loop as there are no more valid records
+          } else {
+            await payload.delete({
+              collection: collection as any,
+              where: {
+                id: {
+                  in: recordIds,
+                },
+              },
+              depth: 0,
+            })
+            totalDeleted += recordIds.length
+          }
+          page++
+
+          // Small delay between batches
+          await new Promise((resolve) => setTimeout(resolve, 100))
+        }
+
+        // Verify clearing worked by counting again
+        const remainingCount = await payload.count({
+          collection: collection as any,
+        })
+
+        payload.logger.info(
+          `   ✓ Cleared ${collection} (deleted ${totalDeleted} records, ${remainingCount.totalDocs} remaining)`,
+        )
+
+        // Small delay between operations
+        await new Promise((resolve) => setTimeout(resolve, 200))
       } catch (error) {
         payload.logger.warn(`   ⚠ Could not clear ${collection}:`, error)
+        // Continue with other collections
       }
-    }
-  }
-
-  // Delete versions sequentially as well
-  for (const collection of collectionsToDelete) {
-    if (collections.includes(collection as any)) {
-      const collectionConfig = payload.collections[collection as CollectionSlug]
-      if (collectionConfig?.config.versions) {
-        try {
-          await payload.db.deleteVersions({ collection: collection as any, req, where: {} })
-          payload.logger.info(`   ✓ Cleared ${collection} versions`)
-          // Small delay to prevent database contention
-          await new Promise((resolve) => setTimeout(resolve, 100))
-        } catch (error) {
-          payload.logger.warn(`   ⚠ Could not clear ${collection} versions:`, error)
-        }
-      }
+    } else {
+      payload.logger.info(`   → Skipping ${collection} (not in collections list)`)
     }
   }
 
@@ -476,20 +527,31 @@ export const seed = async ({
   // Create region first
   let bundabergRegionDoc
   try {
+    const regionData = regionBundaberg({
+      heroImage: bundabergHeroDoc,
+      communityImage: communityDoc,
+      economicImage: economicDoc,
+      employmentImage: employmentDoc,
+      hospitalIcon: hospitalIconDoc,
+      newHomesImage: newHomesDoc,
+    })
+
+    // Explicitly set timestamps to current date to prevent null constraint violation
+    const cleanRegionData = {
+      ...regionData,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    }
+    // Remove id field if it exists
+    delete cleanRegionData.id
+
     bundabergRegionDoc = await payload.create({
       collection: 'regions',
       depth: 0,
       context: {
         disableRevalidate: true,
       },
-      data: regionBundaberg({
-        heroImage: bundabergHeroDoc,
-        communityImage: communityDoc,
-        economicImage: economicDoc,
-        employmentImage: employmentDoc,
-        hospitalIcon: hospitalIconDoc,
-        newHomesImage: newHomesDoc,
-      }),
+      data: cleanRegionData,
     })
     payload.logger.info(`   ✓ Created Bundaberg region`)
   } catch (error) {
@@ -500,16 +562,27 @@ export const seed = async ({
   // Create suburb with region reference
   let bundabergEastSuburbDoc
   try {
+    const suburbData = suburbBundabergEast({
+      heroImage: suburbHeroDoc,
+      region: bundabergRegionDoc,
+    })
+
+    // Explicitly set timestamps to current date to prevent null constraint violation
+    const cleanSuburbData = {
+      ...suburbData,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    }
+    // Remove id field if it exists
+    delete cleanSuburbData.id
+
     bundabergEastSuburbDoc = await payload.create({
       collection: 'suburbs',
       depth: 0,
       context: {
         disableRevalidate: true,
       },
-      data: suburbBundabergEast({
-        heroImage: suburbHeroDoc,
-        region: bundabergRegionDoc,
-      }),
+      data: cleanSuburbData,
     })
     payload.logger.info(`   ✓ Created Bundaberg East suburb`)
   } catch (error) {
@@ -522,30 +595,41 @@ export const seed = async ({
   // Create property with all references
   let property1Doc
   try {
+    const property1Data = property1({
+      heroImage: propertyHeroDoc,
+      image1: propertyImage1Doc,
+      _image2: propertyImage2Doc,
+      _image3: propertyImage3Doc,
+      suburbDoc: bundabergEastSuburbDoc,
+      regionDoc: bundabergRegionDoc,
+      _agentImage1: propertyImage1Doc,
+      _agentImage2: propertyImage2Doc,
+      _agentImage3: propertyImage3Doc,
+      comparableImage1: comparable1Doc,
+      comparableImage2: comparable2Doc,
+      comparableImage3: comparable3Doc,
+      easementImage: easementDoc,
+      floodImage: floodDoc,
+      bushfireImage: bushfireDoc,
+      publicHousingImage: publicHousingDoc,
+    })
+
+    // Explicitly set timestamps to current date to prevent null constraint violation
+    const cleanProperty1Data = {
+      ...property1Data,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    }
+    // Remove id field if it exists
+    delete cleanProperty1Data.id
+
     property1Doc = await payload.create({
       collection: 'properties',
       depth: 0,
       context: {
         disableRevalidate: true,
       },
-      data: property1({
-        heroImage: propertyHeroDoc,
-        image1: propertyImage1Doc,
-        image2: propertyImage2Doc,
-        image3: propertyImage3Doc,
-        suburbDoc: bundabergEastSuburbDoc,
-        regionDoc: bundabergRegionDoc,
-        agentImage1: propertyImage1Doc,
-        agentImage2: propertyImage2Doc,
-        agentImage3: propertyImage3Doc,
-        comparableImage1: comparable1Doc,
-        comparableImage2: comparable2Doc,
-        comparableImage3: comparable3Doc,
-        easementImage: easementDoc,
-        floodImage: floodDoc,
-        bushfireImage: bushfireDoc,
-        publicHousingImage: publicHousingDoc,
-      }),
+      data: cleanProperty1Data,
     })
     payload.logger.info(`   ✓ Created property 1: ${property1Doc.name}`)
   } catch (error) {
@@ -555,21 +639,34 @@ export const seed = async ({
 
   let property2Doc
   try {
+    const property2Data = property2({
+      heroImage: propertyImage2Doc,
+      image1: propertyImage3Doc,
+      suburbDoc: bundabergEastSuburbDoc,
+      regionDoc: bundabergRegionDoc,
+      comparableImage1: comparable1Doc,
+      comparableImage2: comparable2Doc,
+      comparableImage3: comparable3Doc,
+      easementImage: easementDoc,
+      floodImage: floodDoc,
+    })
+
+    // Explicitly set timestamps to current date to prevent null constraint violation
+    const cleanProperty2Data = {
+      ...property2Data,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    }
+    // Remove id field if it exists
+    delete cleanProperty2Data.id
+
     property2Doc = await payload.create({
       collection: 'properties',
       depth: 0,
       context: {
         disableRevalidate: true,
       },
-      data: property2({
-        heroImage: propertyImage2Doc,
-        image1: propertyImage3Doc,
-        suburbDoc: bundabergEastSuburbDoc,
-        regionDoc: bundabergRegionDoc,
-        comparableImage1: comparable1Doc,
-        easementImage: easementDoc,
-        floodImage: floodDoc,
-      }),
+      data: cleanProperty2Data,
     })
     payload.logger.info(`   ✓ Created property 2: ${property2Doc.name}`)
   } catch (error) {
@@ -579,53 +676,49 @@ export const seed = async ({
 
   payload.logger.info(`— Seeding buyers access accounts...`)
 
-  // Create buyers access accounts with property portfolios
+  payload.logger.info(`— Seeding buyers access accounts...`)
+
+  // Create buyers access accounts with no property links to simplify
   const buyersAccessData = [
     {
       email: 'john.doe@example.com',
       name: 'John Doe',
       password: 'password123',
-      properties: [property1Doc.id, property2Doc.id], // Both properties - Experienced investor
+      properties: [], // No properties linked
     },
     {
       email: 'sarah.wilson@example.com',
       name: 'Sarah Wilson',
       password: 'password123',
-      properties: [property1Doc.id], // First property only - New investor focused on flood-affected area
-    },
-    {
-      email: 'michael.chen@example.com',
-      name: 'Michael Chen',
-      password: 'password123',
-      properties: [property2Doc.id], // Second property only - Prefers low-maintenance/vacant properties
-    },
-    {
-      email: 'emma.thompson@example.com',
-      name: 'Emma Thompson',
-      password: 'password123',
-      properties: [property1Doc.id], // First property only - Interested in value-add renovations
-    },
-    {
-      email: 'david.johnson@example.com',
-      name: 'David Johnson',
-      password: 'password123',
-      properties: [], // No properties yet - Prospective buyer evaluating options
+      properties: [], // No properties linked
     },
   ]
 
   for (const buyerData of buyersAccessData) {
     try {
+      payload.logger.info(`   → Creating buyer: ${buyerData.name} (${buyerData.email})`)
+
+      // Explicitly set timestamps to prevent null constraint violation
+      const cleanBuyerData = {
+        ...buyerData,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      }
+      // Remove id field if it exists
+      delete (cleanBuyerData as any).id
+
       const buyerDoc = await payload.create({
         collection: 'buyers-access',
         depth: 0,
         context: {
           disableRevalidate: true,
         },
-        data: buyerData,
+        data: cleanBuyerData,
       })
       payload.logger.info(`   ✓ Created buyer: ${buyerDoc.name} (${buyerDoc.email})`)
     } catch (error) {
       payload.logger.error(`Failed to create buyer ${buyerData.name}:`, error)
+      // Continue with other buyers even if one fails
     }
   }
 
