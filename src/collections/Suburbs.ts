@@ -22,7 +22,7 @@ export const Suburbs: CollectionConfig<'suburbs'> = {
     group: 'Real Estate',
     preview: (data, { req }) =>
       generatePreviewPath({
-        id: typeof data?.id === 'string' || typeof data?.id === 'number' ? data.id : undefined,
+        slug: typeof data?.slug === 'string' ? data.slug : undefined,
         collection: 'suburbs',
         req,
       }),
@@ -35,9 +35,12 @@ export const Suburbs: CollectionConfig<'suburbs'> = {
   },
   defaultPopulate: {
     name: true,
+    slug: true,
     region: true,
     heroImage: true,
     vacancyRate: true,
+    description: true,
+    medianValueByYear: true,
   },
   versions: {
     drafts: {
@@ -162,6 +165,31 @@ export const Suburbs: CollectionConfig<'suburbs'> = {
           },
         },
       ],
+    },
+    {
+      name: 'slug',
+      type: 'text',
+      required: true,
+      label: 'Slug',
+      unique: true,
+      index: true,
+      admin: {
+        position: 'sidebar',
+        description: 'URL-friendly version of the suburb name',
+      },
+      hooks: {
+        beforeValidate: [
+          ({ value, data }) => {
+            if (!value && data?.name) {
+              return data.name
+                .toLowerCase()
+                .replace(/\s+/g, '_')
+                .replace(/[^a-z0-9_-]/g, '')
+            }
+            return value
+          },
+        ],
+      },
     },
     {
       name: 'heroImage',

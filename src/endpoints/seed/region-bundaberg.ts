@@ -22,6 +22,7 @@ export const regionBundaberg: (
 }) => {
   return {
     name: 'Bundaberg Regional Council',
+    slug: 'bundaberg_regional_council',
     _status: 'published',
     heroImage: heroImage.id,
     description: {

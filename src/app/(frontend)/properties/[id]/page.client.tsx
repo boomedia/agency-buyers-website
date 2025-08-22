@@ -18,7 +18,14 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '~/components/ui/dialog'
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '~/components/ui/sheet'
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from '~/components/ui/sheet'
 import { SuburbMedianChart } from '~/components/ui/suburb-median-chart'
 import RichText from '~/components/RichText'
 import type { Property } from '~/types/payload-types'
@@ -1120,6 +1127,10 @@ const MarketInformation = ({ property }: { property: Property }) => {
                       {property.generalInformation.address.postcode}
                     </span>
                   </SheetTitle>
+                  <SheetDescription className="px-4 text-sm text-muted-foreground">
+                    Detailed information about {suburbName} including market data, vacancy rates,
+                    and property insights.
+                  </SheetDescription>
                 </SheetHeader>
                 <div className="flex-1 overflow-y-auto p-4 space-y-6">
                   {/* Suburb Hero Image */}
@@ -1143,6 +1154,7 @@ const MarketInformation = ({ property }: { property: Property }) => {
                   {typeof property.generalInformation.address.suburbName === 'object' &&
                     (property.generalInformation.address.suburbName as any)?.description && (
                       <div>
+                        <h4 className="font-semibold text-base mb-2">About {suburbName}</h4>
                         <div className="text-sm text-muted-foreground leading-relaxed">
                           {(() => {
                             const description = (
@@ -1186,6 +1198,41 @@ const MarketInformation = ({ property }: { property: Property }) => {
                             }
                             return 'Description not available'
                           })()}
+                        </div>
+                      </div>
+                    )}
+
+                  {/* Suburb Vacancy Rate */}
+                  {typeof property.generalInformation.address.suburbName === 'object' &&
+                    (property.generalInformation.address.suburbName as any)?.vacancyRate !==
+                      undefined &&
+                    (property.generalInformation.address.suburbName as any)?.vacancyRate !==
+                      null && (
+                      <div className="bg-muted/50 rounded-lg p-4">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
+                            <svg
+                              className="w-5 h-5 text-primary"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+                              />
+                            </svg>
+                          </div>
+                          <div>
+                            <div className="font-semibold text-sm text-muted-foreground">
+                              Vacancy Rate
+                            </div>
+                            <div className="text-lg font-bold text-primary">
+                              {(property.generalInformation.address.suburbName as any).vacancyRate}%
+                            </div>
+                          </div>
                         </div>
                       </div>
                     )}
@@ -1298,6 +1345,10 @@ const MarketInformation = ({ property }: { property: Property }) => {
                     {regionName} -{' '}
                     <span className="uppercase">{property.generalInformation.address.state}</span>
                   </SheetTitle>
+                  <SheetDescription className="px-4 text-sm text-muted-foreground">
+                    Comprehensive regional information including community landscape, infrastructure
+                    developments, and area insights.
+                  </SheetDescription>
                 </SheetHeader>
                 <div className="flex-1 overflow-y-auto p-4 space-y-6">
                   {/* Region Hero Image */}
@@ -1321,6 +1372,7 @@ const MarketInformation = ({ property }: { property: Property }) => {
                   {typeof property.generalInformation.address.region === 'object' &&
                     (property.generalInformation.address.region as any)?.description && (
                       <div>
+                        <h4 className="font-semibold text-base mb-2">About {regionName}</h4>
                         <div className="text-sm text-muted-foreground leading-relaxed">
                           {(() => {
                             const description = (property.generalInformation.address.region as any)
@@ -1363,6 +1415,188 @@ const MarketInformation = ({ property }: { property: Property }) => {
                             }
                             return 'Description not available'
                           })()}
+                        </div>
+                      </div>
+                    )}
+
+                  {/* Region Video */}
+                  {typeof property.generalInformation.address.region === 'object' &&
+                    (property.generalInformation.address.region as any)?.video && (
+                      <div>
+                        <h4 className="font-semibold text-base mb-3">Region Overview Video</h4>
+                        <div className="aspect-video rounded-lg overflow-hidden">
+                          <iframe
+                            src={getEmbedUrl(
+                              (property.generalInformation.address.region as any).video,
+                            )}
+                            title={`${regionName} Overview Video`}
+                            className="w-full h-full"
+                            allowFullScreen
+                          />
+                        </div>
+                      </div>
+                    )}
+
+                  {/* Community & Economic Landscape */}
+                  {typeof property.generalInformation.address.region === 'object' &&
+                    (property.generalInformation.address.region as any)
+                      ?.communityEconomicLandscape &&
+                    Array.isArray(
+                      (property.generalInformation.address.region as any)
+                        .communityEconomicLandscape,
+                    ) &&
+                    (property.generalInformation.address.region as any).communityEconomicLandscape
+                      .length > 0 && (
+                      <div>
+                        <h4 className="font-semibold text-base mb-3">
+                          Community & Economic Landscape
+                        </h4>
+                        <div className="grid gap-4">
+                          {(
+                            property.generalInformation.address.region as any
+                          ).communityEconomicLandscape.map((item: any, index: number) => (
+                            <div
+                              key={index}
+                              className="border rounded-lg p-4 hover:shadow-md transition-shadow"
+                            >
+                              <div className="flex items-start gap-3">
+                                {item.icon && (
+                                  <div className="w-8 h-8 flex-shrink-0">
+                                    <img
+                                      src={getImageUrl(item.icon.url)}
+                                      alt={item.icon.alt || item.title}
+                                      className="w-full h-full object-contain"
+                                    />
+                                  </div>
+                                )}
+                                <div className="flex-1">
+                                  <h5 className="font-semibold text-sm mb-1">{item.title}</h5>
+                                  {item.description && (
+                                    <div className="text-xs text-muted-foreground mb-2">
+                                      {safeRenderRichText(
+                                        item.description,
+                                        'No description available',
+                                      )}
+                                    </div>
+                                  )}
+                                  {item.url && (
+                                    <a
+                                      href={item.url}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="text-xs text-primary hover:underline inline-flex items-center gap-1"
+                                    >
+                                      Learn more
+                                      <svg
+                                        className="w-3 h-3"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                      >
+                                        <path
+                                          strokeLinecap="round"
+                                          strokeLinejoin="round"
+                                          strokeWidth={2}
+                                          d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                                        />
+                                      </svg>
+                                    </a>
+                                  )}
+                                </div>
+                              </div>
+                              {item.image && (
+                                <div className="mt-3">
+                                  <img
+                                    src={getImageUrl(item.image.url)}
+                                    alt={item.image.alt || item.title}
+                                    className="w-full h-32 object-cover rounded"
+                                  />
+                                </div>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                  {/* Infrastructure & Future Development */}
+                  {typeof property.generalInformation.address.region === 'object' &&
+                    (property.generalInformation.address.region as any)
+                      ?.infrastructureFutureDevelopment &&
+                    Array.isArray(
+                      (property.generalInformation.address.region as any)
+                        .infrastructureFutureDevelopment,
+                    ) &&
+                    (property.generalInformation.address.region as any)
+                      .infrastructureFutureDevelopment.length > 0 && (
+                      <div>
+                        <h4 className="font-semibold text-base mb-3">
+                          Infrastructure & Future Development
+                        </h4>
+                        <div className="grid gap-4">
+                          {(
+                            property.generalInformation.address.region as any
+                          ).infrastructureFutureDevelopment.map((item: any, index: number) => (
+                            <div
+                              key={index}
+                              className="border rounded-lg p-4 hover:shadow-md transition-shadow"
+                            >
+                              <div className="flex items-start gap-3">
+                                {item.icon && (
+                                  <div className="w-8 h-8 flex-shrink-0">
+                                    <img
+                                      src={getImageUrl(item.icon.url)}
+                                      alt={item.icon.alt || item.title}
+                                      className="w-full h-full object-contain"
+                                    />
+                                  </div>
+                                )}
+                                <div className="flex-1">
+                                  <h5 className="font-semibold text-sm mb-1">{item.title}</h5>
+                                  {item.description && (
+                                    <div className="text-xs text-muted-foreground mb-2">
+                                      {safeRenderRichText(
+                                        item.description,
+                                        'No description available',
+                                      )}
+                                    </div>
+                                  )}
+                                  {item.url && (
+                                    <a
+                                      href={item.url}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="text-xs text-primary hover:underline inline-flex items-center gap-1"
+                                    >
+                                      Learn more
+                                      <svg
+                                        className="w-3 h-3"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                      >
+                                        <path
+                                          strokeLinecap="round"
+                                          strokeLinejoin="round"
+                                          strokeWidth={2}
+                                          d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                                        />
+                                      </svg>
+                                    </a>
+                                  )}
+                                </div>
+                              </div>
+                              {item.image && (
+                                <div className="mt-3">
+                                  <img
+                                    src={getImageUrl(item.image.url)}
+                                    alt={item.image.alt || item.title}
+                                    className="w-full h-32 object-cover rounded"
+                                  />
+                                </div>
+                              )}
+                            </div>
+                          ))}
                         </div>
                       </div>
                     )}

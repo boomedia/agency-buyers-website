@@ -22,7 +22,7 @@ export const Regions: CollectionConfig<'regions'> = {
     group: 'Real Estate',
     preview: (data, { req }) =>
       generatePreviewPath({
-        id: typeof data?.id === 'string' || typeof data?.id === 'number' ? data.id : undefined,
+        slug: typeof data?.slug === 'string' ? data.slug : undefined,
         collection: 'regions',
         req,
       }),
@@ -35,7 +35,12 @@ export const Regions: CollectionConfig<'regions'> = {
   },
   defaultPopulate: {
     name: true,
+    slug: true,
     heroImage: true,
+    description: true,
+    video: true,
+    communityEconomicLandscape: true,
+    infrastructureFutureDevelopment: true,
   },
   versions: {
     drafts: {
@@ -100,6 +105,31 @@ export const Regions: CollectionConfig<'regions'> = {
       label: 'Region Name',
       admin: {
         description: 'Region Name also called Local Government Area LGA',
+      },
+    },
+    {
+      name: 'slug',
+      type: 'text',
+      required: true,
+      label: 'Slug',
+      unique: true,
+      index: true,
+      admin: {
+        position: 'sidebar',
+        description: 'URL-friendly version of the region name',
+      },
+      hooks: {
+        beforeValidate: [
+          ({ value, data }) => {
+            if (!value && data?.name) {
+              return data.name
+                .toLowerCase()
+                .replace(/\s+/g, '_')
+                .replace(/[^a-z0-9_-]/g, '')
+            }
+            return value
+          },
+        ],
       },
     },
     {
