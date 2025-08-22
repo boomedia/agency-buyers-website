@@ -610,7 +610,7 @@ function RentalInformation({ property }: { property: Property }) {
           <div className="flex justify-between items-center mb-2">
             <span className="text-muted-foreground">Occupancy</span>
             <div
-              className={`inline-flex px-3 py-1 rounded-full text-xs font-semibold ${
+              className={`inline-flex px-3 py-1 rounded text-xs font-semibold ${
                 property.dueDiligence.propertyOccupancy === 'occupied'
                   ? 'bg-primary/10 text-primary'
                   : 'bg-destructive/10 text-destructive'
@@ -679,8 +679,23 @@ function ComparableSales({ property }: { property: Property }) {
             )}
             <div className="p-3">
               <h5 className="font-semibold text-sm mb-1">{sale.address}</h5>
-              <div className="text-lg font-bold text-primary mb-2">
-                {formatPrice(sale.salePrice)}
+              <div className="flex items-center justify-between mb-2">
+                <div className="text-lg font-bold text-primary">{formatPrice(sale.salePrice)}</div>
+                {sale.comparison && (
+                  <div
+                    className={`text-xs px-2 py-1 rounded font-medium capitalize ${
+                      sale.comparison === 'superior'
+                        ? 'bg-green-100 text-green-700 border border-green-200'
+                        : sale.comparison === 'similar'
+                          ? 'bg-blue-100 text-blue-700 border border-blue-200'
+                          : sale.comparison === 'inferior'
+                            ? 'bg-orange-100 text-orange-700 border border-orange-200'
+                            : 'bg-gray-100 text-gray-700 border border-gray-200'
+                    }`}
+                  >
+                    {sale.comparison}
+                  </div>
+                )}
               </div>
               <div className="text-primary hover:text-primary/80 text-xs font-medium">
                 View Listing →
