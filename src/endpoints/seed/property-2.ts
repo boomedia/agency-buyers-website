@@ -7,6 +7,8 @@ type Property2Args = {
   suburbDoc: Suburb
   regionDoc: Region
   comparableImage1: Media
+  comparableImage2: Media
+  comparableImage3: Media
   easementImage: Media
   floodImage: Media
 }
@@ -17,6 +19,8 @@ export const property2: (args: Property2Args) => RequiredDataFromCollectionSlug<
   suburbDoc,
   regionDoc,
   comparableImage1,
+  comparableImage2,
+  comparableImage3,
   easementImage,
   floodImage,
 }) => {
@@ -105,15 +109,15 @@ export const property2: (args: Property2Args) => RequiredDataFromCollectionSlug<
       saleHistory: [
         {
           year: 2020,
-          salePrice: 365000,
+          value: 365000,
         },
         {
           year: 2017,
-          salePrice: 295000,
+          value: 295000,
         },
         {
           year: 2013,
-          salePrice: 235000,
+          value: 235000,
         },
       ],
       format: {
@@ -133,8 +137,23 @@ export const property2: (args: Property2Args) => RequiredDataFromCollectionSlug<
         {
           address: '22 Smith Street Bundaberg East',
           salePrice: 445000,
+          comparison: 'superior',
           link: 'https://www.realestate.com.au/property-example',
           heroImage: comparableImage1.id,
+        },
+        {
+          address: '18 Jones Road Bundaberg East',
+          salePrice: 415000,
+          comparison: 'similar',
+          link: 'https://www.realestate.com.au/property-example-2',
+          heroImage: comparableImage2.id,
+        },
+        {
+          address: '33 Green Street Bundaberg East',
+          salePrice: 395000,
+          comparison: 'inferior',
+          link: 'https://www.realestate.com.au/property-example-3',
+          heroImage: comparableImage3.id,
         },
       ],
     },

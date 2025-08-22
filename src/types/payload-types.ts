@@ -29,8 +29,32 @@ export interface Property {
     askingPrice: number;
     address: {
       streetAddress: string;
-      suburbName: string | null;
-      region: string | null;
+      suburbName: string | null | {
+        id: number;
+        name: string;
+        region: any;
+        vacancyRate?: number | null;
+        slug: string;
+        heroImage?: any;
+        description?: any;
+        medianValueByYear?: Array<{
+          year: number;
+          medianValue: number;
+          id?: string | null;
+        }> | null;
+        updatedAt: string;
+        createdAt: string;
+        _status?: ('draft' | 'published') | null;
+      };
+      region: string | null | {
+        id: number;
+        name: string;
+        heroImage?: any;
+        description?: any;
+        updatedAt: string;
+        createdAt: string;
+        _status?: ('draft' | 'published') | null;
+      };
       postcode: string;
       state: string;
     };

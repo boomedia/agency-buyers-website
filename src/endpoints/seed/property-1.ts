@@ -4,13 +4,13 @@ import type { Media, Region, Suburb } from '@/payload-types'
 type Property1Args = {
   heroImage: Media
   image1: Media
-  image2: Media
-  image3: Media
+  _image2: Media
+  _image3: Media
   suburbDoc: Suburb
   regionDoc: Region
-  agentImage1: Media
-  agentImage2: Media
-  agentImage3: Media
+  _agentImage1: Media
+  _agentImage2: Media
+  _agentImage3: Media
   comparableImage1: Media
   comparableImage2: Media
   comparableImage3: Media
@@ -23,13 +23,13 @@ type Property1Args = {
 export const property1: (args: Property1Args) => RequiredDataFromCollectionSlug<'properties'> = ({
   heroImage,
   image1,
-  image2,
-  image3,
+  _image2,
+  _image3,
   suburbDoc,
   regionDoc,
-  agentImage1,
-  agentImage2,
-  agentImage3,
+  _agentImage1,
+  _agentImage2,
+  _agentImage3,
   comparableImage1,
   comparableImage2,
   comparableImage3,
@@ -63,15 +63,15 @@ export const property1: (args: Property1Args) => RequiredDataFromCollectionSlug<
       saleHistory: [
         {
           year: 2019,
-          salePrice: 315000,
+          value: 315000,
         },
         {
           year: 2015,
-          salePrice: 265000,
+          value: 265000,
         },
         {
           year: 2011,
-          salePrice: 225000,
+          value: 225000,
         },
       ],
       format: {
@@ -91,18 +91,21 @@ export const property1: (args: Property1Args) => RequiredDataFromCollectionSlug<
         {
           address: '35 Glenmorris Street Norville',
           salePrice: 570000,
+          comparison: 'superior',
           link: 'https://www.realestate.com.au/property-house-qld-norville-148441684?sourcePage=rea:p4ep:property%20details&sourceElement=avm-currently-advertised-view-lis',
           heroImage: comparableImage1.id,
         },
         {
           address: '1 Laack Street Kepnock, Qld 4670',
           salePrice: 665000,
+          comparison: 'similar',
           link: 'https://www.realestate.com.au/sold/property-house-qld-kepnock-148156108',
           heroImage: comparableImage2.id,
         },
         {
           address: '2 Dr Mays Road, Svensson Heights, Qld 4670',
           salePrice: 610000,
+          comparison: 'inferior',
           link: 'https://www.realestate.com.au/sold/property-house-qld-svensson+heights-147969168',
           heroImage: comparableImage3.id,
         },
@@ -469,8 +472,8 @@ export const property1: (args: Property1Args) => RequiredDataFromCollectionSlug<
         loanTerm: 30,
         interestRate: 6.12,
         depositCash: 48500,
-        equityRelease: 0,
-        equityReleaseRate: 0,
+        equityRelease: 55000,
+        equityReleaseRate: 6.4,
         stampDuty: 17503,
         renovationsCost: 0,
         buildingAndPest: 650,

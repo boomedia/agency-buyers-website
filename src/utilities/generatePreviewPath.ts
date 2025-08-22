@@ -19,7 +19,7 @@ export const generatePreviewPath = ({ collection, slug, id }: Props) => {
   // Handle empty slug for pages - default to 'home' for the home page
   const finalSlug = !slug && collection === 'pages' ? 'home' : slug
 
-  // For properties, use ID instead of slug
+  // For properties, use ID instead of slug. For regions and suburbs, prefer slug
   let identifier = finalSlug
   if (collection === 'properties' && id) {
     identifier = String(id)

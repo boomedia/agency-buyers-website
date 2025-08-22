@@ -92,7 +92,7 @@ export function RegionDetails({ region }: RegionDetailsProps) {
                         href={item.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center text-sm text-primary hover:underline"
+                        className="inline-flex items-center text-sm text-link hover:underline hover:text-link-hover"
                       >
                         Learn more →
                       </a>
@@ -140,7 +140,7 @@ export function RegionDetails({ region }: RegionDetailsProps) {
                           href={item.url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center text-sm text-primary hover:underline"
+                          className="inline-flex items-center text-sm text-link hover:underline hover:text-link-hover"
                         >
                           Learn more →
                         </a>

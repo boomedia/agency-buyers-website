@@ -1,13 +1,13 @@
-import type { CompanySetting } from '@/payload-types'
+import type { CompanySetting, Media } from '@/payload-types'
 
 export const companySettings = ({
   logoLight,
   logoDark,
   favicon,
 }: {
-  logoLight?: any
-  logoDark?: any
-  favicon?: any
+  logoLight?: Media
+  logoDark?: Media
+  favicon?: Media
 } = {}): Omit<CompanySetting, 'createdAt' | 'id' | 'updatedAt'> => ({
   companyName: 'Buyers Agency',
   motto: 'Your Property Investment Partners',

@@ -11,11 +11,11 @@ import { RegionDetails } from './page.client'
 
 type Args = {
   params: Promise<{
-    id?: string
+    slug?: string
   }>
 }
 
-const queryRegionById = cache(async ({ id }: { id: string }): Promise<Region | null> => {
+const queryRegionBySlug = cache(async ({ slug }: { slug: string }): Promise<Region | null> => {
   if (process.env.SKIP_PAYLOAD_DB === 'true') {
     return null
   }
@@ -25,15 +25,20 @@ const queryRegionById = cache(async ({ id }: { id: string }): Promise<Region | n
   const payload = await getPayload({ config: configPromise })
 
   try {
-    const result = await payload.findByID({
+    const result = await payload.find({
       collection: 'regions',
-      id,
+      where: {
+        slug: {
+          equals: slug,
+        },
+      },
+      limit: 1,
       draft,
       overrideAccess: draft,
       depth: 2,
     })
 
-    return result as Region
+    return (result.docs[0] as Region) || null
   } catch (error) {
     console.error('Error fetching region:', error)
     return null
@@ -41,15 +46,15 @@ const queryRegionById = cache(async ({ id }: { id: string }): Promise<Region | n
 })
 
 export async function generateMetadata({ params: paramsPromise }: Args): Promise<Metadata> {
-  const { id } = await paramsPromise
-  if (!id) {
+  const { slug } = await paramsPromise
+  if (!slug) {
     return {
       title: 'Region Not Found',
     }
   }
 
   try {
-    const region = await queryRegionById({ id })
+    const region = await queryRegionBySlug({ slug })
 
     if (!region) {
       return {
@@ -83,17 +88,17 @@ export async function generateMetadata({ params: paramsPromise }: Args): Promise
 
 export default async function RegionPage({ params: paramsPromise }: Args) {
   const { isEnabled: draft } = await draftMode()
-  const { id } = await paramsPromise
+  const { slug } = await paramsPromise
 
-  if (!id) {
+  if (!slug) {
     notFound()
   }
 
-  const url = `/regions/${id}`
+  const url = `/regions/${slug}`
   let region: Region | null = null
 
   try {
-    region = await queryRegionById({ id })
+    region = await queryRegionBySlug({ slug })
   } catch (error) {
     console.error('Error fetching region:', error)
   }

@@ -3,6 +3,18 @@ import { generatePreviewPath } from '../utilities/generatePreviewPath'
 import { anyone } from '../access/anyone'
 import { authenticated } from '../access/authenticated'
 
+type WhereQuery = {
+  id?:
+    | {
+        in?: unknown[]
+      }
+    | string
+    | number
+  and?: WhereQuery[]
+  or?: WhereQuery[]
+  [key: string]: unknown
+}
+
 export const Suburbs: CollectionConfig<'suburbs'> = {
   slug: 'suburbs',
   admin: {
@@ -10,7 +22,7 @@ export const Suburbs: CollectionConfig<'suburbs'> = {
     group: 'Real Estate',
     preview: (data, { req }) =>
       generatePreviewPath({
-        id: typeof data?.id === 'string' || typeof data?.id === 'number' ? data.id : undefined,
+        slug: typeof data?.slug === 'string' ? data.slug : undefined,
         collection: 'suburbs',
         req,
       }),
@@ -23,9 +35,12 @@ export const Suburbs: CollectionConfig<'suburbs'> = {
   },
   defaultPopulate: {
     name: true,
+    slug: true,
     region: true,
     heroImage: true,
     vacancyRate: true,
+    description: true,
+    medianValueByYear: true,
   },
   versions: {
     drafts: {
@@ -36,7 +51,7 @@ export const Suburbs: CollectionConfig<'suburbs'> = {
     beforeChange: [
       ({ data }) => {
         // Convert empty strings and invalid number values to null for number fields to prevent PostgreSQL errors
-        const convertEmptyStrings = (obj: any): any => {
+        const convertEmptyStrings = (obj: unknown): unknown => {
           if (obj === '' || obj === '-' || obj === null || obj === undefined) return null
 
           // Handle invalid number strings that could cause JSON parsing errors
@@ -54,7 +69,7 @@ export const Suburbs: CollectionConfig<'suburbs'> = {
 
           if (Array.isArray(obj)) return obj.map(convertEmptyStrings)
           if (obj && typeof obj === 'object') {
-            const result: any = {}
+            const result: Record<string, unknown> = {}
             for (const [key, value] of Object.entries(obj)) {
               result[key] = convertEmptyStrings(value)
             }
@@ -64,6 +79,54 @@ export const Suburbs: CollectionConfig<'suburbs'> = {
         }
 
         return convertEmptyStrings(data)
+      },
+    ],
+    beforeDelete: [
+      ({ req }) => {
+        // Filter out empty string IDs from delete queries to prevent PostgreSQL errors
+        const filterEmptyIds = (where: WhereQuery): WhereQuery => {
+          if (!where) return where
+
+          // Handle the case where 'id' is in an 'in' array
+          if (
+            where.id &&
+            typeof where.id === 'object' &&
+            'in' in where.id &&
+            Array.isArray(where.id.in)
+          ) {
+            where.id.in = where.id.in.filter((id: unknown) => {
+              return id !== '' && id !== null && id !== undefined && String(id).trim() !== ''
+            })
+
+            // If no valid IDs remain, prevent the delete operation
+            if (where.id.in.length === 0) {
+              throw new Error('No valid IDs provided for deletion')
+            }
+          }
+
+          // Handle the case where 'id' is a direct value
+          if (where.id && typeof where.id === 'string' && where.id.trim() === '') {
+            throw new Error('Invalid empty ID provided for deletion')
+          }
+
+          // Handle nested 'and' conditions
+          if (where.and && Array.isArray(where.and)) {
+            where.and = where.and.map(filterEmptyIds).filter(Boolean)
+          }
+
+          // Handle nested 'or' conditions
+          if (where.or && Array.isArray(where.or)) {
+            where.or = where.or.map(filterEmptyIds).filter(Boolean)
+          }
+
+          return where
+        }
+
+        if (req.query && req.query.where) {
+          req.query.where = filterEmptyIds(req.query.where as WhereQuery)
+        }
+
+        return true
       },
     ],
   },
@@ -102,6 +165,31 @@ export const Suburbs: CollectionConfig<'suburbs'> = {
           },
         },
       ],
+    },
+    {
+      name: 'slug',
+      type: 'text',
+      required: true,
+      label: 'Slug',
+      unique: true,
+      index: true,
+      admin: {
+        position: 'sidebar',
+        description: 'URL-friendly version of the suburb name',
+      },
+      hooks: {
+        beforeValidate: [
+          ({ value, data }) => {
+            if (!value && data?.name) {
+              return data.name
+                .toLowerCase()
+                .replace(/\s+/g, '_')
+                .replace(/[^a-z0-9_-]/g, '')
+            }
+            return value
+          },
+        ],
+      },
     },
     {
       name: 'heroImage',

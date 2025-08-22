@@ -11,11 +11,11 @@ import { SuburbDetails } from './page.client'
 
 type Args = {
   params: Promise<{
-    id?: string
+    slug?: string
   }>
 }
 
-const querySuburbById = cache(async ({ id }: { id: string }): Promise<Suburb | null> => {
+const querySuburbBySlug = cache(async ({ slug }: { slug: string }): Promise<Suburb | null> => {
   if (process.env.SKIP_PAYLOAD_DB === 'true') {
     return null
   }
@@ -25,15 +25,20 @@ const querySuburbById = cache(async ({ id }: { id: string }): Promise<Suburb | n
   const payload = await getPayload({ config: configPromise })
 
   try {
-    const result = await payload.findByID({
+    const result = await payload.find({
       collection: 'suburbs',
-      id,
+      where: {
+        slug: {
+          equals: slug,
+        },
+      },
+      limit: 1,
       draft,
       overrideAccess: draft,
       depth: 2,
     })
 
-    return result as Suburb
+    return (result.docs[0] as Suburb) || null
   } catch (error) {
     console.error('Error fetching suburb:', error)
     return null
@@ -41,15 +46,15 @@ const querySuburbById = cache(async ({ id }: { id: string }): Promise<Suburb | n
 })
 
 export async function generateMetadata({ params: paramsPromise }: Args): Promise<Metadata> {
-  const { id } = await paramsPromise
-  if (!id) {
+  const { slug } = await paramsPromise
+  if (!slug) {
     return {
       title: 'Suburb Not Found',
     }
   }
 
   try {
-    const suburb = await querySuburbById({ id })
+    const suburb = await querySuburbBySlug({ slug })
 
     if (!suburb) {
       return {
@@ -83,17 +88,17 @@ export async function generateMetadata({ params: paramsPromise }: Args): Promise
 
 export default async function SuburbPage({ params: paramsPromise }: Args) {
   const { isEnabled: draft } = await draftMode()
-  const { id } = await paramsPromise
+  const { slug } = await paramsPromise
 
-  if (!id) {
+  if (!slug) {
     notFound()
   }
 
-  const url = `/suburbs/${id}`
+  const url = `/suburbs/${slug}`
   let suburb: Suburb | null = null
 
   try {
-    suburb = await querySuburbById({ id })
+    suburb = await querySuburbBySlug({ slug })
   } catch (error) {
     console.error('Error fetching suburb:', error)
   }

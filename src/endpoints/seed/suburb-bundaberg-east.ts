@@ -11,6 +11,7 @@ export const suburbBundabergEast: (
 ) => RequiredDataFromCollectionSlug<'suburbs'> = ({ heroImage, region }) => {
   return {
     name: 'Bundaberg East',
+    slug: 'bundaberg_east',
     _status: 'published',
     region: region.id,
     vacancyRate: 0.5,

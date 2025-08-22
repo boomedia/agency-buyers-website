@@ -1204,6 +1204,10 @@ export interface Suburb {
    * Vacancy rate as a percentage (e.g., 0.7 for 0.7%)
    */
   vacancyRate?: number | null;
+  /**
+   * URL-friendly version of the suburb name
+   */
+  slug: string;
   heroImage?: (number | null) | Media;
   description?: {
     root: {
@@ -1244,6 +1248,10 @@ export interface Region {
    * Region Name also called Local Government Area LGA
    */
   name: string;
+  /**
+   * URL-friendly version of the region name
+   */
+  slug: string;
   heroImage?: (number | null) | Media;
   description?: {
     root: {
@@ -2075,6 +2083,7 @@ export interface PropertiesSelect<T extends boolean = true> {
  */
 export interface RegionsSelect<T extends boolean = true> {
   name?: T;
+  slug?: T;
   heroImage?: T;
   description?: T;
   video?: T;
@@ -2110,6 +2119,7 @@ export interface SuburbsSelect<T extends boolean = true> {
   name?: T;
   region?: T;
   vacancyRate?: T;
+  slug?: T;
   heroImage?: T;
   description?: T;
   medianValueByYear?:

@@ -9,7 +9,7 @@ const config = {
     './app/**/*.{ts,tsx}',
     './src/**/*.{ts,tsx}',
   ],
-  darkMode: "class",
+  darkMode: 'class',
   plugins: [tailwindcssAnimate, typography],
   prefix: '',
   safelist: [
@@ -92,6 +92,10 @@ const config = {
         success: 'hsl(var(--success))',
         error: 'hsl(var(--error))',
         warning: 'hsl(var(--warning))',
+
+        text: 'hsl(var(--text))',
+        link: 'hsl(var(--link))',
+        'link-hover': 'hsl(var(--link-hover))',
       },
       fontFamily: {
         mono: ['var(--font-geist-mono)'],
@@ -111,11 +115,33 @@ const config = {
         DEFAULT: {
           css: [
             {
-              '--tw-prose-body': 'var(--text)',
-              '--tw-prose-headings': 'var(--text)',
+              '--tw-prose-body': 'hsl(var(--text))',
+              '--tw-prose-headings': 'hsl(var(--text))',
+              '--tw-prose-links': 'hsl(var(--link))',
+              '--tw-prose-bold': 'hsl(var(--text))',
+              '--tw-prose-counters': 'hsl(var(--muted-foreground))',
+              '--tw-prose-bullets': 'hsl(var(--muted-foreground))',
+              '--tw-prose-hr': 'hsl(var(--border))',
+              '--tw-prose-quotes': 'hsl(var(--text))',
+              '--tw-prose-quote-borders': 'hsl(var(--border))',
+              '--tw-prose-captions': 'hsl(var(--muted-foreground))',
+              '--tw-prose-code': 'hsl(var(--text))',
+              '--tw-prose-pre-code': 'hsl(var(--muted-foreground))',
+              '--tw-prose-pre-bg': 'hsl(var(--muted))',
+              '--tw-prose-th-borders': 'hsl(var(--border))',
+              '--tw-prose-td-borders': 'hsl(var(--border))',
               h1: {
                 fontWeight: 'normal',
                 marginBottom: '0.25em',
+              },
+              a: {
+                color: 'hsl(var(--link))',
+                textDecoration: 'none',
+                fontWeight: '500',
+                '&:hover': {
+                  color: 'hsl(var(--link-hover))',
+                  textDecoration: 'underline',
+                },
               },
             },
           ],
