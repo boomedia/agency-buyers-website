@@ -661,9 +661,8 @@ export default function PropertiesClient({ properties, regions, suburbs }: Prope
         const matchesAddress = property.generalInformation.address.streetAddress
           .toLowerCase()
           .includes(searchLower)
-        const matchesSuburb = property.generalInformation.address.suburbName
-          ?.toLowerCase()
-          .includes(searchLower)
+        const suburbName = getSuburbName(property.generalInformation.address.suburbName)
+        const matchesSuburb = suburbName?.toLowerCase().includes(searchLower)
         const matchesPostcode = property.generalInformation.address.postcode.includes(searchTerm)
 
         if (!matchesName && !matchesAddress && !matchesSuburb && !matchesPostcode) {
