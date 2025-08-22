@@ -567,7 +567,7 @@ function PropertyPresentation({ property }: { property: Property }) {
                   href={videoUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 text-primary hover:text-primary/80 font-medium text-sm transition-colors"
+                  className="inline-flex items-center gap-2 text-link hover:text-link-hover font-medium text-sm transition-colors"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path

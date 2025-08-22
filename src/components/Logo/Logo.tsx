@@ -57,7 +57,7 @@ export const Logo = (props: Props) => {
             resource={logoDark}
             loading={loading}
             priority={priorityBoolean}
-            className="w-full h-full object-contain block dark:hidden"
+            className="w-full h-full object-contain logo-dark"
             alt={companyName || 'Company Logo'}
           />
         )}
@@ -66,7 +66,7 @@ export const Logo = (props: Props) => {
             resource={logoLight}
             loading={loading}
             priority={priorityBoolean}
-            className="w-full h-full object-contain hidden dark:block"
+            className="w-full h-full object-contain logo-light"
             alt={`${companyName || 'Company'} Logo Light`}
           />
         )}
@@ -98,7 +98,7 @@ export const Logo = (props: Props) => {
             height={34}
             loading={loading}
             priority={priorityBoolean}
-            className="w-full h-full object-contain block dark:hidden"
+            className="w-full h-full object-contain logo-dark"
           />
           {/* Light logo - hidden in light mode, visible in dark mode */}
           <Image
@@ -108,7 +108,7 @@ export const Logo = (props: Props) => {
             height={34}
             loading={loading}
             priority={priorityBoolean}
-            className="w-full h-full object-contain hidden dark:block"
+            className="w-full h-full object-contain logo-light"
           />
         </>
       )}
