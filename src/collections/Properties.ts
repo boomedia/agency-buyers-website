@@ -82,7 +82,7 @@ export const Properties: CollectionConfig<'properties'> = {
     beforeChange: [
       ({ data }) => {
         // Convert empty strings and invalid number values to null for number fields to prevent PostgreSQL errors
-        const convertEmptyStrings = (obj: any): any => {
+        const convertEmptyStrings = (obj: any, currentPath: string = ''): any => {
           if (obj === '' || obj === '-' || obj === null || obj === undefined) return null
 
           // Handle invalid number strings that could cause JSON parsing errors
@@ -98,11 +98,23 @@ export const Properties: CollectionConfig<'properties'> = {
             }
           }
 
-          if (Array.isArray(obj)) return obj.map(convertEmptyStrings)
+          if (Array.isArray(obj))
+            return obj.map((item, index) => convertEmptyStrings(item, `${currentPath}[${index}]`))
           if (obj && typeof obj === 'object') {
             const result: any = {}
             for (const [key, value] of Object.entries(obj)) {
-              result[key] = convertEmptyStrings(value)
+              const fieldPath = currentPath ? `${currentPath}.${key}` : key
+              // Skip timestamp fields that should be managed by Payload automatically
+              if (
+                key === 'createdAt' ||
+                key === 'updatedAt' ||
+                key === 'created_at' ||
+                key === 'updated_at'
+              ) {
+                result[key] = value
+              } else {
+                result[key] = convertEmptyStrings(value, fieldPath)
+              }
             }
             return result
           }
