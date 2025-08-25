@@ -401,7 +401,7 @@ export const Properties: CollectionConfig<'properties'> = {
                       label: 'Your Presentation',
                       admin: {
                         width: '33%',
-                        description: 'Loom video URL',
+                        description: 'Video URL (supports YouTube, Vimeo, and Loom)',
                       },
                     },
                     {

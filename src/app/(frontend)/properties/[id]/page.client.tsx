@@ -28,6 +28,7 @@ import {
 } from '~/components/ui/sheet'
 import { SuburbMedianChart } from '~/components/ui/suburb-median-chart'
 import RichText from '~/components/RichText'
+import { getEmbedUrl } from '@/utilities/videoUtils'
 import type { Property } from '~/types/payload-types'
 import {
   calculateAllPropertyMetrics,
@@ -209,29 +210,6 @@ const safeRenderRichText = (
 
   console.warn('Invalid rich text format:', content)
   return fallbackText
-}
-
-const getEmbedUrl = (url: string) => {
-  if (!url) return ''
-
-  // Handle YouTube URLs
-  if (url.includes('youtube.com/watch')) {
-    const videoId = url.split('v=')[1]?.split('&')[0]
-    return videoId ? `https://www.youtube.com/embed/${videoId}` : url
-  }
-
-  if (url.includes('youtu.be/')) {
-    const videoId = url.split('youtu.be/')[1]?.split('?')[0]
-    return videoId ? `https://www.youtube.com/embed/${videoId}` : url
-  }
-
-  // Handle Vimeo URLs
-  if (url.includes('vimeo.com/')) {
-    const videoId = url.split('vimeo.com/')[1]?.split('?')[0]
-    return videoId ? `https://player.vimeo.com/video/${videoId}` : url
-  }
-
-  return url
 }
 
 // Property Hero Component

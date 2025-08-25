@@ -148,7 +148,7 @@ export const Regions: CollectionConfig<'regions'> = {
       type: 'text',
       label: 'Region Video',
       admin: {
-        description: 'Video URL',
+        description: 'Video URL (supports YouTube, Vimeo, and Loom)',
       },
     },
     {

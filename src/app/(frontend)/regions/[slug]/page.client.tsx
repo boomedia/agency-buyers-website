@@ -5,6 +5,7 @@ import type { Region } from '@/payload-types'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Media } from '@/components/Media'
 import RichText from '@/components/RichText'
+import { getEmbedUrl } from '@/utilities/videoUtils'
 
 interface RegionDetailsProps {
   region: Region
@@ -47,7 +48,7 @@ export function RegionDetails({ region }: RegionDetailsProps) {
             <CardContent>
               <div className="aspect-video">
                 <iframe
-                  src={region.video}
+                  src={getEmbedUrl(region.video)}
                   className="w-full h-full rounded-lg"
                   allowFullScreen
                   title={`${region.name} Video`}

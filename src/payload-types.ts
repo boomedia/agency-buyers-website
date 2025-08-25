@@ -847,7 +847,7 @@ export interface Property {
       [k: string]: unknown;
     } | null;
     /**
-     * Loom video URL
+     * Video URL (supports YouTube, Vimeo, and Loom)
      */
     videoUrl?: string | null;
     /**
@@ -1269,7 +1269,7 @@ export interface Region {
     [k: string]: unknown;
   } | null;
   /**
-   * Video URL
+   * Video URL (supports YouTube, Vimeo, and Loom)
    */
   video?: string | null;
   communityEconomicLandscape?:
