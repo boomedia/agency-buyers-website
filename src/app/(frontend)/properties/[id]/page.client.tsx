@@ -507,7 +507,7 @@ function PropertyPresentation({ property }: { property: Property }) {
 
   return (
     <Card>
-      <CardContent className="p-4">
+      <CardContent className="p-2">
         <Dialog>
           <DialogTrigger asChild>
             <div className="flex items-center gap-3 p-3 border rounded-lg bg-card hover:shadow-md hover:border-primary transition-all cursor-pointer">
@@ -1110,11 +1110,11 @@ const MarketInformation = ({ property }: { property: Property }) => {
                     and property insights.
                   </SheetDescription>
                 </SheetHeader>
-                <div className="flex-1 overflow-y-auto p-4 space-y-6">
+                <div className="flex-1 overflow-y-auto p-0 space-y-6">
                   {/* Suburb Hero Image */}
                   {typeof property.generalInformation.address.suburbName === 'object' &&
                     (property.generalInformation.address.suburbName as any)?.heroImage && (
-                      <div className="w-full">
+                      <div className="w-full px-4">
                         <img
                           src={getImageUrl(
                             (property.generalInformation.address.suburbName as any).heroImage.url,
@@ -1131,7 +1131,7 @@ const MarketInformation = ({ property }: { property: Property }) => {
                   {/* Suburb Description */}
                   {typeof property.generalInformation.address.suburbName === 'object' &&
                     (property.generalInformation.address.suburbName as any)?.description && (
-                      <div>
+                      <div className="px-4">
                         <h4 className="font-semibold text-base mb-2">About {suburbName}</h4>
                         <div className="text-sm text-muted-foreground leading-relaxed">
                           {(() => {
@@ -1186,7 +1186,7 @@ const MarketInformation = ({ property }: { property: Property }) => {
                       undefined &&
                     (property.generalInformation.address.suburbName as any)?.vacancyRate !==
                       null && (
-                      <div className="bg-muted/50 rounded-lg p-4">
+                      <div className="bg-muted/50 rounded-lg p-4 mx-4">
                         <div className="flex items-center gap-3">
                           <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
                             <svg
@@ -1242,13 +1242,13 @@ const MarketInformation = ({ property }: { property: Property }) => {
                             value: yearData.medianValue || yearData.value || 0,
                           }))}
                         suburbName={suburbName || 'Unknown Suburb'}
-                        className="w-full"
+                        className="w-full px-4"
                       />
                     )}
 
                   {/* Fallback message when no detailed suburb data is available */}
                   {typeof property.generalInformation.address.suburbName === 'string' && (
-                    <div className="text-center py-8">
+                    <div className="text-center py-8 px-4">
                       <div className="w-16 h-16 mx-auto mb-4 bg-muted rounded-full flex items-center justify-center">
                         <svg
                           className="w-8 h-8 text-muted-foreground"
@@ -1328,11 +1328,11 @@ const MarketInformation = ({ property }: { property: Property }) => {
                     developments, and area insights.
                   </SheetDescription>
                 </SheetHeader>
-                <div className="flex-1 overflow-y-auto p-4 space-y-6">
+                <div className="flex-1 overflow-y-auto p-0 space-y-6">
                   {/* Region Hero Image */}
                   {typeof property.generalInformation.address.region === 'object' &&
                     (property.generalInformation.address.region as any)?.heroImage && (
-                      <div className="w-full">
+                      <div className="w-full px-4">
                         <img
                           src={getImageUrl(
                             (property.generalInformation.address.region as any).heroImage.url,
@@ -1349,7 +1349,7 @@ const MarketInformation = ({ property }: { property: Property }) => {
                   {/* Region Description */}
                   {typeof property.generalInformation.address.region === 'object' &&
                     (property.generalInformation.address.region as any)?.description && (
-                      <div>
+                      <div className="px-4">
                         <h4 className="font-semibold text-base mb-2">About {regionName}</h4>
                         <div className="text-sm text-muted-foreground leading-relaxed">
                           {(() => {
@@ -1400,7 +1400,7 @@ const MarketInformation = ({ property }: { property: Property }) => {
                   {/* Region Video */}
                   {typeof property.generalInformation.address.region === 'object' &&
                     (property.generalInformation.address.region as any)?.video && (
-                      <div>
+                      <div className="px-4">
                         <h4 className="font-semibold text-base mb-3">Region Overview Video</h4>
                         <div className="aspect-video rounded-lg overflow-hidden">
                           <iframe
@@ -1425,7 +1425,7 @@ const MarketInformation = ({ property }: { property: Property }) => {
                     ) &&
                     (property.generalInformation.address.region as any).communityEconomicLandscape
                       .length > 0 && (
-                      <div>
+                      <div className="px-4">
                         <h4 className="font-semibold text-base mb-3">
                           Community & Economic Landscape
                         </h4>
@@ -1435,62 +1435,65 @@ const MarketInformation = ({ property }: { property: Property }) => {
                           ).communityEconomicLandscape.map((item: any, index: number) => (
                             <div
                               key={index}
-                              className="border rounded-lg p-4 hover:shadow-md transition-shadow"
+                              className="border rounded-lg overflow-hidden hover:shadow-md transition-shadow"
                             >
-                              <div className="flex items-start gap-3">
-                                {item.icon && (
-                                  <div className="w-8 h-8 flex-shrink-0">
-                                    <img
-                                      src={getImageUrl(item.icon.url)}
-                                      alt={item.icon.alt || item.title}
-                                      className="w-full h-full object-contain"
-                                    />
-                                  </div>
-                                )}
-                                <div className="flex-1">
-                                  <h5 className="font-semibold text-sm mb-1">{item.title}</h5>
-                                  {item.description && (
-                                    <div className="text-xs text-muted-foreground mb-2">
-                                      {safeRenderRichText(
-                                        item.description,
-                                        'No description available',
-                                      )}
-                                    </div>
-                                  )}
-                                  {item.url && (
-                                    <a
-                                      href={item.url}
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                      className="text-xs text-primary hover:underline inline-flex items-center gap-1"
-                                    >
-                                      Learn more
-                                      <svg
-                                        className="w-3 h-3"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        viewBox="0 0 24 24"
-                                      >
-                                        <path
-                                          strokeLinecap="round"
-                                          strokeLinejoin="round"
-                                          strokeWidth={2}
-                                          d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                                        />
-                                      </svg>
-                                    </a>
-                                  )}
-                                </div>
-                              </div>
-                              {item.image && (
-                                <div className="mt-3">
+                              {/* Full-width image at top if no icon */}
+                              {!item.icon && item.image && (
+                                <div className="w-full">
                                   <img
                                     src={getImageUrl(item.image.url)}
                                     alt={item.image.alt || item.title}
-                                    className="w-full h-32 object-cover rounded"
+                                    className="w-full h-32 object-cover"
                                   />
                                 </div>
                               )}
+                              <div className="p-4">
+                                <div className="flex items-start gap-3">
+                                  {item.icon && (
+                                    <div className="w-16 h-16 flex-shrink-0">
+                                      <img
+                                        src={getImageUrl(item.icon.url)}
+                                        alt={item.icon.alt || item.title}
+                                        className="w-full h-full object-contain"
+                                      />
+                                    </div>
+                                  )}
+                                  <div className="flex-1">
+                                    <h5 className="font-semibold text-sm mb-1">{item.title}</h5>
+                                    {item.description && (
+                                      <div className="text-xs text-muted-foreground mb-2">
+                                        {safeRenderRichText(
+                                          item.description,
+                                          'No description available',
+                                        )}
+                                      </div>
+                                    )}
+                                    {item.url && (
+                                      <a
+                                        href={item.url}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-xs text-primary hover:underline inline-flex items-center gap-1"
+                                      >
+                                        Learn more
+                                        <svg
+                                          className="w-3 h-3"
+                                          fill="none"
+                                          stroke="currentColor"
+                                          viewBox="0 0 24 24"
+                                        >
+                                          <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth={2}
+                                            d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                                          />
+                                        </svg>
+                                      </a>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
                             </div>
                           ))}
                         </div>
@@ -1507,7 +1510,7 @@ const MarketInformation = ({ property }: { property: Property }) => {
                     ) &&
                     (property.generalInformation.address.region as any)
                       .infrastructureFutureDevelopment.length > 0 && (
-                      <div>
+                      <div className="px-4">
                         <h4 className="font-semibold text-base mb-3">
                           Infrastructure & Future Development
                         </h4>
@@ -1517,62 +1520,65 @@ const MarketInformation = ({ property }: { property: Property }) => {
                           ).infrastructureFutureDevelopment.map((item: any, index: number) => (
                             <div
                               key={index}
-                              className="border rounded-lg p-4 hover:shadow-md transition-shadow"
+                              className="border rounded-lg overflow-hidden hover:shadow-md transition-shadow"
                             >
-                              <div className="flex items-start gap-3">
-                                {item.icon && (
-                                  <div className="w-8 h-8 flex-shrink-0">
-                                    <img
-                                      src={getImageUrl(item.icon.url)}
-                                      alt={item.icon.alt || item.title}
-                                      className="w-full h-full object-contain"
-                                    />
-                                  </div>
-                                )}
-                                <div className="flex-1">
-                                  <h5 className="font-semibold text-sm mb-1">{item.title}</h5>
-                                  {item.description && (
-                                    <div className="text-xs text-muted-foreground mb-2">
-                                      {safeRenderRichText(
-                                        item.description,
-                                        'No description available',
-                                      )}
-                                    </div>
-                                  )}
-                                  {item.url && (
-                                    <a
-                                      href={item.url}
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                      className="text-xs text-primary hover:underline inline-flex items-center gap-1"
-                                    >
-                                      Learn more
-                                      <svg
-                                        className="w-3 h-3"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        viewBox="0 0 24 24"
-                                      >
-                                        <path
-                                          strokeLinecap="round"
-                                          strokeLinejoin="round"
-                                          strokeWidth={2}
-                                          d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                                        />
-                                      </svg>
-                                    </a>
-                                  )}
-                                </div>
-                              </div>
-                              {item.image && (
-                                <div className="mt-3">
+                              {/* Full-width image at top if no icon */}
+                              {!item.icon && item.image && (
+                                <div className="w-full">
                                   <img
                                     src={getImageUrl(item.image.url)}
                                     alt={item.image.alt || item.title}
-                                    className="w-full h-32 object-cover rounded"
+                                    className="w-full h-32 object-cover"
                                   />
                                 </div>
                               )}
+                              <div className="p-4">
+                                <div className="flex items-start gap-3">
+                                  {item.icon && (
+                                    <div className="w-16 h-16 flex-shrink-0">
+                                      <img
+                                        src={getImageUrl(item.icon.url)}
+                                        alt={item.icon.alt || item.title}
+                                        className="w-full h-full object-contain"
+                                      />
+                                    </div>
+                                  )}
+                                  <div className="flex-1">
+                                    <h5 className="font-semibold text-sm mb-1">{item.title}</h5>
+                                    {item.description && (
+                                      <div className="text-xs text-muted-foreground mb-2">
+                                        {safeRenderRichText(
+                                          item.description,
+                                          'No description available',
+                                        )}
+                                      </div>
+                                    )}
+                                    {item.url && (
+                                      <a
+                                        href={item.url}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-xs text-primary hover:underline inline-flex items-center gap-1"
+                                      >
+                                        Learn more
+                                        <svg
+                                          className="w-3 h-3"
+                                          fill="none"
+                                          stroke="currentColor"
+                                          viewBox="0 0 24 24"
+                                        >
+                                          <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth={2}
+                                            d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                                          />
+                                        </svg>
+                                      </a>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
                             </div>
                           ))}
                         </div>
@@ -1581,7 +1587,7 @@ const MarketInformation = ({ property }: { property: Property }) => {
 
                   {/* Fallback message when no detailed region data is available */}
                   {typeof property.generalInformation.address.region === 'string' && (
-                    <div className="text-center py-8">
+                    <div className="text-center py-8 px-4">
                       <div className="w-16 h-16 mx-auto mb-4 bg-muted rounded-full flex items-center justify-center">
                         <svg
                           className="w-8 h-8 text-muted-foreground"

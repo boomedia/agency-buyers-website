@@ -49,9 +49,9 @@ export function getEmbedUrl(url: string): string {
  */
 export function isSupportedVideoUrl(url: string): boolean {
   if (!url) return false
-  
+
   const cleanUrl = url.trim().toLowerCase()
-  
+
   return (
     cleanUrl.includes('youtube.com') ||
     cleanUrl.includes('youtu.be') ||
@@ -65,20 +65,20 @@ export function isSupportedVideoUrl(url: string): boolean {
  */
 export function getVideoPlatform(url: string): string {
   if (!url) return 'Unknown'
-  
+
   const cleanUrl = url.trim().toLowerCase()
-  
+
   if (cleanUrl.includes('youtube.com') || cleanUrl.includes('youtu.be')) {
     return 'YouTube'
   }
-  
+
   if (cleanUrl.includes('vimeo.com')) {
     return 'Vimeo'
   }
-  
+
   if (cleanUrl.includes('loom.com')) {
     return 'Loom'
   }
-  
+
   return 'Unknown'
 }
