@@ -2,6 +2,17 @@ import type { CollectionConfig } from 'payload'
 import { generatePreviewPath } from '../utilities/generatePreviewPath'
 import { anyone } from '../access/anyone'
 import { authenticated } from '../access/authenticated'
+import {
+  FixedToolbarFeature,
+  HeadingFeature,
+  HorizontalRuleFeature,
+  InlineToolbarFeature,
+  lexicalEditor,
+  UnorderedListFeature,
+  OrderedListFeature,
+  LinkFeature,
+  ChecklistFeature,
+} from '@payloadcms/richtext-lexical'
 
 type WhereQuery = {
   id?:
@@ -213,6 +224,23 @@ export const Suburbs: CollectionConfig<'suburbs'> = {
       name: 'description',
       type: 'richText',
       label: 'Suburb Description',
+      editor: lexicalEditor({
+        features: ({ rootFeatures }) => {
+          return [
+            ...rootFeatures,
+            HeadingFeature({ enabledHeadingSizes: ['h1', 'h2', 'h3', 'h4'] }),
+            UnorderedListFeature(),
+            OrderedListFeature(),
+            LinkFeature({
+              enabledCollections: ['pages', 'posts'],
+            }),
+            ChecklistFeature(),
+            FixedToolbarFeature(),
+            InlineToolbarFeature(),
+            HorizontalRuleFeature(),
+          ]
+        },
+      }),
     },
     {
       name: 'medianValueByYear',
