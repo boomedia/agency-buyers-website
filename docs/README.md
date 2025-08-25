@@ -9,6 +9,7 @@ This documentation provides a comprehensive guide to the Payload CMS collections
 - **[Content Collections](./content-collections.md)** - Pages, Posts, Media, and Categories
 - **[User Management](./user-management.md)** - Users, Buyers Access, and Access Tokens
 - **[Field Reference](./field-reference.md)** - Detailed field definitions and types
+- **[Video URL Support](./video-url-support.md)** - Video embedding from YouTube, Vimeo, and Loom
 
 ## 🏗️ Quick Start
 

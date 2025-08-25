@@ -2,6 +2,17 @@ import type { CollectionConfig } from 'payload'
 import { generatePreviewPath } from '../utilities/generatePreviewPath'
 import { anyone } from '../access/anyone'
 import { authenticated } from '../access/authenticated'
+import {
+  FixedToolbarFeature,
+  HeadingFeature,
+  HorizontalRuleFeature,
+  InlineToolbarFeature,
+  lexicalEditor,
+  UnorderedListFeature,
+  OrderedListFeature,
+  LinkFeature,
+  ChecklistFeature,
+} from '@payloadcms/richtext-lexical'
 
 type WhereQuery = {
   id?:
@@ -51,7 +62,7 @@ export const Suburbs: CollectionConfig<'suburbs'> = {
     beforeChange: [
       ({ data }) => {
         // Convert empty strings and invalid number values to null for number fields to prevent PostgreSQL errors
-        const convertEmptyStrings = (obj: unknown): unknown => {
+        const convertEmptyStrings = (obj: unknown, currentPath: string = ''): unknown => {
           if (obj === '' || obj === '-' || obj === null || obj === undefined) return null
 
           // Handle invalid number strings that could cause JSON parsing errors
@@ -67,11 +78,23 @@ export const Suburbs: CollectionConfig<'suburbs'> = {
             }
           }
 
-          if (Array.isArray(obj)) return obj.map(convertEmptyStrings)
+          if (Array.isArray(obj))
+            return obj.map((item, index) => convertEmptyStrings(item, `${currentPath}[${index}]`))
           if (obj && typeof obj === 'object') {
             const result: Record<string, unknown> = {}
             for (const [key, value] of Object.entries(obj)) {
-              result[key] = convertEmptyStrings(value)
+              const fieldPath = currentPath ? `${currentPath}.${key}` : key
+              // Skip timestamp fields that should be managed by Payload automatically
+              if (
+                key === 'createdAt' ||
+                key === 'updatedAt' ||
+                key === 'created_at' ||
+                key === 'updated_at'
+              ) {
+                result[key] = value
+              } else {
+                result[key] = convertEmptyStrings(value, fieldPath)
+              }
             }
             return result
           }
@@ -201,6 +224,23 @@ export const Suburbs: CollectionConfig<'suburbs'> = {
       name: 'description',
       type: 'richText',
       label: 'Suburb Description',
+      editor: lexicalEditor({
+        features: ({ rootFeatures }) => {
+          return [
+            ...rootFeatures,
+            HeadingFeature({ enabledHeadingSizes: ['h1', 'h2', 'h3', 'h4'] }),
+            UnorderedListFeature(),
+            OrderedListFeature(),
+            LinkFeature({
+              enabledCollections: ['pages', 'posts'],
+            }),
+            ChecklistFeature(),
+            FixedToolbarFeature(),
+            InlineToolbarFeature(),
+            HorizontalRuleFeature(),
+          ]
+        },
+      }),
     },
     {
       name: 'medianValueByYear',

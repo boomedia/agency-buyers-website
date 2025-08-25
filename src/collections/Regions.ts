@@ -2,6 +2,16 @@ import type { CollectionConfig } from 'payload'
 import { generatePreviewPath } from '../utilities/generatePreviewPath'
 import { anyone } from '../access/anyone'
 import { authenticated } from '../access/authenticated'
+import {
+  FixedToolbarFeature,
+  HorizontalRuleFeature,
+  InlineToolbarFeature,
+  lexicalEditor,
+  UnorderedListFeature,
+  OrderedListFeature,
+  LinkFeature,
+  ChecklistFeature,
+} from '@payloadcms/richtext-lexical'
 
 type WhereQuery = {
   id?:
@@ -142,13 +152,29 @@ export const Regions: CollectionConfig<'regions'> = {
       name: 'description',
       type: 'richText',
       label: 'Region Description',
+      editor: lexicalEditor({
+        features: ({ rootFeatures }) => {
+          return [
+            ...rootFeatures,
+            UnorderedListFeature(),
+            OrderedListFeature(),
+            LinkFeature({
+              enabledCollections: ['pages', 'posts'],
+            }),
+            ChecklistFeature(),
+            FixedToolbarFeature(),
+            InlineToolbarFeature(),
+            HorizontalRuleFeature(),
+          ]
+        },
+      }),
     },
     {
       name: 'video',
       type: 'text',
       label: 'Region Video',
       admin: {
-        description: 'Video URL',
+        description: 'Video URL (supports YouTube, Vimeo, and Loom)',
       },
     },
     {

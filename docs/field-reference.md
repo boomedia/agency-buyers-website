@@ -282,6 +282,77 @@ Total Expenses = Council Rates + Insurance + Utilities +
 - **Format**: DD/MM/YYYY for Australian dates
 - **Input**: Calendar picker for date selection
 
+## Video URL Fields
+
+### Video Field Configuration
+Video fields in the system support multiple platforms and automatically convert sharing URLs to embed-compatible formats.
+
+#### Supported Platforms
+- **YouTube**: Standard watch URLs and youtu.be short URLs
+- **Vimeo**: Standard vimeo.com URLs
+- **Loom**: Share URLs from loom.com/share/
+
+#### URL Conversion Examples
+
+**YouTube URLs:**
+```
+Input:  https://youtube.com/watch?v=dQw4w9WgXcQ
+Output: https://www.youtube.com/embed/dQw4w9WgXcQ
+
+Input:  https://youtu.be/dQw4w9WgXcQ
+Output: https://www.youtube.com/embed/dQw4w9WgXcQ
+```
+
+**Vimeo URLs:**
+```
+Input:  https://vimeo.com/123456789
+Output: https://player.vimeo.com/video/123456789
+```
+
+**Loom URLs:**
+```
+Input:  https://www.loom.com/share/abc123def456
+Output: https://www.loom.com/embed/abc123def456
+```
+
+#### Field Configuration
+```typescript
+{
+  name: 'videoUrl',
+  type: 'text',
+  label: 'Video URL',
+  admin: {
+    description: 'Video URL (supports YouTube, Vimeo, and Loom)',
+  },
+}
+```
+
+#### Usage in Collections
+- **Properties**: `generalInformation.videoUrl` - Property presentation videos
+- **Regions**: `video` - Regional overview videos
+
+#### Frontend Implementation
+The video URLs are automatically converted to embed format using the `getEmbedUrl()` utility function:
+
+```typescript
+import { getEmbedUrl } from '@/utilities/videoUtils'
+
+// Usage in component
+<iframe
+  src={getEmbedUrl(videoUrl)}
+  className="w-full h-full rounded-lg"
+  allowFullScreen
+  title="Video"
+/>
+```
+
+#### User Instructions
+When adding video URLs in the admin panel:
+1. Copy the full URL from the video platform
+2. Paste the URL into the video field
+3. The system will automatically handle embed conversion
+4. All major sharing formats are supported (no need to use embed URLs)
+
 ## Best Practices
 
 ### Field Organization
